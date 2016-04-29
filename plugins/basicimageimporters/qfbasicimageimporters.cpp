@@ -39,6 +39,7 @@ QStringList QFBasicImageImporters::getIDs() const {
     res<<"imageimporter_rawfloat";
     res<<"imageimporter_rawdouble";
     res<<"imageimporter_csv";
+    res<<"imageimporter_ziti";
     return res;
 }
 
@@ -75,6 +76,9 @@ QFImporter* QFBasicImageImporters::createImporter(QString id) const  {
     }
     if (id=="imageimporter_csv") {
         return new QFImageReaderCSV();
+    }
+    if (id=="imageimporter_ziti") {
+        return new QFImageReaderZITI();
     }
     return NULL;
 }

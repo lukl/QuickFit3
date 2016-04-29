@@ -28,6 +28,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfpluginoptionsdialog.h"
 #include "qfimagereadertinytiff.h"
 #include "qfimagereadercsv.h"
+#include "qfimagereaderziti.h"
 
 /*!
     \defgroup qf3importerplugins_importers_basicimages Importer Plugin

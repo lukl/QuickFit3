@@ -41,7 +41,8 @@ HEADERS += qfbasicimageimporters.h \
     qfimagereadertinytiff.h \
     qfimagereaderdiffusion4binary.h \
     qfimagereaderraw.h \
-    qfimagereadercsv.h
+    qfimagereadercsv.h \
+    qfimagereaderziti.h
 
 SOURCES += qfbasicimageimporters.cpp\
            qfimagereaderlibtiff.cpp \
@@ -50,7 +51,8 @@ SOURCES += qfbasicimageimporters.cpp\
     qfimagereadertinytiff.cpp \
     qfimagereaderdiffusion4binary.cpp \
     qfimagereaderraw.cpp \
-    qfimagereadercsv.cpp
+    qfimagereadercsv.cpp \
+    qfimagereaderziti.cpp
 
 FORMS = \
     qfbasicimageimportersoptionswidget.ui
