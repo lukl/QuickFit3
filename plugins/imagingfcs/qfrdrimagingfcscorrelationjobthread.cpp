@@ -1375,7 +1375,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_series(float* image_series, 
         ccf_blockingLevel=(uint32_t*)qfCalloc(frame_width*frame_height,sizeof(uint32_t));
         ccf_blockingSuccess=(bool*)qfCalloc(frame_width*frame_height,sizeof(bool));
     }
-
+    #pragma omp parallel for
     for (int32_t y=0; y<(int32_t)frame_height; y++) {
         for (int32_t x=0; x<(int32_t)frame_width; x++) {
             int32_t p=y*(int32_t)frame_width+x;
@@ -1850,38 +1850,36 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
 
 void QFRDRImagingFCSCorrelationJobThread::contribute_to_correlations(QList<MultiTauCorrelator<double, double>* >& ccfjk, QList<correlatorjb<double, double>* >& ccfjb, float* frame_data, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frame, uint64_t segment_frames, double */*ccf_tau*/, double *ccf, double *ccf_std, uint64_t ccf_N) {
     if (job.correlator==CORRELATOR_MTAUALLMON) {
-        uint32_t i=0;
-        for (register uint32_t y=0; y<frame_height; y++) {
-            for (register uint32_t x=0; x<frame_width; x++) {
+        #pragma omp parallel for
+        for (uint32_t y=0; y<frame_height; y++) {
+            for (uint32_t x=0; x<frame_width; x++) {
 
                 const int32_t p=y*frame_width+x;
                 const int32_t x1=x+shiftX;
                 const int32_t y1=y+shiftY;
                 const int32_t p1=y1*frame_width+x1;
                 if ((x1>=0) && (x1<(int32_t)frame_width) && (y1>=0) && (y1<(int32_t)frame_height)) {
-
-                    ccfjk[i]->crosscorrelate_step(frame_data[p], frame_data[p1]);
+                    ccfjk[p]->crosscorrelate_step(frame_data[p], frame_data[p1]);
 
                     if ((frame%segment_frames)==(segment_frames-1)) {
-                        ccfjk[i]->crossnormalize();
+                        ccfjk[p]->crossnormalize();
                         //qDebug()<<"normalize jk ("<<x<<", "<<y<<": "<<i<<") !";
-                        double* corr1=ccfjk[i]->getCor();
+                        double* corr1=ccfjk[p]->getCor();
                         for (register uint32_t tt=0; tt<ccf_N; tt++) {
                             register double v=corr1[tt];
-                            ccf[i*ccf_N+tt]=ccf[i*ccf_N+tt]+v;
-                            ccf_std[i*ccf_N+tt]=ccf_std[i*ccf_N+tt]+v*v;
+                            ccf[p*ccf_N+tt]=ccf[p*ccf_N+tt]+v;
+                            ccf_std[p*ccf_N+tt]=ccf_std[p*ccf_N+tt]+v*v;
                         }
-                        delete ccfjk[i];
-                        ccfjk[i]=new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime);
+                        delete ccfjk[p];
+                        ccfjk[p]=new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime);
                     }
                 }
-                i++;
             }
         }
     } else {
-        uint32_t i=0;
-        for (register uint32_t y=0; y<frame_height; y++) {
-            for (register uint32_t x=0; x<frame_width; x++) {
+        #pragma omp parallel for
+        for (uint32_t y=0; y<frame_height; y++) {
+            for (uint32_t x=0; x<frame_width; x++) {
 
                 const int32_t p=y*frame_width+x;
                 const int32_t x1=x+shiftX;
@@ -1889,23 +1887,22 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_correlations(QList<Multi
                 const int32_t p1=y1*frame_width+x1;
                 if ((x1>=0) && (x1<(int32_t)frame_width) && (y1>=0) && (y1<(int32_t)frame_height)) {
 
-                    ccfjb[i]->run(frame_data[p], frame_data[p1]);
+                    ccfjb[p]->run(frame_data[p], frame_data[p1]);
 
                     if ((frame%segment_frames)==(segment_frames-1)) {
-                        double** corr1=ccfjb[i]->get_array_G();
+                        double** corr1=ccfjb[p]->get_array_G();
                         //qDebug()<<"normalize jb ("<<x<<", "<<y<<": "<<i<<") !";
                         for (register uint32_t tt=0; tt<ccf_N; tt++) {
                             register double v=corr1[1][tt];
-                            ccf[i*ccf_N+tt]=ccf[i*ccf_N+tt]+v;
-                            ccf_std[i*ccf_N+tt]=ccf_std[i*ccf_N+tt]+v*v;
+                            ccf[p*ccf_N+tt]=ccf[p*ccf_N+tt]+v;
+                            ccf_std[p*ccf_N+tt]=ccf_std[p*ccf_N+tt]+v*v;
                         }
-                        delete ccfjb[i];
-                        ccfjb[i]=new correlatorjb<double, double>(job.S, job.P, 0.0);
+                        delete ccfjb[p];
+                        ccfjb[p]=new correlatorjb<double, double>(job.S, job.P, 0.0);
                         qfFree(corr1[0]);
                         qfFree(corr1[1]);
                     }
                 }
-                i++;
             }
         }
     }
