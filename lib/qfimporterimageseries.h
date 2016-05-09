@@ -27,6 +27,12 @@
 #include <QVariant>
 #include "qfimporter.h"
 
+//Internal raw data format, used for high performance correlators
+//unknown / unsupported format
+#define QF_RDF_UNKNOWN 0
+//single bit information, used eg. by SPADS
+#define QF_RDF_PACKED1B 1
+
 /*! \brief interface for image reader classes
     \ingroup qf3importerplugins
 
@@ -113,6 +119,8 @@ class QFLIB_EXPORT QFImporterImageSeries: public QFImporter {
          *
          *  \note The dfeault implementation of this function returns 1!
          */
+        /** \brief Return type of raw data. Used for optimized correlators. */
+        virtual uint32_t intRawDataFormat(){return QF_RDF_UNKNOWN;}
         virtual uint32_t intFrameChannels();
         /** \brief read a new frame into the given array of floating point numbers */
         virtual bool intReadFrameFloat(float* data, int channel=0)=0;

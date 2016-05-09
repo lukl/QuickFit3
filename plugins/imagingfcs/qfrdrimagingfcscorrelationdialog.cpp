@@ -137,8 +137,8 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     connect(actCropBottomHalf, SIGNAL(triggered()), this, SLOT(cropBottomHalf()));
     ui->btnSelCrop->addAction(actCropBottomHalf);
 
-    //ui->cmbCorrelator->addItem(tr("Multi-Tau 2 (one monitor for all lags)"));
-    //ui->cmbCorrelator->addItem(tr("!!! Experimental Corelator from Shared Library [don't use]"));
+    ui->cmbCorrelator->addItem(tr("Multi-Tau 2 (one monitor for all lags)"));
+    ui->cmbCorrelator->addItem(tr("External Correlator (from shared library / DLL) [don't use]"));
 
 
 

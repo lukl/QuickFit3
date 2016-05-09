@@ -383,8 +383,10 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         ////////////////////////////////////////////////////////////////////////////////////////////
                         // RUN THE CORRELATION
                         ////////////////////////////////////////////////////////////////////////////////////////////
-                        if (job.correlator==CORRELATOR_MTAUALLMON || job.correlator==CORRELATOR_MTAUONEMON) {
+                        if (job.correlator==CORRELATOR_MTAUALLMON || job.correlator==CORRELATOR_MTAUONEMON){
                             correlate_loadsingle();
+                        } else if (job.correlator==CORRELATOR_CORRELATORFROMSHAREDLIB){
+                            correlate_blockwise();
                         } else {
                             correlate_loadall();
                         }
@@ -1375,6 +1377,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_series(float* image_series, 
         ccf_blockingLevel=(uint32_t*)qfCalloc(frame_width*frame_height,sizeof(uint32_t));
         ccf_blockingSuccess=(bool*)qfCalloc(frame_width*frame_height,sizeof(bool));
     }
+    qDebug() << "running parallel...";
     #pragma omp parallel for
     for (int32_t y=0; y<(int32_t)frame_height; y++) {
         for (int32_t x=0; x<(int32_t)frame_width; x++) {
@@ -1850,6 +1853,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
 
 void QFRDRImagingFCSCorrelationJobThread::contribute_to_correlations(QList<MultiTauCorrelator<double, double>* >& ccfjk, QList<correlatorjb<double, double>* >& ccfjb, float* frame_data, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frame, uint64_t segment_frames, double */*ccf_tau*/, double *ccf, double *ccf_std, uint64_t ccf_N) {
     if (job.correlator==CORRELATOR_MTAUALLMON) {
+        qDebug() << "running parallel...";
         #pragma omp parallel for
         for (uint32_t y=0; y<frame_height; y++) {
             for (uint32_t x=0; x<frame_width; x++) {
@@ -1876,7 +1880,8 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_correlations(QList<Multi
                 }
             }
         }
-    } else {
+    } else if (job.correlator==CORRELATOR_MTAUONEMON) {
+        qDebug() << "running parallel...";
         #pragma omp parallel for
         for (uint32_t y=0; y<frame_height; y++) {
             for (uint32_t x=0; x<frame_width; x++) {
@@ -1905,6 +1910,8 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_correlations(QList<Multi
                 }
             }
         }
+    } else {
+        qDebug() << "Correlator not implemented yet. Sorry!";
     }
 
 }
@@ -1933,11 +1940,13 @@ void QFRDRImagingFCSCorrelationJobThread::prepare_ccfs(QList<MultiTauCorrelator<
             acfjk.append(new MultiTauCorrelator<double, double>(job.S, job.m, job.P, job.frameTime));
         }
         acf_N=acfjk[0]->getSlots();
-    } else {
+    } else if (job.correlator==CORRELATOR_MTAUONEMON) {
         for (register uint32_t i=0; i<frame_width*frame_height; i++) {
             acfjb.append(new correlatorjb<double, double>(job.S, job.P, 0.0));
         }
         acf_N=job.S*job.P;
+    } else {
+        qDebug() << "Not implemented";
     }
 
     if (acf_N>0) {

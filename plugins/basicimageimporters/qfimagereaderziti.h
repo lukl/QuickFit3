@@ -145,6 +145,8 @@ protected:
         return height;
     }
 
+    inline virtual uint32_t intRawDataFormat() {return QF_RDF_PACKED1B;}
+
     inline virtual uint32_t intFrameChannels() {
         return channels;
     }

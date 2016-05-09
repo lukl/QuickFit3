@@ -68,6 +68,7 @@ class QFImageReaderRadhard : public QFImporterImageSeries
         virtual uint32_t intFrameWidth();
         /** \brief return the height of the frames (valid after open() returned \c true */
         virtual uint32_t intFrameHeight();
+        virtual uint32_t intRawDataFormat() {return QF_RDF_PACKED1B;}
         /** \brief read a new frame into the given array of floating point numbers */
         virtual bool intReadFrameFloat(float* data, int channel=0);
         /** \brief read a new frame into the given array of integers */
