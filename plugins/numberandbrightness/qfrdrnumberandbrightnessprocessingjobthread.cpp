@@ -2581,7 +2581,6 @@ void QFRDRNumberAndBrightnessProcessingJobThread::calcBleachCorrection(float* fi
         if (fit_frames && fit_t && NFitFrames>2) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
                 lm_control_struct control=lm_control_double;
-                control.maxcall=500;
                 lm_status_struct status;
 
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
@@ -2599,7 +2598,7 @@ void QFRDRNumberAndBrightnessProcessingJobThread::calcBleachCorrection(float* fi
                 //double par[2]={fit_I[0], fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2])};
                 double par[2]={pA, -1.0/pB};
                 //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
-                lmcurve_fit(2, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpLin, &control, &status);
+                lmcurve(2, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpLin, &control, &status);
                 //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
 
                 bleachAmplitude[i]=exp(par[0]);
@@ -2633,7 +2632,6 @@ void QFRDRNumberAndBrightnessProcessingJobThread::calcBleachCorrection(float* fi
         if (fit_frames && fit_t && NFitFrames>2) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
                 lm_control_struct control=lm_control_double;
-                control.maxcall=500;
                 lm_status_struct status;
 
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
@@ -2654,7 +2652,7 @@ void QFRDRNumberAndBrightnessProcessingJobThread::calcBleachCorrection(float* fi
                 double par[4]={pA, -1.0/pB,0};
                 //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
                 int npar=3;
-                lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly2Lin, &control, &status);
+                lmcurve(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly2Lin, &control, &status);
                 //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
 
                 bleachAmplitude[i]=exp(par[0]);
@@ -2698,7 +2696,6 @@ void QFRDRNumberAndBrightnessProcessingJobThread::calcBleachCorrection(float* fi
         if (fit_frames && fit_t && NFitFrames>2) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
                 lm_control_struct control=lm_control_double;
-                control.maxcall=500;
                 lm_status_struct status;
 
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
@@ -2719,9 +2716,9 @@ void QFRDRNumberAndBrightnessProcessingJobThread::calcBleachCorrection(float* fi
                 double par[4]={pA, -1.0/pB,0,0};
                 int npar=3;
                 //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
-                lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly2Lin, &control, &status);
+                lmcurve(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly2Lin, &control, &status);
                 npar++;
-                lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly3Lin, &control, &status);
+                lmcurve(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly3Lin, &control, &status);
                 //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
 
                 bleachAmplitude[i]=exp(par[0]);
@@ -2767,7 +2764,6 @@ void QFRDRNumberAndBrightnessProcessingJobThread::calcBleachCorrection(float* fi
         if (fit_frames && fit_t && NFitFrames>2) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
                 lm_control_struct control=lm_control_double;
-                control.maxcall=500;
                 lm_status_struct status;
 
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
@@ -2788,11 +2784,11 @@ void QFRDRNumberAndBrightnessProcessingJobThread::calcBleachCorrection(float* fi
                 double par[5]={pA, -1.0/pB,0,0,0};
                 int npar=3;
                 //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
-                lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly2Lin, &control, &status);
+                lmcurve(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly2Lin, &control, &status);
                 npar++;
-                lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly3Lin, &control, &status);
+                lmcurve(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly3Lin, &control, &status);
                 npar++;
-                lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly4Lin, &control, &status);
+                lmcurve(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly4Lin, &control, &status);
                 //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
 
                 bleachAmplitude[i]=exp(par[0]);
@@ -2839,7 +2835,6 @@ void QFRDRNumberAndBrightnessProcessingJobThread::calcBleachCorrection(float* fi
         if (fit_frames && fit_t && NFitFrames>2) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
                 lm_control_struct control=lm_control_double;
-                control.maxcall=500;
                 lm_status_struct status;
 
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
@@ -2860,13 +2855,13 @@ void QFRDRNumberAndBrightnessProcessingJobThread::calcBleachCorrection(float* fi
                 double par[6]={pA, -1.0/pB,0,0,0,0};
                 int npar=3;
                 //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
-                lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly2Lin, &control, &status);
+                lmcurve(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly2Lin, &control, &status);
                 npar++;
-                lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly3Lin, &control, &status);
+                lmcurve(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly3Lin, &control, &status);
                 npar++;
-                lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly4Lin, &control, &status);
+                lmcurve(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly4Lin, &control, &status);
                 npar++;
-                lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly5Lin, &control, &status);
+                lmcurve(npar, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExpPoly5Lin, &control, &status);
                 //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
 
                 bleachAmplitude[i]=exp(par[0]);
@@ -2915,7 +2910,6 @@ void QFRDRNumberAndBrightnessProcessingJobThread::calcBleachCorrection(float* fi
         if (fit_frames && fit_t && NFitFrames>2) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
                 lm_control_struct control=lm_control_double;
-                control.maxcall=500;
                 lm_status_struct status;
 
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
@@ -2937,11 +2931,11 @@ void QFRDRNumberAndBrightnessProcessingJobThread::calcBleachCorrection(float* fi
                 //double par[2]={fit_I[0], fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2])};
                 double par[4]={exp(par[0]), -1.0/pB,0,0};
                 //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
-                lmcurve_fit(2, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExp, &control, &status);
+                lmcurve(2, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fExp, &control, &status);
                 par[2]=par[0]/2.0;
                 par[0]=par[0]/2.0;
                 par[3]=par[1];
-                lmcurve_fit(4, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fDblExp, &control, &status);
+                lmcurve(4, par, NFitFrames, fit_t, fit_I, QFRDRNumberAndBrightnessProcessingJobThread_fDblExp, &control, &status);
                 //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
 
                 bleachAmplitude[i]=par[0];

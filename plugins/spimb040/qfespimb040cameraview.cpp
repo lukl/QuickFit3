@@ -1443,8 +1443,7 @@ void QFESPIMB040CameraView::prepareImage() {
                 pout[1]=pltDataMarginalLeftYMax-pltDataMarginalLeftYMin;
                 lm_status_struct status;
                 lm_control_struct control = lm_control_double;
-                control.printflags = 0; // monitor status (+1) and parameters (+2)
-                lmcurve_fit( n_par, pout, m_dat, pltDataMarginalLeftX, pltDataMarginalLeftY, fGauss, &control, &status );
+                lmcurve( n_par, pout, m_dat, pltDataMarginalLeftX, pltDataMarginalLeftY, fGauss, &control, &status );
                 for (uint32_t i=0; i<pltDataMarginalLeftFitN; i++) {
                     double x=(double)i*(double)pltDataMarginalLeftN/(double)pltDataMarginalLeftFitN;
                     pltDataMarginalFitLeftX[i]=x;
@@ -1471,8 +1470,7 @@ void QFESPIMB040CameraView::prepareImage() {
                 pout[0]=pltDataMarginalBottomYMin;
                 pout[1]=pltDataMarginalBottomYMax-pltDataMarginalBottomYMin;
                 control = lm_control_double;
-                control.printflags = 0; // monitor status (+1) and parameters (+2)
-                lmcurve_fit( n_par, pout, m_dat, pltDataMarginalBottomX, pltDataMarginalBottomY, fGauss, &control, &status );
+                lmcurve( n_par, pout, m_dat, pltDataMarginalBottomX, pltDataMarginalBottomY, fGauss, &control, &status );
                 for (uint32_t i=0; i<pltDataMarginalBottomFitN; i++) {
                     double x=(double)i*(double)pltDataMarginalBottomN/(double)pltDataMarginalBottomFitN;
                     pltDataMarginalFitBottomX[i]=x;
@@ -1503,8 +1501,7 @@ void QFESPIMB040CameraView::prepareImage() {
                 pout[1]=pltDataMarginalLeftYMax-pltDataMarginalLeftYMin;
                 lm_status_struct status;
                 lm_control_struct control = lm_control_double;
-                control.printflags = 0; // monitor status (+1) and parameters (+2)
-                lmcurve_fit( n_par, pout, m_dat, pltDataMarginalLeftX, pltDataMarginalLeftY, fSlit, &control, &status );
+                lmcurve( n_par, pout, m_dat, pltDataMarginalLeftX, pltDataMarginalLeftY, fSlit, &control, &status );
                 for (uint32_t i=0; i<pltDataMarginalLeftFitN; i++) {
                     double x=(double)i*(double)pltDataMarginalLeftN/(double)pltDataMarginalLeftFitN;
                     pltDataMarginalFitLeftX[i]=x;
@@ -1530,8 +1527,7 @@ void QFESPIMB040CameraView::prepareImage() {
                 pout[0]=pltDataMarginalBottomYMin;
                 pout[1]=pltDataMarginalBottomYMax-pltDataMarginalBottomYMin;
                 control = lm_control_double;
-                control.printflags = 0; // monitor status (+1) and parameters (+2)
-                lmcurve_fit( n_par, pout, m_dat, pltDataMarginalBottomX, pltDataMarginalBottomY, fSlit, &control, &status );
+                lmcurve( n_par, pout, m_dat, pltDataMarginalBottomX, pltDataMarginalBottomY, fSlit, &control, &status );
                 for (uint32_t i=0; i<pltDataMarginalBottomFitN; i++) {
                     double x=(double)i*(double)pltDataMarginalBottomN/(double)pltDataMarginalBottomFitN;
                     pltDataMarginalFitBottomX[i]=x;
@@ -1560,8 +1556,7 @@ void QFESPIMB040CameraView::prepareImage() {
                 pout[1]=pltDataMarginalLeftYMax-pltDataMarginalLeftYMin;
                 lm_status_struct status;
                 lm_control_struct control = lm_control_double;
-                control.printflags = 0; // monitor status (+1) and parameters (+2)
-                lmcurve_fit( n_par, pout, m_dat, pltDataMarginalLeftX, pltDataMarginalLeftY, fSigmoid, &control, &status );
+                lmcurve( n_par, pout, m_dat, pltDataMarginalLeftX, pltDataMarginalLeftY, fSigmoid, &control, &status );
                 for (uint32_t i=0; i<pltDataMarginalLeftFitN; i++) {
                     double x=(double)i*(double)pltDataMarginalLeftN/(double)pltDataMarginalLeftFitN;
                     pltDataMarginalFitLeftX[i]=x;
@@ -1587,8 +1582,7 @@ void QFESPIMB040CameraView::prepareImage() {
                 pout[0]=pltDataMarginalBottomYMin;
                 pout[1]=pltDataMarginalBottomYMax-pltDataMarginalBottomYMin;
                 control = lm_control_double;
-                control.printflags = 0; // monitor status (+1) and parameters (+2)
-                lmcurve_fit( n_par, pout, m_dat, pltDataMarginalBottomX, pltDataMarginalBottomY, fSigmoid, &control, &status );
+                lmcurve( n_par, pout, m_dat, pltDataMarginalBottomX, pltDataMarginalBottomY, fSigmoid, &control, &status );
                 for (uint32_t i=0; i<pltDataMarginalBottomFitN; i++) {
                     double x=(double)i*(double)pltDataMarginalBottomN/(double)pltDataMarginalBottomFitN;
                     pltDataMarginalFitBottomX[i]=x;
