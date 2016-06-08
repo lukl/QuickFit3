@@ -46,10 +46,10 @@ echo -e  "\n"
 
 
 #sh ../output/get_bit_depth.sh
-MORECFLAGS=" -mtune=generic -msse -msse2 -mmmx -mfpmath=sse"
+MORECFLAGS=" -march=native"
 MORELDFLAGS=
 if [ $MAKE_COMPILEFORLOCAL == "y" ] ; then
-	MORECFLAGS=" -mtune=native -msse -msse2 -mmmx -mfpmath=sse"
+	MORECFLAGS=" -march=native"
 fi
 if [ $MAKE_AGRESSIVEOPTIMIZATIONS == "y" ] ; then
 	MORECFLAGS=" $MORECFLAGS -ftree-vectorize -funroll-loops "
@@ -341,10 +341,10 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	mkdir build
 	tar xvf lmfit-5.1.tar -C ./build/
 	cd build/lmfit-5.1
-        export LDFLAGS="${LDFLAGS}  "
-        export CFLAGS="${CFLAGS}  "
-        export CPPFLAGS="${CPPFLAGS} "
-        ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit5  CFLAGS=" ${MORECFLAGS}" CPPFLAGS=" ${MORECFLAGS}"	LDFLAGS=" ${MORELDFLAGS}"
+        export LDFLAGS="${LDFLAGS} ${PICFLAGS} "
+        export CFLAGS="${CFLAGS} ${PICFLAGS} "
+        export CPPFLAGS="${CPPFLAGS} ${PICFLAGS} "
+        ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit5  CFLAGS=" ${MORECFLAGS} ${PICFLAGS}" CPPFLAGS=" ${MORECFLAGS} ${PICFLAGS}"	LDFLAGS=" ${MORELDFLAGS} ${PICFLAGS}"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}
