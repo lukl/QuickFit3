@@ -23,9 +23,9 @@ TEMPLATE = lib
 TARGET = quickfit3lib
 DEPENDPATH += .
 
+include(../quickfit3.pri)
 include(../extlibs/zlib.pri)
 include(../extlibsb040/tinymat.pri)
-include(../quickfit3.pri)
 include(../quickfit3_configqtwidgets.pri)
 include(../extlibs/quazip.pri)
 include(../extlibs/faddeeva.pri)
