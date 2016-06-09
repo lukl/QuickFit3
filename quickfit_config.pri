@@ -54,6 +54,10 @@ QMAKE_CXXFLAGS += -Wno-unused-variable -Wno-unused-but-set-variable -Werror=retu
 
 #-ftree-vectorizer-verbose=5
 
+contains( HAS_ZLIB, true ) {
+    DEFINES += QF_HAS_ZLIB
+}
+
 contains( HAS_LAPACK, true ) {
     DEFINES += QF_HAS_LAPACK
 }
@@ -118,10 +122,6 @@ contains( HAS_TIFF, true ) {
     DEFINES += QF_HAS_TIFF
 }
 
-contains( HAS_ZLIB, true ) {
-    DEFINES += QF_HAS_ZLIB
-}
-
 contains( HAS_USB0, true ) {
     DEFINES += QF_HAS_USB0
 }
@@ -134,15 +134,5 @@ contains( HAS_USB1, true ) {
     include(extlibs/eigen.pri)
     DEFINES += STATISTICS_TOOLS_MAY_USE_EIGEN3
 }
-
-
-
-
-
-
-
-
-
-
 
 DEFINES += STATISTICS_TOOLS_USE_QFTOOLS_H
