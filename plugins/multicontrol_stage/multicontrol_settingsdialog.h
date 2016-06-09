@@ -12,7 +12,7 @@
 
 
 #include "qfpluginservices.h"
-
+#include "qfdialog.h"
 
 class MulticontrolSettingsDialog : public QFDialog
 
