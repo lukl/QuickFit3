@@ -19,9 +19,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-INCLUDEPATH += $$PWD/cairo/include/cairo/ $$PWD/cairo/include/ cairo
-LIBS += -L$$PWD/cairo/lib/ -lcairo
-DEFINES += QF_HAS_LIBCAIRO
-include(pixman.pri)
-include(png.pri)
-win32:LIBS += -lgdi32
+!contains(DEFINES, QF_HAS_CAIRO) {
+	INCLUDEPATH += $$PWD/cairo/include/cairo/ $$PWD/cairo/include/ cairo
+	LIBS += -L$$PWD/cairo/lib/ -lcairo
+	DEFINES += QF_HAS_CAIRO
+	include(pixman.pri)
+	include(png.pri)
+	win32:LIBS += -lgdi32
+}else{
+	INCLUDEPATH += /usr/include/cairo/
+	LIBS += -lcairo
+}

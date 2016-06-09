@@ -21,25 +21,30 @@
 
 include(zlib.pri)
 
-DEFINES += QF_HAS_MINIZIP
+!contains(DEFINES, QF_HAS_MINIZIP) {
+	DEFINES += QF_HAS_MINIZIP
 
-INCLUDEPATH += $$QFOUTPUT/../extlibs/minizip/
+	INCLUDEPATH += $$QFOUTPUT/../extlibs/minizip/
 
-HEADERS += $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/crypt.h \
-           $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/ioapi.h \
-           $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/iowin32.h \
-           $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/mztools.h \
-           $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/unzip.h \
-           $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/zip.h 
-		   
+	HEADERS += $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/crypt.h \
+						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/ioapi.h \
+						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/iowin32.h \
+						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/mztools.h \
+						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/unzip.h \
+						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/zip.h 
+				
 
-SOURCES += $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/ioapi.c \
-           $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/iowin32.c \
-           $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/mztools.c \
-           $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/unzip.c \
-           $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/zip.c 
+	SOURCES += $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/ioapi.c \
+						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/iowin32.c \
+						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/mztools.c \
+						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/unzip.c \
+						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/zip.c 
 
-win32 {
-	HEADERS += $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/iowin32.h
-	SOURCES += $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/iowin32.c
+	win32 {
+		HEADERS += $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/iowin32.h
+		SOURCES += $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/iowin32.c
+	}
+}else{
+	INCLUDEPATH += /usr/include/minizip/
 }
+

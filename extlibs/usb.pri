@@ -19,9 +19,13 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-INCLUDEPATH += $$PWD/libusb/include/
-LIBS += -L$$PWD/libusb/lib/ -lusb
-DEFINES += QF_HAS_LIBUSB
-win32:LIBS += -lgdi32
+!contains(DEFINES, QF_HAS_USB0) {
+	INCLUDEPATH += $$PWD/libusb/include/
+	LIBS += -L$$PWD/libusb/lib/ -lusb
+	DEFINES += QF_HAS_USB0
+	win32:LIBS += -lgdi32
+}else{
+	LIBS += -lusb
+}
 
 include(usb1.0.pri)

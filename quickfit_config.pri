@@ -75,4 +75,75 @@ contains( HAS_LMFIT5, true ) {
     DEFINES += QF_HAS_LMFIT5
 }
 
+contains( HAS_CAIRO, true ) {
+    DEFINES += QF_HAS_CAIRO
+}
+
+contains( HAS_CIMG, true ) {
+    DEFINES += QF_HAS_CIMG
+}
+
+contains( HAS_EIGEN3, true ) {
+    DEFINES += QF_HAS_EIGEN3
+}
+
+contains( HAS_GSL, true ) {
+    DEFINES += QF_HAS_GSL
+}
+
+contains( HAS_JPEG, true ) {
+    DEFINES += QF_HAS_JPEG
+}
+
+contains( HAS_LEVMAR, true ) {
+    DEFINES += QF_HAS_LEVMAR
+}
+
+contains( HAS_MINIZIP, true ) {
+    DEFINES += QF_HAS_MINIZIP
+}
+
+contains( HAS_NLOPT, true ) {
+    DEFINES += QF_HAS_NLOPT
+}
+
+contains( HAS_OOL, true ) {
+    DEFINES += QF_HAS_OOL
+}
+
+contains( HAS_PIXMAN, true ) {
+    DEFINES += QF_HAS_PIXMAN
+}
+
+contains( HAS_PNG, true ) {
+    DEFINES += QF_HAS_PNG
+}
+
+contains( HAS_TIFF, true ) {
+    DEFINES += QF_HAS_TIFF
+}
+
+contains( HAS_ZLIB, true ) {
+    DEFINES += QF_HAS_ZLIB
+}
+
+contains( HAS_USB0, true ) {
+    DEFINES += QF_HAS_USB0
+}
+
+contains( HAS_USB1, true ) {
+    DEFINES += QF_HAS_USB1
+}
+
+
+
+
+
+
+
+
+
+
+
+
 DEFINES += STATISTICS_TOOLS_USE_QFTOOLS_H

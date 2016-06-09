@@ -19,5 +19,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-INCLUDEPATH += $$PWD/nlopt/include/
-LIBS += -L$$PWD/nlopt/lib/ -lnlopt_cxx
+!contains(DEFINES, QF_HAS_NLOPT) {
+	INCLUDEPATH += $$PWD/nlopt/include/
+	LIBS += -L$$PWD/nlopt/lib/ -lnlopt_cxx
+	DEFINES += QF_HAS_NLOPT
+}else{
+	LIBS += -lnlopt_cxx
+}

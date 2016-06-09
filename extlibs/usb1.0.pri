@@ -19,7 +19,12 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-INCLUDEPATH += $$PWD/libusb/include/libusb $$PWD/libusb/include/
-LIBS += -L$$PWD/libusb/lib/ -lusb-1.0
-DEFINES += QF_HAS_LIBUSB
-win32:LIBS += -lgdi32
+!contains(DEFINES, QF_HAS_USB1) {
+	INCLUDEPATH += $$PWD/libusb/include/libusb $$PWD/libusb/include/
+	LIBS += -L$$PWD/libusb/lib/ -lusb-1.0
+	DEFINES += QF_HAS_USB1
+	win32:LIBS += -lgdi32
+}else{
+	INCLUDEPATH += /usr/include/libusb/
+	LIBS += -lusb-1.0
+}

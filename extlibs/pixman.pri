@@ -21,6 +21,11 @@
 
 include(zlib.pri)
 include(png.pri)
-INCLUDEPATH += $$PWD/pixman/include/pixman-1/ $$PWD/pixman/include/ pixman-1
-LIBS += -L$$PWD/pixman/lib/ -lpixman-1
-DEFINES += QF_HAS_LIBPIXMAN
+
+!contains(DEFINES, QF_HAS_PIXMAN) {
+	INCLUDEPATH += $$PWD/pixman/include/pixman-1/ $$PWD/pixman/include/ pixman-1
+	LIBS += -L$$PWD/pixman/lib/ -lpixman-1
+	DEFINES += QF_HAS_PIXMAN
+}else{
+	LIBS += -lpixman-1
+}

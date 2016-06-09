@@ -19,11 +19,16 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-contains( HAS_LAPACK, true ) {
-   LIBS += $$LAPACK_LINK -L$$PWD/levmar/lib/ -llevmar
-   INCLUDEPATH += $$LAPACK_INCLUDE \
-                  $$PWD/levmar/include/
-} else {
-   LIBS += -L$$PWD/levmar/lib/ -llevmar
-   INCLUDEPATH += $$PWD/levmar/include/
+!contains(DEFINES, QF_HAS_LEVMAR) {
+	contains( HAS_LAPACK, true ) {
+		LIBS += $$LAPACK_LINK -L$$PWD/levmar/lib/ -llevmar
+		INCLUDEPATH += $$LAPACK_INCLUDE \
+										$$PWD/levmar/include/
+	} else {
+		LIBS += -L$$PWD/levmar/lib/ -llevmar
+		INCLUDEPATH += $$PWD/levmar/include/
+	}
+	DEFINES += QF_HAS_LEVMAR
+}else{
+	LIBS += -llevmar
 }

@@ -19,5 +19,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-INCLUDEPATH += $$PWD/ool/include/ $$PWD/ool/include/ool/
-LIBS += -L$$PWD/ool/lib/ -lool
+!contains(DEFINES, QF_HAS_OOL) {
+	INCLUDEPATH += $$PWD/ool/include/ $$PWD/ool/include/ool/
+	LIBS += -L$$PWD/ool/lib/ -lool
+	DEFINES += QF_HAS_OOL
+}else{
+	LIBS += -lool
+}

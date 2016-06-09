@@ -19,5 +19,9 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-INCLUDEPATH += $$PWD/eigen/include/
-INCLUDEPATH += /usr/include/eigen3/
+!contains(DEFINES, QF_HAS_EIGEN3) {
+	INCLUDEPATH += $$PWD/eigen/include/
+	DEFINES += QF_HAS_EIGEN3
+}else{
+	INCLUDEPATH += /usr/include/eigen3/
+}

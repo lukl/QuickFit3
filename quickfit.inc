@@ -11,10 +11,26 @@ HAS_BLAS = true
 BLAS_LIB = -lblas -lf2c -lm
 BLAS_INCLUDE =
 
-# if you have LMFIT3/5, you may use these lines:
+# SYSTEM LIBRARIES CONFIGURATION
+# If enabled, the corresponding system library is used (must be installed!).
+# Otherwise build library in extlibs (run build_dependencies.sh).
 #HAS_LMFIT3 = true
 HAS_LMFIT5 = true
-
+HAS_CAIRO = true
+HAS_CIMG = true
+HAS_EIGEN3 = true
+HAS_GSL = true
+HAS_JPEG = true
+HAS_LEVMAR = true
+HAS_MINIZIP = true
+HAS_NLOPT = true
+#HAS_OOL = true
+HAS_PIXMAN = true
+HAS_PNG = true
+HAS_TIFF = true
+HAS_ZLIB = true
+HAS_USB0 = true
+HAS_USB1 = true
 
 # deactivate non-standard plugins:
 

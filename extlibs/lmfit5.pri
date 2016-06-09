@@ -23,7 +23,11 @@
 	LIBS += -L$$PWD/lmfit5/lib/ -L$$PWD/lmfit5/lib64/ -llmfit
 	INCLUDEPATH += $$PWD/lmfit5/include/
 	DEFINES += QF_HAS_LMFIT5
+}else{
+	LIBS += -llmfit
 }
+
+
 
 
 

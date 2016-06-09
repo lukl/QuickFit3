@@ -19,9 +19,11 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-INCLUDEPATH += $$PWD/cimg/
-HEADERS += $$PWD/cimg/CImg.h
-win32:LIBS+=-lgdi32
-#PRECOMPILED_HEADER += cimg.h
+!contains(DEFINES, QF_HAS_CIMG) {
+	INCLUDEPATH += $$PWD/cimg/
+	HEADERS += $$PWD/cimg/CImg.h
+	win32:LIBS+=-lgdi32
+	#PRECOMPILED_HEADER += cimg.h
+}
 include (zlib.pri)
 #include (png.pri)

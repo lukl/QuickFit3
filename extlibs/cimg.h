@@ -9,19 +9,19 @@
 #  endif
 #endif
 
-#ifdef QF_HAS_LIBTIFF
+#ifdef QF_HAS_TIFF
 #  ifndef cimg_use_tiff
 #    define cimg_use_tiff
 #  endif
 #endif
 
-#ifdef QF_HAS_LIBJPEG
+#ifdef QF_HAS_JPEG
 #  ifndef cimg_use_jpeg
 #    define cimg_use_jpeg
 #  endif
 #endif
 
-#ifdef QF_HAS_LIBZ
+#ifdef QF_HAS_ZLIB
 #  ifndef cimg_use_zlib
 #    define cimg_use_zlib
 #  endif

@@ -19,11 +19,15 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-!contains(DEFINES, QF_HAS_LMFIT3) {
-    DEFINES += QF_HAS_LMFIT3
-    LIBS += -L$$PWD/lmfit/lib/ -L$$PWD/lmfit/lib64/ -llmmin
-    INCLUDEPATH += $$PWD/lmfit/include/
+!contains(DEFINES, QF_USE_SYSTEM_LMFIT3) {
+	LIBS += -L$$PWD/lmfit/lib/ -L$$PWD/lmfit/lib64/ -llmmin
+	INCLUDEPATH += $$PWD/lmfit/include/
+	DEFINES += QF_HAS_LMFIT3
+}else{
+	LIBS += -llmmin
 }
+
+
 
 
 
