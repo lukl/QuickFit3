@@ -62,11 +62,6 @@ contains( HAS_CBLAS, true ) {
     DEFINES += QF_HAS_CBLAS
 }
 
-!contains(QF3CONFIG, noeigen3lib) {
-    include(extlibs/eigen.pri)
-    DEFINES += STATISTICS_TOOLS_MAY_USE_EIGEN3
-}
-
 contains( HAS_LMFIT3, true ) {
     DEFINES += QF_HAS_LMFIT3
 }
@@ -135,6 +130,10 @@ contains( HAS_USB1, true ) {
     DEFINES += QF_HAS_USB1
 }
 
+!contains(QF3CONFIG, noeigen3lib) {
+    include(extlibs/eigen.pri)
+    DEFINES += STATISTICS_TOOLS_MAY_USE_EIGEN3
+}
 
 
 
