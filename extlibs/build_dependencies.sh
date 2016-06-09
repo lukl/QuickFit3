@@ -43,6 +43,8 @@ read -p "Do you want to optimize libraries for your local machine? (y/n)? " -n 1
 echo -e  "\n"
 read -p "Do you want to use OpenMP? (y/n)? " -n 1  MAKE_USEOPENMP
 echo -e  "\n"
+read -p "Should I try to build all libraries? (y/n)? " -n 1  BUILD_ALL
+echo -e  "\n"
 
 
 #sh ../output/get_bit_depth.sh
@@ -146,8 +148,12 @@ fi
 
 
 zlibOK=-1
-read -p "Do you want to build 'zlib' (y/n)? " -n 1 INSTALL_ANSWER
-echo -e  "\n"
+if [ $BUILD_ALL == "y" ] ; then
+	INSTALL_ANSWER="y"
+else
+	read -p "Do you want to build 'zlib' (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+fi
 if [ $INSTALL_ANSWER == "y" ] ; then
 	echo -e  "------------------------------------------------------------------------\n"\
 	"-- BUILDING: zlib                                                     --\n"\
@@ -280,8 +286,12 @@ echo -e "\n\n\n"
 
 
 lmfitOK=-1
-read -p "Do you want to build 'lmfit' (y/n)? " -n 1 INSTALL_ANSWER
-echo -e  "\n"
+if [ $BUILD_ALL == "y" ] ; then
+	INSTALL_ANSWER="y"
+else
+	read -p "Do you want to build 'lmfit' (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+fi
 if [ $INSTALL_ANSWER == "y" ] ; then
 	echo -e  "\n------------------------------------------------------------------------\n"\
 	"-- BUILDING: lmfit                                                    --\n"\
@@ -330,8 +340,12 @@ fi
 
 
 lmfit5OK=-1
-read -p "Do you want to build 'lmfit v5' (y/n)? " -n 1 INSTALL_ANSWER
-echo -e  "\n"
+if [ $BUILD_ALL == "y" ] ; then
+	INSTALL_ANSWER="y"
+else
+	read -p "Do you want to build 'lmfit v5' (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+fi
 if [ $INSTALL_ANSWER == "y" ] ; then
 	echo -e  "\n------------------------------------------------------------------------\n"\
 	"-- BUILDING: lmfit v5                                                 --\n"\
@@ -377,9 +391,12 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 fi
 
 
-
-read -p "Do you want to build 'levmar' (y/n)? " -n 1 INSTALL_ANSWER
-echo -e  "\n"
+if [ $BUILD_ALL == "y" ] ; then
+	INSTALL_ANSWER="y"
+else
+	read -p "Do you want to build 'levmar' (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+fi
 levmarOK=-1
 if [ $INSTALL_ANSWER == "y" ] ; then
 	echo -e  "\n------------------------------------------------------------------------\n"\
@@ -473,8 +490,12 @@ fi
 
 
 libpngOK=-1
-read -p "Do you want to build 'libpng' (y/n)? " -n 1 INSTALL_ANSWER
-echo -e  "\n"
+if [ $BUILD_ALL == "y" ] ; then
+	INSTALL_ANSWER="y"
+else
+	read -p "Do you want to build 'libpng' (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+fi
 if [ $INSTALL_ANSWER == "y" ] ; then
 	echo -e  "\n------------------------------------------------------------------------\n"\
 	"-- BUILDING: libpng                                                    --\n"\
@@ -542,8 +563,12 @@ fi
 
 
 libJPEGOK=-1
-read -p "Do you want to build 'libJPEG' (y/n)? " -n 1 INSTALL_ANSWER
-echo -e  "\n"
+if [ $BUILD_ALL == "y" ] ; then
+	INSTALL_ANSWER="y"
+else
+	read -p "Do you want to build 'libJPEG' (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+fi
 if [ $INSTALL_ANSWER == "y" ] ; then
 	echo -e  "\n------------------------------------------------------------------------\n"\
 	"-- BUILDING: libJPEG                                                  --\n"\
@@ -594,8 +619,12 @@ fi
 
 
 libtiffOK=-1
-read -p "Do you want to build 'libtiff' (y/n)? " -n 1 INSTALL_ANSWER
-echo -e  "\n"
+if [ $BUILD_ALL == "y" ] ; then
+	INSTALL_ANSWER="y"
+else
+	read -p "Do you want to build 'libtiff' (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+fi
 if [ $INSTALL_ANSWER == "y" ] ; then
 	echo -e  "\n------------------------------------------------------------------------\n"\
 	"-- BUILDING: libtiff                                                   --\n"\
@@ -643,8 +672,12 @@ fi
 
 
 libgslOK=-1
-read -p "Do you want to build 'gsl' (y/n)? " -n 1 INSTALL_ANSWER
-echo -e  "\n"
+if [ $BUILD_ALL == "y" ] ; then
+	INSTALL_ANSWER="y"
+else
+	read -p "Do you want to build 'gsl' (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+fi
 if [ $INSTALL_ANSWER == "y" ] ; then
 	echo -e  "\n------------------------------------------------------------------------\n"\
 	"-- BUILDING: gsl                                                       --\n"\
@@ -692,8 +725,12 @@ if [ -e ${CURRENTDIR}/gsl/lib/libgsl.a ] ; then
 fi
 
 libusbOK=-1
-read -p "Do you want to build 'libusb' (y/n)? " -n 1 INSTALL_ANSWER
-echo -e  "\n"
+if [ $BUILD_ALL == "y" ] ; then
+	INSTALL_ANSWER="y"
+else
+	read -p "Do you want to build 'libusb' (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+fi
 if [ $INSTALL_ANSWER == "y" ] ; then
 
 	echo -e  "------------------------------------------------------------------------\n"\
@@ -839,8 +876,12 @@ fi
 
 
 eigenOK=-1
-read -p "Do you want to build 'eigen' (y/n)? " -n 1 INSTALL_ANSWER
-echo -e  "\n"
+if [ $BUILD_ALL == "y" ] ; then
+	INSTALL_ANSWER="y"
+else
+	read -p "Do you want to build 'eigen' (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+fi
 if [ $INSTALL_ANSWER == "y" ] ; then
 	echo -e  "------------------------------------------------------------------------\n"\
 	"-- BUILDING: eigen                                                    --\n"\
@@ -875,8 +916,12 @@ fi
 
 
 libnloptOK=-1
-read -p "Do you want to build 'NLopt' (y/n)? " -n 1 INSTALL_ANSWER
-echo -e  "\n"
+if [ $BUILD_ALL == "y" ] ; then
+	INSTALL_ANSWER="y"
+else
+	read -p "Do you want to build 'NLopt' (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"	
+fi
 if [ $INSTALL_ANSWER == "y" ] ; then
 	echo -e  "\n------------------------------------------------------------------------\n"\
 	"-- BUILDING: nlopt                                                     --\n"\
@@ -962,8 +1007,12 @@ fi
 
 
 libOOLOK=-1
-read -p "Do you want to build 'OOL' (y/n)? " -n 1 INSTALL_ANSWER
-echo -e  "\n"
+if [ $BUILD_ALL == "y" ] ; then
+	INSTALL_ANSWER="y"
+else
+	read -p "Do you want to build 'OOL' (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+fi
 if [ $INSTALL_ANSWER == "y" ] ; then
 	echo -e  "\n------------------------------------------------------------------------\n"\
 	"-- BUILDING: OOL                                                       --\n"\
@@ -1004,8 +1053,12 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 fi
 
 cimgOK=-1
-read -p "Do you want to build 'cimg' (y/n)? " -n 1 INSTALL_ANSWER
-echo -e  "\n"
+if [ $BUILD_ALL == "y" ] ; then
+	INSTALL_ANSWER="y"
+else
+	read -p "Do you want to build 'cimg' (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+fi
 if [ $INSTALL_ANSWER == "y" ] ; then
 	echo -e  "------------------------------------------------------------------------\n"\
 	"-- BUILDING: cimg                                                     --\n"\
@@ -1039,8 +1092,12 @@ fi
 
 
 libpixmanOK=-1
-read -p "Do you want to build 'pixman' (y/n)? " -n 1 INSTALL_ANSWER
-echo -e  "\n"
+if [ $BUILD_ALL == "y" ] ; then
+	INSTALL_ANSWER="y"
+else
+	read -p "Do you want to build 'pixman' (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+fi
 if [ $INSTALL_ANSWER == "y" ] ; then
 	echo -e  "\n------------------------------------------------------------------------\n"\
 	"-- BUILDING: pixman                                                   --\n"\
@@ -1081,8 +1138,12 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 fi
 
 libcairoOK=-1
-read -p "Do you want to build 'cairo' (y/n)? " -n 1 INSTALL_ANSWER
-echo -e  "\n"
+if [ $BUILD_ALL == "y" ] ; then
+	INSTALL_ANSWER="y"
+else
+	read -p "Do you want to build 'cairo' (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+fi
 if [ $INSTALL_ANSWER == "y" ] ; then
 	echo -e  "\n------------------------------------------------------------------------\n"\
 	"-- BUILDING: cairo                                                   --\n"\
