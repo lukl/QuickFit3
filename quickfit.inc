@@ -11,6 +11,10 @@ HAS_BLAS = true
 BLAS_LIB = -lblas -lf2c -lm
 BLAS_INCLUDE =
 
+# if you have LMFIT3/5, you may use these lines:
+#HAS_LMFIT3 = true
+HAS_LMFIT5 = true
+
 
 # deactivate non-standard plugins:
 

@@ -67,4 +67,12 @@ contains( HAS_CBLAS, true ) {
     DEFINES += STATISTICS_TOOLS_MAY_USE_EIGEN3
 }
 
+contains( HAS_LMFIT3, true ) {
+    DEFINES += QF_HAS_LMFIT3
+}
+
+contains( HAS_LMFIT5, true ) {
+    DEFINES += QF_HAS_LMFIT5
+}
+
 DEFINES += STATISTICS_TOOLS_USE_QFTOOLS_H

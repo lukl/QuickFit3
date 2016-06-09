@@ -19,11 +19,11 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-#!contains(DEFINES, QF_HAS_LMFIT) {
-    DEFINES += QF_HAS_LMFIT
-    LIBS += -L$$PWD/lmfit/lib/ -L$$PWD/lmfit/lib64/ -llmfit
+!contains(DEFINES, QF_HAS_LMFIT3) {
+    DEFINES += QF_HAS_LMFIT3
+    LIBS += -L$$PWD/lmfit/lib/ -L$$PWD/lmfit/lib64/ -llmmin
     INCLUDEPATH += $$PWD/lmfit/include/
-#}
+}
 
 
 
