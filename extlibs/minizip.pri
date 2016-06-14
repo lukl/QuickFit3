@@ -24,27 +24,46 @@ include(zlib.pri)
 !contains(DEFINES, QF_HAS_MINIZIP) {
 	DEFINES += QF_HAS_MINIZIP
 
-	INCLUDEPATH += $$QFOUTPUT/../extlibs/minizip/
+#	INCLUDEPATH += $$QFOUTPUT/../extlibs/minizip/
+#
+#	HEADERS += $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/crypt.h \
+#						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/ioapi.h \
+#						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/iowin32.h \
+#						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/mztools.h \
+#						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/unzip.h \
+#						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/zip.h 
+#				
+#
+#	SOURCES += $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/ioapi.c \
+#						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/iowin32.c \
+#						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/mztools.c \
+#						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/unzip.c \
+#						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/zip.c 
+#
+#	win32 {
+#		HEADERS += $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/iowin32.h
+#		SOURCES += $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/iowin32.c
+#	}
 
-	HEADERS += $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/crypt.h \
-						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/ioapi.h \
-						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/iowin32.h \
-						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/mztools.h \
-						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/unzip.h \
-						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/zip.h 
-				
+	INCLUDEPATH += \
+		$$PWD/../plugins/qfe_dataexportbasics_xlsx/libxlsxwriter-master/third_party/ \
+		$$PWD/../plugins/qfe_dataexportbasics_xlsx/libxlsxwriter-master/third_party/minizip/
+	
+	HEADERS += \
+		$$PWD/../plugins/qfe_dataexportbasics_xlsx/libxlsxwriter-master/third_party/minizip/crypt.h \
+		$$PWD/../plugins/qfe_dataexportbasics_xlsx/libxlsxwriter-master/third_party/minizip/ioapi.h \
+		$$PWD/../plugins/qfe_dataexportbasics_xlsx/libxlsxwriter-master/third_party/minizip/iowin32.h \
+		$$PWD/../plugins/qfe_dataexportbasics_xlsx/libxlsxwriter-master/third_party/minizip/mztools.h \
+		$$PWD/../plugins/qfe_dataexportbasics_xlsx/libxlsxwriter-master/third_party/minizip/unzip.h \
+		$$PWD/../plugins/qfe_dataexportbasics_xlsx/libxlsxwriter-master/third_party/minizip/zip.h
 
-	SOURCES += $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/ioapi.c \
-						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/iowin32.c \
-						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/mztools.c \
-						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/unzip.c \
-						$$QFOUTPUT/../extlibs/minizip/minizip/unzip11/zip.c 
+	SOURCES += \
+		$$PWD/../plugins/qfe_dataexportbasics_xlsx/libxlsxwriter-master/third_party/minizip/ioapi.c \
+		$$PWD/../plugins/qfe_dataexportbasics_xlsx/libxlsxwriter-master/third_party/minizip/zip.c
 
-	win32 {
-		HEADERS += $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/iowin32.h
-		SOURCES += $$QFOUTPUT/../extlibs/minizip/minizip/unzip11/iowin32.c
-	}
+
 }else{
 	INCLUDEPATH += /usr/include/minizip/
+	LIBS += -lminizip
 }
 

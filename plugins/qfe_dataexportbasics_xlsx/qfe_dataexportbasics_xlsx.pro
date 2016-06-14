@@ -26,8 +26,10 @@ TARGET = qfe_dataexportbasics_xlsx
 DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 
+
 include(../../qf3plugins.pri)
 include(../../extlibs/zlib.pri)
+include(../../extlibs/minizip.pri)
 include(../../libquickfitwidgets.pri)
 
 DESTDIR = $${QFOUTPUT}/plugins/
