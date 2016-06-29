@@ -23,7 +23,7 @@
 #include "qfespimb040samplestagestepconfigdialog.h"
 #include "ui_qfespimb040samplestagestepconfigdialog.h"
 
-QFESPIMB040SampleStageStepConfigDialog::QFESPIMB040SampleStageStepConfigDialog(double x, double y, double z, QWidget *parent) :
+QFESPIMB040SampleStageStepConfigDialog::QFESPIMB040SampleStageStepConfigDialog(double x, double y, double z, double R, QWidget *parent) :
     QFDialog(parent),
     ui(new Ui::QFESPIMB040SampleStageStepConfigDialog)
 {
@@ -31,6 +31,7 @@ QFESPIMB040SampleStageStepConfigDialog::QFESPIMB040SampleStageStepConfigDialog(d
     ui->spinX->setValue(x);
     ui->spinY->setValue(y);
     ui->spinZ->setValue(z);
+    ui->spinR->setValue(R);
 }
 
 QFESPIMB040SampleStageStepConfigDialog::~QFESPIMB040SampleStageStepConfigDialog()
@@ -48,4 +49,8 @@ double QFESPIMB040SampleStageStepConfigDialog::y() const {
 
 double QFESPIMB040SampleStageStepConfigDialog::z() const {
     return ui->spinZ->value();
+}
+
+double QFESPIMB040SampleStageStepConfigDialog::R() const {
+    return ui->spinR->value();
 }

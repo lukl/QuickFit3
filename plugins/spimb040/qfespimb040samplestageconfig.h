@@ -115,9 +115,11 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         void stepX();
         void stepY();
         void stepZ();
+        void stepR();
         void stepMinusX();
         void stepMinusY();
         void stepMinusZ();
+        void stepMinusR();
 
     protected slots:
         void updateStates();
@@ -125,8 +127,9 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         void stageXMoved(QFExtensionLinearStage::AxisState state, double position, double velocity);
         void stageYMoved(QFExtensionLinearStage::AxisState state, double position, double velocity);
         void stageZMoved(QFExtensionLinearStage::AxisState state, double position, double velocity);
+        void stageRMoved(QFExtensionLinearStage::AxisState state, double position, double velocity);
         void joystickStateChanged(bool enabled);
-        void stagesConnectedChanged(bool connX, bool connY, bool connZ);
+        void stagesConnectedChanged(bool connX, bool connY, bool connZ, bool connR);
         void threadStarted();
         void threadFinished();
     protected:
@@ -148,6 +151,8 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         QFStageComboBox* cmbStageY;
         /** \brief combobox to select a z-stage */
         QFStageComboBox* cmbStageZ;
+        /** \brief combobox to select a Rot-stage */
+        QFStageComboBox* cmbStageR;
 
         /** \brief tool button to connect to stage for axis x */
         QToolButton* btnConnectX;
@@ -155,15 +160,19 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         QToolButton* btnConnectY;
         /** \brief tool button to connect to stage for axis z */
         QToolButton* btnConnectZ;
+        /** \brief tool button to connect to stage for axis rot */
+        QToolButton* btnConnectR;
 
-        /** \brief tool button to configuzre stage for axis x */
+        /** \brief tool button to configure stage for axis x */
         QToolButton* btnConfigureX;
-        /** \brief tool button to configuzre stage for axis y */
+        /** \brief tool button to configure stage for axis y */
         QToolButton* btnConfigureY;
-        /** \brief tool button to configuzre stage for axis z */
+        /** \brief tool button to configure stage for axis z */
         QToolButton* btnConfigureZ;
+        /** \brief tool button to configure stage for axis rot */
+        QToolButton* btnConfigureR;
 
-        /** \brief checkbox to en-/disable the joystic for all axes at once */
+        /** \brief checkbox to en-/disable the joystic for all axes (but rot) at once */
         QCheckBox* chkJoystick;
         /** \brief edit to give the maximum speed of the joystick in micron/sec */
         QDoubleSpinBox* spinJoystickMaxSpeed;
@@ -174,6 +183,8 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         QDoubleSpinBox* spinMoveY;
         /** \brief edit to give z coordinate for movement */
         QDoubleSpinBox* spinMoveZ;
+        /** \brief edit to give Rot coordinate for movement */
+        QDoubleSpinBox* spinMoveR;
         /** \brief button for absolute movement */
         QPushButton* btnMoveAbsolute;
         /** \brief button for relative movement */
@@ -185,22 +196,30 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         QLabel* labXState;
         /** \brief label for x-axis position */
         QLabel* labXPosition;
-        /** \brief label for x-axis position */
+        /** \brief label for x-axis speed */
         QLabel* labXSpeed;
 
         /** \brief label for y-axis state */
         QLabel* labYState;
         /** \brief label for y-axis position */
         QLabel* labYPosition;
-        /** \brief label for y-axis position */
+        /** \brief label for y-axis speed */
         QLabel* labYSpeed;
 
         /** \brief label for z-axis state */
         QLabel* labZState;
         /** \brief label for z-axis position */
         QLabel* labZPosition;
-        /** \brief label for z-axis position */
+        /** \brief label for z-axis speed */
         QLabel* labZSpeed;
+
+        /** \brief label for Rot-axis state */
+        QLabel* labRState;
+        /** \brief label for Rot-axis position */
+        QLabel* labRPosition;
+        /** \brief label for Rot-axis speed */
+        QLabel* labRSpeed;
+
         /** \brief label to display joystick status */
         QLabel* labJoystick;
         //QLabel* labThread;
@@ -216,13 +235,17 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         QAction* actConnectY;
         /** \brief action to connect to stage for axis z */
         QAction* actConnectZ;
+        /** \brief action to connect to stage for axis Rot */
+        QAction* actConnectR;
 
-        /** \brief action to configuzre stage for axis x */
+        /** \brief action to configure stage for axis x */
         QAction* actConfigureX;
-        /** \brief action to configuzre stage for axis y */
+        /** \brief action to configure stage for axis y */
         QAction* actConfigureY;
-        /** \brief action to configuzre stage for axis z */
+        /** \brief action to configure stage for axis z */
         QAction* actConfigureZ;
+        /** \brief action to configure stage for axis Rot */
+        QAction* actConfigureR;
 
         QAction* actConfigSteps;
         QToolButton* btnConfigSteps;
@@ -247,6 +270,7 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         double m_stepX;
         double m_stepY;
         double m_stepZ;
+        double m_stepR;
 
         bool useThread;
 
@@ -263,6 +287,9 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         /** \brief return a pointer to the z-axis stage class */
         QFExtensionLinearStage* getZStage();
 
+        /** \brief return a pointer to the Rot-axis stage class */
+        QFExtensionLinearStage* getRStage();
+
         /** \brief return a pointer to the x-axis QFExtension class */
         QFExtension* getXStageExtension();
 
@@ -272,6 +299,9 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         /** \brief return a pointer to the z-axis QFExtension class */
         QFExtension* getZStageExtension();
 
+        /** \brief return a pointer to the Rot-axis QFExtension class */
+        QFExtension* getRStageExtension();
+
         /** \brief return a pointer to the x-axis QObject class */
         QObject* getXStageExtensionObject();
 
@@ -280,6 +310,9 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
 
         /** \brief return a pointer to the z-axis QObject class */
         QObject* getZStageExtensionObject();
+
+        /** \brief return a pointer to the Rot-axis QObject class */
+        QObject* getRStageExtensionObject();
 
 
 
@@ -292,18 +325,24 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         /** \brief get the axis number of z-axis stage inside its class */
         int getZStageAxis();
 
+        /** \brief get the axis number of Rot-axis stage inside its class */
+        int getRStageAxis();
+
         bool isXStageConnected() const;
         bool isYStageConnected() const;
         bool isZStageConnected() const;
+        bool isRStageConnected() const;
 
-        void moveRelative(double x, double y, double z);
+        void moveRelative(double x, double y, double z, double R);
     protected slots:
         void disConnectX();
         void disConnectY();
         void disConnectZ();
+        void disConnectR();
         void configureX();
         void configureY();
         void configureZ();
+        void configureR();
         void updateJoystick();
         void displayAxisStates();
         void moveAbsolute();

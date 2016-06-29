@@ -46,7 +46,7 @@
 QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QWidget* parent, bool useThread):
     QGroupBox(parent)
 {
-    setTitle(tr(" Sample Translation Stages: "));
+    setTitle(tr(" Sample Translation and Rotation Stages: "));
 
     timUpdate=new QTimer(this);
     timUpdate->setSingleShot(true);
@@ -56,15 +56,16 @@ QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QWidget* parent, bool
     m_pluginServices=NULL;
     locked=false;
 
-    m_stepX=m_stepY=m_stepZ=1;
+    m_stepX=m_stepY=m_stepZ=m_stepR=1;
 
     this->useThread=useThread;
     stageThread=new QFESPIMB040SampleStageConfigThread(this);
     connect(stageThread, SIGNAL(joystickStateChanged(bool)), this, SLOT(joystickStateChanged(bool)));
-    connect(stageThread, SIGNAL(stagesConnectedChanged(bool,bool,bool)), this, SLOT(stagesConnectedChanged(bool,bool,bool)));
+    connect(stageThread, SIGNAL(stagesConnectedChanged(bool,bool,bool, bool)), this, SLOT(stagesConnectedChanged(bool,bool,bool, bool)));
     connect(stageThread, SIGNAL(stageXMoved(QFExtensionLinearStage::AxisState,double,double)), this, SLOT(stageXMoved(QFExtensionLinearStage::AxisState,double,double)));
     connect(stageThread, SIGNAL(stageYMoved(QFExtensionLinearStage::AxisState,double,double)), this, SLOT(stageYMoved(QFExtensionLinearStage::AxisState,double,double)));
     connect(stageThread, SIGNAL(stageZMoved(QFExtensionLinearStage::AxisState,double,double)), this, SLOT(stageZMoved(QFExtensionLinearStage::AxisState,double,double)));
+    connect(stageThread, SIGNAL(stageRMoved(QFExtensionLinearStage::AxisState,double,double)), this, SLOT(stageRMoved(QFExtensionLinearStage::AxisState,double,double)));
     connect(stageThread, SIGNAL(started()), this, SLOT(threadStarted()));
     connect(stageThread, SIGNAL(finished()), this, SLOT(threadFinished()));
     connect(stageThread, SIGNAL(terminated()), this, SLOT(threadFinished()));
@@ -153,11 +154,13 @@ void QFESPIMB040SampleStageConfig::init(QFPluginLogService* log, QFPluginService
         cmbStageX->init(m_pluginServices->getExtensionManager());
         cmbStageY->init(m_pluginServices->getExtensionManager());
         cmbStageZ->init(m_pluginServices->getExtensionManager());
+        cmbStageR->init(m_pluginServices->getExtensionManager());
     } else {
         //stages.clear();
         cmbStageX->clear();
         cmbStageY->clear();
         cmbStageZ->clear();
+        cmbStageR->clear();
     }
     updateStates();
 }
@@ -170,6 +173,7 @@ void QFESPIMB040SampleStageConfig::loadSettings(QSettings& settings, QString pre
         cmbStageX->loadSettings(settings, prefix+"stage_x/");
         cmbStageY->loadSettings(settings, prefix+"stage_y/");
         cmbStageZ->loadSettings(settings, prefix+"stage_z/");
+        cmbStageR->loadSettings(settings, prefix+"stage_R/");
     }
 
     spinJoystickMaxSpeed->setValue(settings.value(prefix+"joystick_max_speed", 500).toDouble());
@@ -178,6 +182,7 @@ void QFESPIMB040SampleStageConfig::loadSettings(QSettings& settings, QString pre
     m_stepX=settings.value(prefix+"step_x", m_stepX).toDouble();
     m_stepY=settings.value(prefix+"step_y", m_stepY).toDouble();
     m_stepZ=settings.value(prefix+"step_z", m_stepZ).toDouble();
+    m_stepR=settings.value(prefix+"step_R", m_stepR).toDouble();
     //timerDisplayUpdate.setInterval(stageStateUpdateInterval);
 }
 
@@ -187,6 +192,7 @@ void QFESPIMB040SampleStageConfig::loadSettings(QFManyFilesSettings &settings, Q
         cmbStageX->loadSettings(settings, prefix+"stage_x/");
         cmbStageY->loadSettings(settings, prefix+"stage_y/");
         cmbStageZ->loadSettings(settings, prefix+"stage_z/");
+        cmbStageR->loadSettings(settings, prefix+"stage_R/");
     }
 
     spinJoystickMaxSpeed->setValue(settings.value(prefix+"joystick_max_speed", 500).toDouble());
@@ -195,6 +201,7 @@ void QFESPIMB040SampleStageConfig::loadSettings(QFManyFilesSettings &settings, Q
     m_stepX=settings.value(prefix+"step_x", m_stepX).toDouble();
     m_stepY=settings.value(prefix+"step_y", m_stepY).toDouble();
     m_stepZ=settings.value(prefix+"step_z", m_stepZ).toDouble();
+    m_stepR=settings.value(prefix+"step_z", m_stepR).toDouble();
 }
 
 void QFESPIMB040SampleStageConfig::saveSettings(QSettings& settings, QString prefix) {
@@ -204,12 +211,14 @@ void QFESPIMB040SampleStageConfig::saveSettings(QSettings& settings, QString pre
     cmbStageX->storeSettings(settings, prefix+"stage_x/");
     cmbStageY->storeSettings(settings, prefix+"stage_y/");
     cmbStageZ->storeSettings(settings, prefix+"stage_z/");
+    cmbStageR->storeSettings(settings, prefix+"stage_R/");
     settings.setValue(prefix+"joystick_max_speed", spinJoystickMaxSpeed->value());
     settings.setValue(prefix+"joystick_enabled", chkJoystick->isChecked());
     settings.setValue(prefix+"update_interval", stageStateUpdateInterval);
     settings.setValue(prefix+"step_x", m_stepX);
     settings.setValue(prefix+"step_y", m_stepY);
     settings.setValue(prefix+"step_z", m_stepZ);
+    settings.setValue(prefix+"step_R", m_stepR);
 }
 
 void QFESPIMB040SampleStageConfig::saveSettings(QFManyFilesSettings &settings, QString prefix)
@@ -220,12 +229,14 @@ void QFESPIMB040SampleStageConfig::saveSettings(QFManyFilesSettings &settings, Q
     cmbStageX->storeSettings(settings, prefix+"stage_x/");
     cmbStageY->storeSettings(settings, prefix+"stage_y/");
     cmbStageZ->storeSettings(settings, prefix+"stage_z/");
+    cmbStageR->storeSettings(settings, prefix+"stage_R/");
     settings.setValue(prefix+"joystick_max_speed", spinJoystickMaxSpeed->value());
     settings.setValue(prefix+"joystick_enabled", chkJoystick->isChecked());
     settings.setValue(prefix+"update_interval", stageStateUpdateInterval);
     settings.setValue(prefix+"step_x", m_stepX);
     settings.setValue(prefix+"step_y", m_stepY);
     settings.setValue(prefix+"step_z", m_stepZ);
+    settings.setValue(prefix+"step_R", m_stepR);
 }
 
 /*
@@ -297,12 +308,24 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     stagelayout->addRow(tr("<b>z axis:</b>"), hbl);
     cmbStageZ->setEnabled(false);
 
+    cmbStageR=new QFStageComboBox(this);
+    hbl=new QHBoxLayout();
+    hbl->setContentsMargins(0,0,0,0);
+    hbl->setSpacing(1);
+    hbl->addWidget(cmbStageR);
+    btnConnectR=new QToolButton(this);
+    hbl->addWidget(btnConnectR);
+    btnConfigureR=new QToolButton(this);
+    hbl->addWidget(btnConfigureR);
+    hbl->addStretch();
+    stagelayout->addRow(tr("<b>Rot axis:</b>"), hbl);
+    cmbStageR->setEnabled(false);
 
 
 
     hbl=new QHBoxLayout();
     hbl->setContentsMargins(0,0,0,0);
-    chkJoystick=new QCheckBox(tr("joystick:"), this);
+    chkJoystick=new QCheckBox(tr("Joystick:"), this);
     QFont fb=chkJoystick->font();
     fb.setBold(true);
     chkJoystick->setFont(fb);
@@ -341,13 +364,18 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     hbl->addWidget(btnD10);
     connect(btnD10, SIGNAL(clicked()), this, SLOT(speedD10()));
     hbl->addStretch();
-    stagelayout->addRow(chkJoystick, hbl);
+    //stagelayout->addRow(chkJoystick, hbl); // minor layout change:
+    stagelayout->addRow(chkJoystick);
+    stagelayout->addRow(hbl);
+//    stagelayout->setItem(hbl, 0, );
 
     QGridLayout* gl=new QGridLayout();
     gl->addWidget(new QLabel("<b>x [&mu;m]:</b>", this), 0, 0);
     gl->addWidget(new QLabel("<b>y [&mu;m]:</b>", this), 0, 1);
     gl->addWidget(new QLabel("<b>z [&mu;m]:</b>", this), 0, 2);
+    gl->addWidget(new QLabel("<b>Rot [°]:</b>", this), 2, 2);
     gl->addWidget(new QLabel("<b>move ...</b>", this), 0, 3,1,2);
+    gl->addWidget(new QLabel("<b>Rotate:</b>", this), 3, 0);
     spinMoveX=new QDoubleSpinBox(this);
     spinMoveX->setRange(-1e6,1e6);
     spinMoveX->setSingleStep(1);
@@ -366,6 +394,12 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     spinMoveZ->setDecimals(2);
     spinMoveZ->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
     gl->addWidget(spinMoveZ, 1,2);
+    spinMoveR=new QDoubleSpinBox(this);
+    spinMoveR->setRange(-180,180);
+    spinMoveR->setSingleStep(1);
+    spinMoveR->setDecimals(2);
+    spinMoveR->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
+    gl->addWidget(spinMoveR, 3,2);
     btnMoveAbsolute=new QPushButton(QIcon(":/spimb040/move_abs.png"), "", this);
     btnMoveRelative=new QPushButton(QIcon(":/spimb040/move_rel.png"), "", this);
     gl->addWidget(btnMoveRelative, 1, 3);
@@ -381,32 +415,37 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
 
 
     gl=new QGridLayout();
-    l=new QLabel(tr("<b><i>x</i>-axis</b>"));
+    l=new QLabel(tr("<b><i>x</i></b>"));
     l->setStyleSheet("background-color: darkgrey;");
     l->setAlignment(Qt::AlignHCenter|Qt::AlignBottom);
     l->setAutoFillBackground(true);
     gl->addWidget(l, 0, 1);
-    l=new QLabel(tr("<b><i>y</i>-axis</b>"));
+    l=new QLabel(tr("<b><i>y</i></b>"));
     l->setAlignment(Qt::AlignHCenter|Qt::AlignBottom);
     l->setStyleSheet("background-color: darkgrey;");
     l->setAutoFillBackground(true);
     gl->addWidget(l, 0, 2);
-    l=new QLabel(tr("<b><i>z</i>-axis</b>"));
+    l=new QLabel(tr("<b><i>z</i></b>"));
     l->setAlignment(Qt::AlignHCenter|Qt::AlignBottom);
     l->setStyleSheet("background-color: darkgrey;");
     l->setAutoFillBackground(true);
     gl->addWidget(l, 0, 3);
+    l=new QLabel(tr("<b><i>Rot</i></b>"));
+    l->setAlignment(Qt::AlignHCenter|Qt::AlignBottom);
+    l->setStyleSheet("background-color: darkgrey;");
+    l->setAutoFillBackground(true);
+    gl->addWidget(l, 0, 4);
     l=new QLabel(tr("<b>status:</b>"));
     l->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
     l->setStyleSheet("background-color: darkgrey;");
     l->setAutoFillBackground(true);
     gl->addWidget(l, 1, 0);
-    l=new QLabel(tr("<b>position [&mu;m]:</b>"));
+    l=new QLabel(tr("<b>pos. [&mu;m / °]:</b>"));
     l->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
     l->setStyleSheet("background-color: darkgrey;");
     l->setAutoFillBackground(true);
     gl->addWidget(l, 2, 0);
-    l=new QLabel(tr("<b>speed [&mu;m/s]:</b>"));
+    l=new QLabel(tr("<b>vel. [&mu;m/s / °/s]:</b>"));
     l->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
     l->setStyleSheet("background-color: darkgrey;");
     l->setAutoFillBackground(true);
@@ -448,6 +487,18 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     labZState->setStyleSheet("background-color: 	lightgrey;");;
     labZState->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     labZState->setAutoFillBackground(true);
+    labRPosition=new QLabel(this);
+    labRPosition->setStyleSheet("background-color: 	lightgrey;");;
+    labRPosition->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+    labRPosition->setAutoFillBackground(true);
+    labRSpeed=new QLabel(this);
+    labRSpeed->setStyleSheet("background-color: 	lightgrey;");;
+    labRSpeed->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+    labRSpeed->setAutoFillBackground(true);
+    labRState=new QLabel(this);
+    labRState->setStyleSheet("background-color: 	lightgrey;");;
+    labRState->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+    labRState->setAutoFillBackground(true);
 
     labJoystick=new QLabel(this);
     labJoystick->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
@@ -461,15 +512,18 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     gl->addWidget(labXState, 1,1);
     gl->addWidget(labYState, 1,2);
     gl->addWidget(labZState, 1,3);
+    gl->addWidget(labRState, 1,4);
     gl->addWidget(labXPosition, 2,1);
     gl->addWidget(labYPosition, 2,2);
     gl->addWidget(labZPosition, 2,3);
+    gl->addWidget(labRPosition, 2,4);
     gl->addWidget(labXSpeed, 3,1);
     gl->addWidget(labYSpeed, 3,2);
     gl->addWidget(labZSpeed, 3,3);
+    gl->addWidget(labRSpeed, 3,4);
     gl->addWidget(new QWidget(this), 4,4);
     //gl->addWidget(labThread, 5,0);
-    gl->setColumnStretch(4,10);
+    //gl->setColumnStretch(5,10);
     gl->setRowStretch(4,10);
     gl->setContentsMargins(0,0,0,0);
     gl->setHorizontalSpacing(1);
@@ -495,6 +549,10 @@ void QFESPIMB040SampleStageConfig::createActions() {
     connect(actConnectZ, SIGNAL(triggered()), this, SLOT(disConnectZ()));
     btnConnectZ->setDefaultAction(actConnectZ);
 
+    actConnectR=new QFActionWithNoMenuRole(QIcon(":/spimb040/stageconnect.png"), tr("Connect Rot-axis ..."), this);
+    actConnectR->setCheckable(true);
+    connect(actConnectR, SIGNAL(triggered()), this, SLOT(disConnectR()));
+    btnConnectR->setDefaultAction(actConnectR);
 
 
     actConfigureX=new QFActionWithNoMenuRole(QIcon(":/spimb040/stagesettings.png"), tr("Configure x-axis ..."), this);
@@ -508,6 +566,10 @@ void QFESPIMB040SampleStageConfig::createActions() {
     actConfigureZ=new QFActionWithNoMenuRole(QIcon(":/spimb040/stagesettings.png"), tr("Configure z-axis ..."), this);
     connect(actConfigureZ, SIGNAL(triggered()), this, SLOT(configureZ()));
     btnConfigureZ->setDefaultAction(actConfigureZ);
+
+    actConfigureR=new QFActionWithNoMenuRole(QIcon(":/spimb040/stagesettings.png"), tr("Configure Rot-axis ..."), this);
+    connect(actConfigureR, SIGNAL(triggered()), this, SLOT(configureR()));
+    btnConfigureR->setDefaultAction(actConfigureR);
 
     actConfigSteps=new QFActionWithNoMenuRole(QIcon(":/spimb040/configsteps.png"), tr("Configure step sizes ..."), this);
     connect(actConfigSteps, SIGNAL(triggered()), this, SLOT(configSteps()));
@@ -596,6 +658,28 @@ void QFESPIMB040SampleStageConfig::updateStates() {
         actConfigureZ->setEnabled(true);
         cmbStageZ->setEnabled(!conn);
         spinMoveZ->setEnabled(conn);
+
+        stage=getRStage();
+        axis=getRStageAxis();
+        conn=false;
+        if (stage) {
+            conn=stage->isConnected(axis);
+            anyconn=anyconn||conn;
+            anyjoy=anyjoy||stage->isJoystickActive(axis);
+            if (conn) {
+                actConnectR->setChecked(true);
+                actConnectR->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
+                actConnectR->setText(tr("Disconnect Rot-axis ..."));
+            } else {
+                actConnectR->setChecked(false);
+                actConnectR->setIcon(QIcon(":/spimb040/stageconnect.png"));
+                actConnectR->setText(tr("Connect Rot-axis ..."));
+            }
+        }
+        actConfigureR->setEnabled(true);
+        cmbStageR->setEnabled(!conn);
+        spinMoveR->setEnabled(conn);
+
 
         btnMoveAbsolute->setEnabled(anyconn);
         btnMoveRelative->setEnabled(anyconn);
@@ -721,6 +805,39 @@ void QFESPIMB040SampleStageConfig::disConnectZ() {
     if (useThread) stageThread->start(QThread::LowPriority);
 }
 
+void QFESPIMB040SampleStageConfig::disConnectR() {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    if (useThread) stageThread->stopThread();
+    bool conn=actConnectR->isChecked();
+    QFExtensionLinearStage* stage=getRStage();
+    int axis=getRStageAxis();
+    bool oldJoystick=chkJoystick->isChecked();
+    chkJoystick->setChecked(false);
+    updateJoystick();
+    if (stage) {
+        if (conn) {
+            stage->setLogging(m_log);
+            stage->connectDevice(axis);
+            if (stage->isConnected(axis) && (stage->getAxisState(axis)==QFExtensionLinearStage::Ready)) {
+                m_log->log_text("connected to Rot-axis stage driver ...\n");
+            } else {
+                actConnectR->setChecked(false);
+                stage->disconnectDevice(axis);
+                m_log->log_error("error connecting to Rot-axis stage driver ...\n");
+            }
+        } else {
+            stage->disconnectDevice(axis);
+            m_log->log_text("disconnected from Rot-axis stage driver ...\n");
+        }
+    } else {
+        actConnectR->setChecked(false);
+    }
+    chkJoystick->setChecked(oldJoystick);
+    updateJoystick();
+    updateStates();
+    QApplication::restoreOverrideCursor();
+    if (useThread) stageThread->start(QThread::LowPriority);
+}
 
 
 void QFESPIMB040SampleStageConfig::configureX() {
@@ -750,7 +867,16 @@ void QFESPIMB040SampleStageConfig::configureZ() {
     if (useThread) stageThread->start(QThread::LowPriority);
 }
 
+void QFESPIMB040SampleStageConfig::configureR() {
+    if (useThread) stageThread->stopThread();
+    QFExtensionLinearStage* stage=getRStage();
+    int axis=getRStageAxis();
+    if (stage) stage->showSettingsDialog(axis, this);
+    updateStates();
+    if (useThread) stageThread->start(QThread::LowPriority);
+}
 
+// x-Stage
 
 QFExtensionLinearStage* QFESPIMB040SampleStageConfig::getXStage() {
     return cmbStageX->currentExtensionLinearStage();
@@ -765,6 +891,11 @@ int QFESPIMB040SampleStageConfig::getXStageAxis() {
     return cmbStageX->currentAxisID();
 }
 
+QObject *QFESPIMB040SampleStageConfig::getXStageExtensionObject() {
+    return cmbStageX->currentExtensionObject();
+}
+
+// y-Stage
 
 QFExtensionLinearStage* QFESPIMB040SampleStageConfig::getYStage() {
     return cmbStageY->currentExtensionLinearStage();
@@ -779,6 +910,11 @@ int QFESPIMB040SampleStageConfig::getYStageAxis() {
     return cmbStageY->currentAxisID();
 }
 
+QObject *QFESPIMB040SampleStageConfig::getYStageExtensionObject() {
+    return cmbStageY->currentExtensionObject();
+}
+
+// z-Stage
 
 QFExtensionLinearStage* QFESPIMB040SampleStageConfig::getZStage() {
     return cmbStageZ->currentExtensionLinearStage();
@@ -788,22 +924,39 @@ QFExtension* QFESPIMB040SampleStageConfig::getZStageExtension() {
     return cmbStageZ->currentExtension();
 }
 
-QObject *QFESPIMB040SampleStageConfig::getXStageExtensionObject() {
-    return cmbStageX->currentExtensionObject();
-}
+int QFESPIMB040SampleStageConfig::getZStageAxis() {
 
-QObject *QFESPIMB040SampleStageConfig::getYStageExtensionObject() {
-    return cmbStageY->currentExtensionObject();
+    return cmbStageZ->currentAxisID();
 }
 
 QObject *QFESPIMB040SampleStageConfig::getZStageExtensionObject() {
     return cmbStageZ->currentExtensionObject();
 }
 
-int QFESPIMB040SampleStageConfig::getZStageAxis() {
+// Rot-Stage
 
-    return cmbStageZ->currentAxisID();
+QFExtensionLinearStage* QFESPIMB040SampleStageConfig::getRStage() {
+    return cmbStageR->currentExtensionLinearStage();
 }
+
+QFExtension* QFESPIMB040SampleStageConfig::getRStageExtension() {
+    return cmbStageR->currentExtension();
+}
+
+int QFESPIMB040SampleStageConfig::getRStageAxis() {
+
+    return cmbStageR->currentAxisID();
+}
+
+QObject *QFESPIMB040SampleStageConfig::getRStageExtensionObject() {
+    return cmbStageR->currentExtensionObject();
+}
+
+
+
+
+
+
 
 
 
@@ -936,6 +1089,29 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
             labPos->setText(QLocale::system().toString(position, 'f', 2));
         }
 
+//        stage=getRStage();
+//        axis=getRStageAxis();
+//        labPos=labRPosition;
+//        labState=labRState;
+//        labSpeed=labRSpeed;
+//        if (stage) {
+//            anyconn=anyconn||stage->isConnected(axis);
+//            QFExtensionLinearStage::AxisState state=stage->getAxisState(axis);
+//            double position=stage->getPosition(axis);
+//            double speed=stage->getSpeed(axis);
+//            switch(state) {
+//                case QFExtensionLinearStage::Ready : labState->setPixmap(iconReady); break;
+//                case QFExtensionLinearStage::Disconnected : labState->setPixmap(iconDisconnected); break;
+//                case QFExtensionLinearStage::Moving : {
+//          if (speed>0) labState->setPixmap(iconMoving);
+//          else labState->setPixmap(iconMovingOpposite);
+//        } break;
+//                case QFExtensionLinearStage::Error : labState->setPixmap(iconError); break;
+//                default: labState->setText(tr("?")); break;
+//            }
+//            labSpeed->setText(QLocale::system().toString(speed, 'f', 2));
+//            labPos->setText(QLocale::system().toString(position, 'f', 2));
+//        }
 
         updateStates();
         if (widVisible) setUpdatesEnabled(updt);
@@ -950,9 +1126,10 @@ void QFESPIMB040SampleStageConfig::moveAbsolute() {
     double x=spinMoveX->value();
     double y=spinMoveY->value();
     double z=spinMoveZ->value();
+    double R=spinMoveR->value();
 
     if (useThread) {
-        stageThread->move(x,y,z);
+        stageThread->move(x,y,z,R);
     } else {
         QFExtensionLinearStage* stage;
         int axis;
@@ -978,6 +1155,13 @@ void QFESPIMB040SampleStageConfig::moveAbsolute() {
                 stage->move(axis, z);
             }
         }
+        stage=getRStage();
+        axis=getRStageAxis();
+        if (stage) {
+            if (stage->isConnected(axis)) {
+                stage->move(axis, R);
+            }
+        }
     }
 }
 
@@ -985,24 +1169,26 @@ void QFESPIMB040SampleStageConfig::moveRelative() {
     double x=spinMoveX->value();
     double y=spinMoveY->value();
     double z=spinMoveZ->value();
-    moveRelative(x,y,z);
+    double R=spinMoveR->value();
+    moveRelative(x,y,z,R);
 }
 
 void QFESPIMB040SampleStageConfig::configSteps() {
-    QFESPIMB040SampleStageStepConfigDialog* dlg=new QFESPIMB040SampleStageStepConfigDialog(m_stepX, m_stepY, m_stepZ, this);
+    QFESPIMB040SampleStageStepConfigDialog* dlg=new QFESPIMB040SampleStageStepConfigDialog(m_stepX, m_stepY, m_stepZ, m_stepR, this);
 
     if (dlg->exec()==QDialog::Accepted) {
         m_stepX=dlg->x();
         m_stepY=dlg->y();
         m_stepZ=dlg->z();
+        m_stepR=dlg->R();
     }
     delete dlg;
 }
 
 
-void QFESPIMB040SampleStageConfig::moveRelative(double x, double y, double z) {
+void QFESPIMB040SampleStageConfig::moveRelative(double x, double y, double z, double R) {
     if (useThread) {
-        stageThread->moveRel(x,y,z);
+        stageThread->moveRel(x,y,z,R);
     } else {
         QFExtensionLinearStage* stage;
         int axis;
@@ -1028,6 +1214,13 @@ void QFESPIMB040SampleStageConfig::moveRelative(double x, double y, double z) {
                 stage->move(axis, stage->getPosition(axis)+z);
             }
         }
+        stage=getRStage();
+        axis=getRStageAxis();
+        if (stage) {
+            if (stage->isConnected(axis) && (R!=0)) {
+                stage->move(axis, stage->getPosition(axis)+R);
+            }
+        }
     }
 
 
@@ -1038,9 +1231,11 @@ void QFESPIMB040SampleStageConfig::connectStages() {
     bool bx=actConnectX->signalsBlocked();
     bool by=actConnectY->signalsBlocked();
     bool bz=actConnectZ->signalsBlocked();
+    bool br=actConnectR->signalsBlocked();
     actConnectX->blockSignals(true);
     actConnectY->blockSignals(true);
     actConnectZ->blockSignals(true);
+    actConnectR->blockSignals(true);
 
     if (cmbStageX->currentExtensionLinearStage() && !actConnectX->isChecked()) {
         actConnectX->setChecked(true);
@@ -1054,9 +1249,14 @@ void QFESPIMB040SampleStageConfig::connectStages() {
         actConnectZ->setChecked(true);
         disConnectZ();
     }
+    if (cmbStageR->currentExtensionLinearStage() && !actConnectR->isChecked()) {
+        actConnectR->setChecked(true);
+        disConnectR();
+    }
     actConnectX->blockSignals(bx);
     actConnectY->blockSignals(by);
     actConnectZ->blockSignals(bz);
+    actConnectR->blockSignals(br);
     setUpdatesEnabled(updt);
 }
 
@@ -1074,6 +1274,10 @@ void QFESPIMB040SampleStageConfig::disconnectStages() {
         actConnectZ->setChecked(true);
         actConnectZ->trigger();
     }
+    if (cmbStageR->currentExtensionLinearStage() && actConnectR->isChecked()) {
+        actConnectR->setChecked(true);
+        actConnectR->trigger();
+    }
     setUpdatesEnabled(updt);
 }
 
@@ -1082,6 +1286,7 @@ void QFESPIMB040SampleStageConfig::setReadOnly(bool readonly) {
     cmbStageX->setReadOnly(readonly);
     cmbStageY->setReadOnly(readonly);
     cmbStageZ->setReadOnly(readonly);
+    cmbStageR->setReadOnly(readonly);
     setUpdatesEnabled(updt);
 }
 
@@ -1095,6 +1300,10 @@ void QFESPIMB040SampleStageConfig::stageYMoved(QFExtensionLinearStage::AxisState
 
 void QFESPIMB040SampleStageConfig::stageZMoved(QFExtensionLinearStage::AxisState state, double position, double speed) {
     updateStageStateWidgets(labZPosition, labZSpeed, labZState, getZStage(), state, position, speed);
+}
+
+void QFESPIMB040SampleStageConfig::stageRMoved(QFExtensionLinearStage::AxisState state, double position, double speed) {
+    updateStageStateWidgets(labRPosition, labRSpeed, labRState, getRStage(), state, position, speed);
 }
 
 void QFESPIMB040SampleStageConfig::updateStageStateWidgets(QLabel* labPos, QLabel* labSpeed, QLabel* labState, bool present, QFExtensionLinearStage::AxisState state, double position, double speed) {
@@ -1192,7 +1401,7 @@ void QFESPIMB040SampleStageConfig::joystickStateChanged(bool enabled) {
     //setUpdatesEnabled(updt);
 }
 
-void QFESPIMB040SampleStageConfig::stagesConnectedChanged(bool connX, bool connY, bool connZ) {
+void QFESPIMB040SampleStageConfig::stagesConnectedChanged(bool connX, bool connY, bool connZ, bool connR) {
     bool anyconn=false;
     bool conn=connX;
     //bool updt=updatesEnabled(); setUpdatesEnabled(false);
@@ -1260,6 +1469,30 @@ void QFESPIMB040SampleStageConfig::stagesConnectedChanged(bool connX, bool connY
     if (cmbStageZ->isEnabled()!=!conn) cmbStageZ->setEnabled(!conn);
     if (spinMoveZ->isEnabled()!=conn) spinMoveZ->setEnabled(conn);
 
+
+    conn=connR;
+    anyconn=anyconn||conn;
+    if (conn) {
+        if (!actConnectR->isChecked()) actConnectR->setChecked(true);
+        QString txt=tr("Disconnect Rot-axis ...");
+        if (actConnectR->text()!=txt) {
+            actConnectR->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
+            actConnectR->setText(txt);
+        }
+    } else {
+        if (actConnectR->isChecked()) actConnectR->setChecked(false);
+        QString txt=tr("Connect Rot-axis ...");
+        if (actConnectR->text()!=txt) {
+            actConnectR->setIcon(QIcon(":/spimb040/stageconnect.png"));
+            actConnectR->setText(txt);
+        }
+    }
+    if (!actConfigureR->isEnabled()) actConfigureR->setEnabled(true);
+    if (cmbStageR->isEnabled()!=!conn) cmbStageR->setEnabled(!conn);
+    if (spinMoveR->isEnabled()!=conn) spinMoveR->setEnabled(conn);
+
+
+
     if (btnMoveAbsolute->isEnabled()!=anyconn) btnMoveAbsolute->setEnabled(anyconn);
     if (btnMoveRelative->isEnabled()!=anyconn) btnMoveRelative->setEnabled(anyconn);
 
@@ -1288,6 +1521,10 @@ bool QFESPIMB040SampleStageConfig::isYStageConnected() const {
 
 bool QFESPIMB040SampleStageConfig::isZStageConnected() const {
     return actConnectZ->isChecked();
+}
+
+bool QFESPIMB040SampleStageConfig::isRStageConnected() const {
+    return actConnectR->isChecked();
 }
 
 bool QFESPIMB040SampleStageConfig::isJoystickChecked() const {
@@ -1326,26 +1563,33 @@ void QFESPIMB040SampleStageConfig::joystickOff() {
 }
 
 void QFESPIMB040SampleStageConfig::stepX() {
-    moveRelative(m_stepX,0,0);
+    moveRelative(m_stepX,0,0,0);
 }
 
 void QFESPIMB040SampleStageConfig::stepY() {
-    moveRelative(0,m_stepY,0);
+    moveRelative(0,m_stepY,0,0);
 }
 
 void QFESPIMB040SampleStageConfig::stepZ() {
-    moveRelative(0,0,m_stepZ);
+    moveRelative(0,0,m_stepZ,0);
+}
+
+void QFESPIMB040SampleStageConfig::stepR() {
+    moveRelative(0,0,0,m_stepR);
 }
 
 void QFESPIMB040SampleStageConfig::stepMinusX() {
-    moveRelative(-m_stepX,0,0);
+    moveRelative(-m_stepX,0,0,0);
 }
 
 void QFESPIMB040SampleStageConfig::stepMinusY() {
-    moveRelative(0,-m_stepY,0);
+    moveRelative(0,-m_stepY,0,0);
 }
 
 void QFESPIMB040SampleStageConfig::stepMinusZ() {
-    moveRelative(0,0,-m_stepZ);
+    moveRelative(0,0,-m_stepZ,0);
 }
 
+void QFESPIMB040SampleStageConfig::stepMinusR() {
+    moveRelative(0,0,0,-m_stepR);
+}

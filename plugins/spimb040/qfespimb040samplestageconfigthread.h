@@ -42,8 +42,8 @@ class QFESPIMB040SampleStageConfigThread: public QThread {
         QFESPIMB040SampleStageConfigThread(QFESPIMB040SampleStageConfig* parent);
         ~QFESPIMB040SampleStageConfigThread();
         void run();
-        void move(double x, double y, double z);
-        void moveRel(double x, double y, double z);
+        void move(double x, double y, double z, double R);
+        void moveRel(double x, double y, double z, double R);
         void setJoystick(bool enabled, double maxSpeed);
         /** \brief stop the thread and block until it is stopped! */
         void stopThread();
@@ -54,8 +54,9 @@ class QFESPIMB040SampleStageConfigThread: public QThread {
         void stageXMoved(QFExtensionLinearStage::AxisState state, double position, double velocity);
         void stageYMoved(QFExtensionLinearStage::AxisState state, double position, double velocity);
         void stageZMoved(QFExtensionLinearStage::AxisState state, double position, double velocity);
+        void stageRMoved(QFExtensionLinearStage::AxisState state, double position, double velocity);
         void joystickStateChanged(bool enabled);
-        void stagesConnectedChanged(bool connX, bool connY, bool connZ);
+        void stagesConnectedChanged(bool connX, bool connY, bool connZ, bool connR);
     protected:
         QFESPIMB040SampleStageConfig* m_parent;
         QMutex* InstructionMutex;
@@ -76,6 +77,7 @@ class QFESPIMB040SampleStageConfigThread: public QThread {
         bool connX;
         bool connY;
         bool connZ;
+        bool connR;
     protected slots:
         void nextInstruction();
 

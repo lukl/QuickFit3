@@ -107,7 +107,7 @@ void QFESPIMB040SampleStageConfigThread::nextInstruction() {
                 if (stage) connZ=stage->isConnected(axis);
                 else connZ=false;
 
-                emit stagesConnectedChanged(connX,  connY,  connZ);
+                emit stagesConnectedChanged(connX,  connY,  connZ, connR);
             } else if (readCounter==1) {
                 /////////////////////////////////////////////////////////////////////////////
                 // read stage x state
@@ -289,24 +289,26 @@ void QFESPIMB040SampleStageConfigThread::nextInstruction() {
 
 }
 
-void QFESPIMB040SampleStageConfigThread::move(double x, double y, double z) {
+void QFESPIMB040SampleStageConfigThread::move(double x, double y, double z, double R) {
     QFESPIMB040SampleStageConfigThread::Instruction inst;
     inst.type=QFESPIMB040SampleStageConfigThread::Move;
     inst.pd1=x;
     inst.pd2=y;
     inst.pd3=z;
+//    inst.pd4=R;
     InstructionMutex->lock();
     instructions.enqueue(inst);
     InstructionMutex->unlock();
 }
 
 
-void QFESPIMB040SampleStageConfigThread::moveRel(double x, double y, double z) {
+void QFESPIMB040SampleStageConfigThread::moveRel(double x, double y, double z, double R) {
     QFESPIMB040SampleStageConfigThread::Instruction inst;
     inst.type=QFESPIMB040SampleStageConfigThread::MoveRel;
     inst.pd1=x;
     inst.pd2=y;
     inst.pd3=z;
+//    inst.pd4=R
     InstructionMutex->lock();
     instructions.enqueue(inst);
     InstructionMutex->unlock();

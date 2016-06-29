@@ -34,12 +34,13 @@ class QFESPIMB040SampleStageStepConfigDialog : public QFDialog
         Q_OBJECT
         
     public:
-        explicit QFESPIMB040SampleStageStepConfigDialog(double x, double y, double z, QWidget *parent = 0);
+        explicit QFESPIMB040SampleStageStepConfigDialog(double x, double y, double z, double R, QWidget *parent = 0);
         ~QFESPIMB040SampleStageStepConfigDialog();
         
         double x() const;
         double y() const;
         double z() const;
+        double R() const;
     private:
         Ui::QFESPIMB040SampleStageStepConfigDialog *ui;
 };
