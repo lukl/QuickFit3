@@ -39,7 +39,7 @@
 
 QFESPIMB040SampleStageConfigThread::QFESPIMB040SampleStageConfigThread(QFESPIMB040SampleStageConfig* parent):
     QThread(parent)
-{
+    {
 
     m_parent=parent;
     qRegisterMetaType<QFExtensionLinearStage::AxisState>("QFExtensionLinearStage::AxisState");
@@ -48,6 +48,7 @@ QFESPIMB040SampleStageConfigThread::QFESPIMB040SampleStageConfigThread(QFESPIMB0
     connX=false;
     connY=false;
     connZ=false;
+    connR=false;
     InstructionMutex=new QMutex(QMutex::Recursive);
 }
 
@@ -65,7 +66,7 @@ void QFESPIMB040SampleStageConfigThread::run() {
 }
 
 bool QFESPIMB040SampleStageConfigThread::anyConnected() const {
-    return connX||connY||connZ;
+    return connX||connY||connZ||connR;
 }
 
 void QFESPIMB040SampleStageConfigThread::start(Priority priority ) {
@@ -80,8 +81,9 @@ void QFESPIMB040SampleStageConfigThread::nextInstruction() {
         quit();*/
     } else {
         if (m_parent->getXStage()) connX=m_parent->getXStage()->isConnected(m_parent->getXStageAxis()); else connX=false;
-        if (m_parent->getYStage()) connX=m_parent->getYStage()->isConnected(m_parent->getYStageAxis()); else connY=false;
-        if (m_parent->getZStage()) connX=m_parent->getZStage()->isConnected(m_parent->getZStageAxis()); else connZ=false;
+        if (m_parent->getYStage()) connY=m_parent->getYStage()->isConnected(m_parent->getYStageAxis()); else connY=false;
+        if (m_parent->getZStage()) connZ=m_parent->getZStage()->isConnected(m_parent->getZStageAxis()); else connZ=false;
+        if (m_parent->getRStage()) connR=m_parent->getRStage()->isConnected(m_parent->getRStageAxis()); else connR=false;
         InstructionMutex->lock();
         if (instructions.isEmpty()) {
             InstructionMutex->unlock();
@@ -106,6 +108,12 @@ void QFESPIMB040SampleStageConfigThread::nextInstruction() {
                 axis=m_parent->getZStageAxis();
                 if (stage) connZ=stage->isConnected(axis);
                 else connZ=false;
+
+                stage=m_parent->getRStage();
+                axis=m_parent->getRStageAxis();
+                if (stage) connR=stage->isConnected(axis);
+                else connR=false;
+
 
                 emit stagesConnectedChanged(connX,  connY,  connZ, connR);
             } else if (readCounter==1) {
@@ -156,6 +164,22 @@ void QFESPIMB040SampleStageConfigThread::nextInstruction() {
 
             } else if (readCounter==4) {
                 /////////////////////////////////////////////////////////////////////////////
+                // read stage Rot state
+                /////////////////////////////////////////////////////////////////////////////
+                QFExtensionLinearStage* stage;
+                int axis;
+
+                stage=m_parent->getRStage();
+                axis=m_parent->getRStageAxis();
+                if (stage) {
+                    QFExtensionLinearStage::AxisState state=stage->getAxisState(axis);
+                    double position=stage->getPosition(axis);
+                    double speed=stage->getSpeed(axis);
+                    emit stageRMoved(state, position, speed);
+                }
+
+            } else if (readCounter==5) {
+                /////////////////////////////////////////////////////////////////////////////
                 // read joystick
                 /////////////////////////////////////////////////////////////////////////////
                 bool joystick=false;
@@ -174,7 +198,7 @@ void QFESPIMB040SampleStageConfigThread::nextInstruction() {
 
                 emit joystickStateChanged(joystick);
 
-            } else if (readCounter==5) {
+            } else if (readCounter==6) {
                 /////////////////////////////////////////////////////////////////////////////
                 // set joystick
                 /////////////////////////////////////////////////////////////////////////////
@@ -194,6 +218,7 @@ void QFESPIMB040SampleStageConfigThread::nextInstruction() {
                 double x=inst.pd1;
                 double y=inst.pd2;
                 double z=inst.pd3;
+                double R=inst.pd4;
 
                 QFExtensionLinearStage* stage;
                 int axis;
@@ -219,6 +244,13 @@ void QFESPIMB040SampleStageConfigThread::nextInstruction() {
                         stage->move(axis, z);
                     }
                 }
+                stage=m_parent->getRStage();
+                axis=m_parent->getRStageAxis();
+                if (stage) {
+                    if (stage->isConnected(axis)) {
+                        stage->move(axis, R);
+                    }
+                }
             } else if (inst.type==QFESPIMB040SampleStageConfigThread::MoveRel) {
                 /////////////////////////////////////////////////////////////////////////////
                 // move relative
@@ -226,6 +258,7 @@ void QFESPIMB040SampleStageConfigThread::nextInstruction() {
                 double x=inst.pd1;
                 double y=inst.pd2;
                 double z=inst.pd3;
+                double R=inst.pd4;
 
                 QFExtensionLinearStage* stage;
                 int axis;
@@ -249,6 +282,13 @@ void QFESPIMB040SampleStageConfigThread::nextInstruction() {
                 if (stage) {
                     if (stage->isConnected(axis)) {
                         stage->move(axis, stage->getPosition(axis)+z);
+                    }
+                }
+                stage=m_parent->getRStage();
+                axis=m_parent->getRStageAxis();
+                if (stage) {
+                    if (stage->isConnected(axis)) {
+                        stage->move(axis, stage->getPosition(axis)+R);
                     }
                 }
             } else if (inst.type==QFESPIMB040SampleStageConfigThread::SetJoystick) {
@@ -295,7 +335,7 @@ void QFESPIMB040SampleStageConfigThread::move(double x, double y, double z, doub
     inst.pd1=x;
     inst.pd2=y;
     inst.pd3=z;
-//    inst.pd4=R;
+    inst.pd4=R;
     InstructionMutex->lock();
     instructions.enqueue(inst);
     InstructionMutex->unlock();
@@ -308,7 +348,7 @@ void QFESPIMB040SampleStageConfigThread::moveRel(double x, double y, double z, d
     inst.pd1=x;
     inst.pd2=y;
     inst.pd3=z;
-//    inst.pd4=R
+    inst.pd4=R;
     InstructionMutex->lock();
     instructions.enqueue(inst);
     InstructionMutex->unlock();

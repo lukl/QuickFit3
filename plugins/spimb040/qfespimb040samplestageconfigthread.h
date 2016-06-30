@@ -31,7 +31,7 @@
 
 class QFESPIMB040SampleStageConfig; // forward
 
-/*! \brief SPIM Control Extension (B040, DKFZ Heidelberg): thread that reads three stages and sends signals for the current states
+/*! \brief SPIM Control Extension (B040, DKFZ Heidelberg): thread that reads four stages and sends signals for the current states
     \ingroup qf3ext_spimb040
 
 
@@ -68,6 +68,7 @@ class QFESPIMB040SampleStageConfigThread: public QThread {
             double pd1;
             double pd2;
             double pd3;
+            double pd4;
             bool pb1;
         };
 
