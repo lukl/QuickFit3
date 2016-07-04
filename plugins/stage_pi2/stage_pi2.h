@@ -23,8 +23,8 @@
 #ifndef STAGE_PI2_H
 #define STAGE_PI2_H
 
-#include <time.h>
 #include <QObject>
+#include <time.h>
 #include <QVector>
 #include "qfextension.h"
 #include "qfextensionlinearstage.h"

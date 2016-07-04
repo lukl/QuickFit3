@@ -67,9 +67,11 @@ QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QWidget* parent, bool
     connect(stageThread, SIGNAL(stageZMoved(QFExtensionLinearStage::AxisState,double,double)), this, SLOT(stageZMoved(QFExtensionLinearStage::AxisState,double,double)));
     connect(stageThread, SIGNAL(stageRMoved(QFExtensionLinearStage::AxisState,double,double)), this, SLOT(stageRMoved(QFExtensionLinearStage::AxisState,double,double)));
     connect(stageThread, SIGNAL(started()), this, SLOT(threadStarted()));
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     connect(stageThread, SIGNAL(finished()), this, SLOT(threadFinished()));
-    connect(stageThread, SIGNAL(terminated()), this, SLOT(threadFinished()));
-
+#else
+    connect(stageThread, SIGNAL(terminated()), this, SLOT(threadFinished())); // terminated() SIGNAL of QThread just available for qt version < 5.0.0
+#endif
     stageStateUpdateInterval=250;
     iconDisconnected=QPixmap(":/spimb040/stage_disconnected.png");
     iconReady=QPixmap(":/spimb040/stage_ready.png");
@@ -201,7 +203,7 @@ void QFESPIMB040SampleStageConfig::loadSettings(QFManyFilesSettings &settings, Q
     m_stepX=settings.value(prefix+"step_x", m_stepX).toDouble();
     m_stepY=settings.value(prefix+"step_y", m_stepY).toDouble();
     m_stepZ=settings.value(prefix+"step_z", m_stepZ).toDouble();
-    m_stepR=settings.value(prefix+"step_z", m_stepR).toDouble();
+    m_stepR=settings.value(prefix+"step_R", m_stepR).toDouble();
 }
 
 void QFESPIMB040SampleStageConfig::saveSettings(QSettings& settings, QString prefix) {

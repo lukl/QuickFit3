@@ -46,6 +46,9 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="0" column="1">
       <widget class="QDoubleSpinBox" name="spinX">
+       <property name="cursor">
+        <cursorShape>IBeamCursor</cursorShape>
+       </property>
        <property name="suffix">
         <string> µm</string>
        </property>
@@ -72,6 +75,9 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="1" column="1">
       <widget class="QDoubleSpinBox" name="spinY">
+       <property name="cursor">
+        <cursorShape>IBeamCursor</cursorShape>
+       </property>
        <property name="suffix">
         <string> µm</string>
        </property>
@@ -98,6 +104,9 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="2" column="1">
       <widget class="QDoubleSpinBox" name="spinZ">
+       <property name="cursor">
+        <cursorShape>IBeamCursor</cursorShape>
+       </property>
        <property name="suffix">
         <string> µm</string>
        </property>
@@ -120,9 +129,27 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QLineEdit" name="spinR">
-       <property name="text">
-        <string>1,000 °</string>
+      <widget class="QDoubleSpinBox" name="spinR">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="cursor">
+        <cursorShape>IBeamCursor</cursorShape>
+       </property>
+       <property name="suffix">
+        <string> °</string>
+       </property>
+       <property name="decimals">
+        <number>4</number>
+       </property>
+       <property name="minimum">
+        <double>0.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>36000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>1.000000000000000</double>
        </property>
       </widget>
      </item>
