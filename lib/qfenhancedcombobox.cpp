@@ -110,7 +110,7 @@ void QFEnhancedComboBox::addItemsAndVariantdata(const QStringList &items, const 
     for (int i=0; i<qMax(items.size(), data.size()); i++) {
         addItem(items.value(i, tr("item %1").arg(i+1)), data.value(i, QVariant()));
     }
-    if (en) setUpdatesEnabled(en);
+    if (en) setUpdatesEnabled(true);
 }
 
 void QFEnhancedComboBox::addItemsAndStringData(const QStringList &items, const QStringList &data)
@@ -123,7 +123,7 @@ void QFEnhancedComboBox::addItemsAndStringData(const QStringList &items, const Q
         if (i<0 || i>=data.size()) d=QVariant();
         addItem(items.value(i, tr("item %1").arg(i+1)), d);
     }
-    if (en) setUpdatesEnabled(en);
+    if (en) setUpdatesEnabled(true);
 }
 
 void QFEnhancedComboBox::selectIndex(const QModelIndex &index)

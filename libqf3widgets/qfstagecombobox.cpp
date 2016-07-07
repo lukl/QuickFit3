@@ -22,6 +22,7 @@ Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include "qfstagecombobox.h"
 
+
 QFStageComboBox::QFStageComboBox(QFExtensionManager* extManager, QWidget* parent):
     QFEnhancedComboBox(parent)
 {
@@ -47,7 +48,7 @@ void QFStageComboBox::init(QFExtensionManager* extManager) {
 }
 
 void QFStageComboBox::findExtensions() {
-    stages.clear();
+    stages.clear();     /* QList<QObject*> stages;*/
     clear();
     if (!m_extManager) return;
     // load available acquisition devices from extManager
@@ -68,9 +69,11 @@ void QFStageComboBox::findExtensions() {
             QString name=extension->getName();
             if (stage->getAxisCount()>0) name=name+QString(" #%1").arg(j);
             addItem(QIcon(extension->getIconFilename()), name, sl);
+
         }
     }
-
+//    addItem(QIcon(":/libqf3widgets/stage_none.png"), tr("--- none ---"), QPoint(stages.size(), 0));
+    setEnabled(true);
 }
 
 QObject* QFStageComboBox::currentExtensionObject() const {

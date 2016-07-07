@@ -144,7 +144,7 @@ class QFWIDLIB_EXPORT QFStageConfigWidget : public QFrame {
         /** \brief tool button to connect to stage for axis x */
         QToolButton* btnConnectX;
 
-        /** \brief tool button to configuzre stage for axis x */
+        /** \brief tool button to configure stage for axis x */
         QToolButton* btnConfigureX;
 
         /** \brief checkbox to en-/disable the joystic for all axes at once */
@@ -180,7 +180,7 @@ class QFWIDLIB_EXPORT QFStageConfigWidget : public QFrame {
         /** \brief action to connect to stage for axis x */
         QAction* actConnectX;
 
-        /** \brief action to configuzre stage for axis x */
+        /** \brief action to configure stage for axis x */
         QAction* actConfigureX;
 
         QAction* actConfigSteps;

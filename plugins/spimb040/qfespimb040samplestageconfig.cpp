@@ -2,7 +2,7 @@
     Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     German Cancer Research Center/University Heidelberg
 
-    
+
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
@@ -271,6 +271,7 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     btnConfigSteps=new QToolButton(this);
 
     cmbStageX=new QFStageComboBox(this);
+    cmbStageX->findExtensions();
     QHBoxLayout* hbl=new QHBoxLayout();
     hbl->setContentsMargins(0,0,0,0);
     hbl->setSpacing(1);
@@ -1032,9 +1033,9 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
                 case QFExtensionLinearStage::Ready : labState->setPixmap(iconReady); break;
                 case QFExtensionLinearStage::Disconnected : labState->setPixmap(iconDisconnected); break;
                 case QFExtensionLinearStage::Moving : {
-		  if (speed>0) labState->setPixmap(iconMoving);
-		  else labState->setPixmap(iconMovingOpposite);
-		} break;
+                if (speed>0) labState->setPixmap(iconMoving);
+                else labState->setPixmap(iconMovingOpposite);
+            } break;
                 case QFExtensionLinearStage::Error : labState->setPixmap(iconError); break;
                 default: labState->setText(tr("?")); break;
             }
@@ -1057,9 +1058,9 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
                 case QFExtensionLinearStage::Ready : labState->setPixmap(iconReady); break;
                 case QFExtensionLinearStage::Disconnected : labState->setPixmap(iconDisconnected); break;
                 case QFExtensionLinearStage::Moving : {
-		  if (speed>0) labState->setPixmap(iconMoving);
-		  else labState->setPixmap(iconMovingOpposite);
-		} break;
+                if (speed>0) labState->setPixmap(iconMoving);
+                else labState->setPixmap(iconMovingOpposite);
+            } break;
                 case QFExtensionLinearStage::Error : labState->setPixmap(iconError); break;
                 default: labState->setText(tr("?")); break;
             }
@@ -1081,9 +1082,9 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
                 case QFExtensionLinearStage::Ready : labState->setPixmap(iconReady); break;
                 case QFExtensionLinearStage::Disconnected : labState->setPixmap(iconDisconnected); break;
                 case QFExtensionLinearStage::Moving : {
-		  if (speed>0) labState->setPixmap(iconMoving);
-		  else labState->setPixmap(iconMovingOpposite);
-		} break;
+                if (speed>0) labState->setPixmap(iconMoving);
+                else labState->setPixmap(iconMovingOpposite);
+            } break;
                 case QFExtensionLinearStage::Error : labState->setPixmap(iconError); break;
                 default: labState->setText(tr("?")); break;
             }

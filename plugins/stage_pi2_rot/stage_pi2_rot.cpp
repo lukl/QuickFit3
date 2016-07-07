@@ -20,7 +20,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "stage_pi2.h"
+#include "stage_pi2_rot.h"
 #include<QtGlobal>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets>
@@ -33,23 +33,23 @@
 #include <iostream>
 #include "pimercury863calibrationdialog.h"
 
-#define LOG_PREFIX "[PI863v2]: "
-#define GLOBAL_CONFIGFILE "stage_pi863_2.ini"
+#define LOG_PREFIX "[PI863v2rot]: "
+#define GLOBAL_CONFIGFILE "stage_pi863_2_rot.ini"
 
-QFExtensionLinearStagePI2::QFExtensionLinearStagePI2(QObject* parent):
+QFExtensionLinearStagePI2Rot::QFExtensionLinearStagePI2Rot(QObject* parent):
     QObject(parent)
 {
 	logService=NULL;
 }
 
-QFExtensionLinearStagePI2::~QFExtensionLinearStagePI2() {
+QFExtensionLinearStagePI2Rot::~QFExtensionLinearStagePI2Rot() {
 }
 
-void QFExtensionLinearStagePI2::initExtension() {
-    /* do initializations here but do not yet connect to the stage! */
-    QString ini=services->getGlobalConfigFileDirectory()+QString("/stage_pi863_2.ini");
-    if (!QFile::exists(ini)) ini=services->getConfigFileDirectory()+QString("/stage_pi863_2.ini");
-    if (!QFile::exists(ini)) ini=services->getAssetsDirectory()+QString("plugins/")+getID()+QString("/stage_pi863_2.ini");
+void QFExtensionLinearStagePI2Rot::initExtension() {
+    /* do initializations here but do not yet connect to the camera! */
+    QString ini=services->getGlobalConfigFileDirectory()+QString("/stage_pi863_2_rot.ini");
+    if (!QFile::exists(ini)) ini=services->getConfigFileDirectory()+QString("/stage_pi863_2_rot.ini");
+    if (!QFile::exists(ini)) ini=services->getAssetsDirectory()+QString("plugins/")+getID()+QString("/stage_pi863_2_rot.ini");
     QFPluginServices::getInstance()->log_global_text(tr("%1loading INI-file %2\n").arg(QString(LOG_PREFIX)).arg(ini));
     QSettings inifile(ini, QSettings::IniFormat);
 
@@ -81,7 +81,7 @@ void QFExtensionLinearStagePI2::initExtension() {
             if (s.size()>0) d.ID=s[0];
 
             d.port=ports.addCOMPort(inifile, axisname+"/", 38400);
-            d.serial=new QFExtensionLinearStagePI2ProtocolHandler(ports.getCOMPort(d.port), ports.getMutex(d.port), getName());
+            d.serial=new QFExtensionLinearStagePI2RotProtHandler(ports.getCOMPort(d.port), ports.getMutex(d.port), getName());
 
             d.PTerm=inifile.value(axisname+"/pterm", defaultAD.PTerm).toUInt();
             d.iTerm=inifile.value(axisname+"/iterm", defaultAD.iTerm).toUInt();
@@ -112,9 +112,9 @@ void QFExtensionLinearStagePI2::initExtension() {
     }
 }
 
-void QFExtensionLinearStagePI2::deinit() {
+void QFExtensionLinearStagePI2Rot::deinit() {
 	/* add code for cleanup here */
-    QSettings inifile(services->getGlobalConfigFileDirectory()+"/stage_pi863_2.ini", QSettings::IniFormat);
+    QSettings inifile(services->getGlobalConfigFileDirectory()+"/stage_pi863_2_rot.ini", QSettings::IniFormat);
     int axisCount=inifile.value("axis_count", 0).toUInt();
 
 
@@ -134,14 +134,14 @@ void QFExtensionLinearStagePI2::deinit() {
     }
 }
 
-void QFExtensionLinearStagePI2::projectChanged(QFProject* /*oldProject*/, QFProject* /*project*/) {
+void QFExtensionLinearStagePI2Rot::projectChanged(QFProject* /*oldProject*/, QFProject* /*project*/) {
 	/* usually cameras do not have to react to a change of the project in QuickFit .. so you don't need to do anything here
 	   But: possibly you could read config information from the project here
 	 */
 }
 
 
-void QFExtensionLinearStagePI2::loadSettings(ProgramOptions* settingspo) {
+void QFExtensionLinearStagePI2Rot::loadSettings(ProgramOptions* settingspo) {
 	/* here you could read config information from the quickfit.ini file using settings object */
     if (!settingspo) return;
 	if (settingspo->getQSettings()==NULL) return;
@@ -152,7 +152,7 @@ void QFExtensionLinearStagePI2::loadSettings(ProgramOptions* settingspo) {
 
 }
 
-void QFExtensionLinearStagePI2::storeSettings(ProgramOptions* settingspo) {
+void QFExtensionLinearStagePI2Rot::storeSettings(ProgramOptions* settingspo) {
 	/* here you could write config information to the quickfit.ini file using settings object */
     if (!settingspo) return;
 	if (settingspo->getQSettings()==NULL) return;
@@ -163,11 +163,11 @@ void QFExtensionLinearStagePI2::storeSettings(ProgramOptions* settingspo) {
 
 }
 
-unsigned int QFExtensionLinearStagePI2::getAxisCount() {
+unsigned int QFExtensionLinearStagePI2Rot::getAxisCount() {
 	return axes.size();
 }
 
-void QFExtensionLinearStagePI2::showSettingsDialog(unsigned int /*axis*/, QWidget* parent) {
+void QFExtensionLinearStagePI2Rot::showSettingsDialog(unsigned int /*axis*/, QWidget* parent) {
 
 
     QString ini1=services->getGlobalConfigFileDirectory()+QString("/")+GLOBAL_CONFIGFILE;
@@ -178,7 +178,7 @@ void QFExtensionLinearStagePI2::showSettingsDialog(unsigned int /*axis*/, QWidge
 
 
 
-//    bool globalIniWritable=QSettings(services->getGlobalConfigFileDirectory()+"/stage_pi863_2.ini", QSettings::IniFormat).isWritable();
+//    bool globalIniWritable=QSettings(services->getGlobalConfigFileDirectory()+"/stage_pi863_2_rot.ini", QSettings::IniFormat).isWritable();
 
 
 //    /* open a dialog that configures the camera.
@@ -250,7 +250,7 @@ void QFExtensionLinearStagePI2::showSettingsDialog(unsigned int /*axis*/, QWidge
 
 
 
-void QFExtensionLinearStagePI2::calibrateJoysticks() {
+void QFExtensionLinearStagePI2Rot::calibrateJoysticks() {
 
     for (unsigned int axis=0; axis<getAxisCount(); axis++) {
         QMessageBox::StandardButton answer=QMessageBox::question(NULL, tr("PI Mercury C863 joystick calibration"), tr("Do you want to calibrate a joystick on axis %1?").arg(axis), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::Yes);
@@ -270,7 +270,7 @@ void QFExtensionLinearStagePI2::calibrateJoysticks() {
 
 
 
-bool QFExtensionLinearStagePI2::isConnected(unsigned int i) {
+bool QFExtensionLinearStagePI2Rot::isConnected(unsigned int i) {
     if (((int64_t)i<axes.size())) {
         QMutexLocker locker(axes[i].serial->getMutex());
         return axes[i].serial->getCOM()->isConnectionOpen();
@@ -278,11 +278,11 @@ bool QFExtensionLinearStagePI2::isConnected(unsigned int i) {
     return false;
 }
 
-void QFExtensionLinearStagePI2::connectDevice(unsigned int i) {
+void QFExtensionLinearStagePI2Rot::connectDevice(unsigned int i) {
     if (((int64_t)i<axes.size())) {
         QMutexLocker locker(axes[i].serial->getMutex());
         QFSerialConnection* com=axes[i].serial->getCOM();
-        QFExtensionLinearStagePI2ProtocolHandler* serial=axes[i].serial;
+        QFExtensionLinearStagePI2RotProtHandler* serial=axes[i].serial;
         com->open();
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[i].ID);
@@ -312,25 +312,25 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int i) {
     }
 }
 
-void QFExtensionLinearStagePI2::disconnectDevice(unsigned int axis) {
+void QFExtensionLinearStagePI2Rot::disconnectDevice(unsigned int axis) {
     if (((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         QFSerialConnection* com=axes[axis].serial->getCOM();
-        QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
+        QFExtensionLinearStagePI2RotProtHandler* serial=axes[axis].serial;
         com->close();
         axes[axis].state=QFExtensionLinearStage::Disconnected;
     }
 }
 
-void QFExtensionLinearStagePI2::setLogging(QFPluginLogService* logService) {
+void QFExtensionLinearStagePI2Rot::setLogging(QFPluginLogService* logService) {
 	this->logService=logService;
 }
 
-void QFExtensionLinearStagePI2::setJoystickActive(unsigned int axis, bool enabled, double maxVelocity) {
+void QFExtensionLinearStagePI2Rot::setJoystickActive(unsigned int axis, bool enabled, double maxVelocity) {
     if (((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         QFSerialConnection* com=axes[axis].serial->getCOM();
-        QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
+        QFExtensionLinearStagePI2RotProtHandler* serial=axes[axis].serial;
 
         if (enabled) {
             serial->selectAxis(axes[axis].ID);
@@ -346,16 +346,16 @@ void QFExtensionLinearStagePI2::setJoystickActive(unsigned int axis, bool enable
 
 }
 
-bool QFExtensionLinearStagePI2::isJoystickActive(unsigned int axis) {
+bool QFExtensionLinearStagePI2Rot::isJoystickActive(unsigned int axis) {
 	return axes[axis].joystickEnabled;
 }
 
 
-void QFExtensionLinearStagePI2::stop(unsigned int axis) {
+void QFExtensionLinearStagePI2Rot::stop(unsigned int axis) {
     if (((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         QFSerialConnection* com=axes[axis].serial->getCOM();
-        QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
+        QFExtensionLinearStagePI2RotProtHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[axis].ID);
             serial->sendCommand("AB");
@@ -363,11 +363,11 @@ void QFExtensionLinearStagePI2::stop(unsigned int axis) {
     }
 }
 
-double QFExtensionLinearStagePI2::getSpeed(unsigned int axis) {
+double QFExtensionLinearStagePI2Rot::getSpeed(unsigned int axis) {
     if (((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         QFSerialConnection* com=axes[axis].serial->getCOM();
-        QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
+        QFExtensionLinearStagePI2RotProtHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[axis].ID);
             std::string r=serial->queryCommand("TV")+"\n";
@@ -385,11 +385,11 @@ double QFExtensionLinearStagePI2::getSpeed(unsigned int axis) {
     return 0;
 }
 
-double QFExtensionLinearStagePI2::getPosition(unsigned int axis) {
+double QFExtensionLinearStagePI2Rot::getPosition(unsigned int axis) {
     if (((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         QFSerialConnection* com=axes[axis].serial->getCOM();
-        QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
+        QFExtensionLinearStagePI2RotProtHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[axis].ID);
             std::string r=serial->queryCommand("TP")+"\n";
@@ -407,11 +407,11 @@ double QFExtensionLinearStagePI2::getPosition(unsigned int axis) {
     return 0;
 }
 
-void QFExtensionLinearStagePI2::move(unsigned int axis, double newPosition) {
+void QFExtensionLinearStagePI2Rot::move(unsigned int axis, double newPosition) {
     if (((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         QFSerialConnection* com=axes[axis].serial->getCOM();
-        QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
+        QFExtensionLinearStagePI2RotProtHandler* serial=axes[axis].serial;
         serial->selectAxis(axes[axis].ID);
         if (com->isConnectionOpen() && (axes[axis].state==QFExtensionLinearStage::Ready) && (!axes[axis].joystickEnabled)) {
             long xx=(long)round(newPosition/axes[axis].lengthFactor);
@@ -423,11 +423,11 @@ void QFExtensionLinearStagePI2::move(unsigned int axis, double newPosition) {
     }
 }
 
-QFExtensionLinearStage::AxisState QFExtensionLinearStagePI2::getAxisState(unsigned int axis)  {
+QFExtensionLinearStage::AxisState QFExtensionLinearStagePI2Rot::getAxisState(unsigned int axis)  {
     if (((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         QFSerialConnection* com=axes[axis].serial->getCOM();
-        QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
+        QFExtensionLinearStagePI2RotProtHandler* serial=axes[axis].serial;
 
 
         std::string failedaxes="";
@@ -503,14 +503,14 @@ QFExtensionLinearStage::AxisState QFExtensionLinearStagePI2::getAxisState(unsign
     return QFExtensionLinearStage::Disconnected;
 }
 
-QString QFExtensionLinearStagePI2::getStageName(unsigned int axis) const
+QString QFExtensionLinearStagePI2Rot::getStageName(unsigned int axis) const
 {
-    QString n=tr("PI Mercury 863 v2, axis %1").arg(axis);
+    QString n=tr("Rot PI Mercury 863 v2, axis %1").arg(axis);
     if ( (int64_t)axis<axes.size()) n=axes[axis].label;
     return n;
 }
 
-QFExtensionLinearStage::StageInfo QFExtensionLinearStagePI2::getStageInfo(unsigned int axis) const
+QFExtensionLinearStage::StageInfo QFExtensionLinearStagePI2Rot::getStageInfo(unsigned int axis) const
 {
     QFExtensionLinearStage::StageInfo info;
     info.maxSpeed=axes[axis].maxVelocity;
@@ -518,21 +518,21 @@ QFExtensionLinearStage::StageInfo QFExtensionLinearStagePI2::getStageInfo(unsign
 }
 
 
-void QFExtensionLinearStagePI2::log_text(QString message) {
+void QFExtensionLinearStagePI2Rot::log_text(QString message) {
 	if (logService) logService->log_text(message);
 	else if (services) services->log_text(message);
 }
 
-void QFExtensionLinearStagePI2::log_warning(QString message) {
+void QFExtensionLinearStagePI2Rot::log_warning(QString message) {
 	if (logService) logService->log_warning(message);
 	else if (services) services->log_warning(message);
 }
 
-void QFExtensionLinearStagePI2::log_error(QString message) {
+void QFExtensionLinearStagePI2Rot::log_error(QString message) {
 	if (logService) logService->log_error(message);
 	else if (services) services->log_error(message);
 }
 
 
-Q_EXPORT_PLUGIN2(stage_pi863_2, QFExtensionLinearStagePI2)
+Q_EXPORT_PLUGIN2(stage_pi863_2_rot, QFExtensionLinearStagePI2Rot)
 

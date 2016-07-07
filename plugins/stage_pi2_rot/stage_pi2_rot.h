@@ -20,54 +20,55 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef STAGE_PI2_H
-#define STAGE_PI2_H
+#ifndef STAGE_PI2_ROT_H
+#define STAGE_PI2_ROT_H
 
-#include <time.h>
 #include <QObject>
+#include <time.h>
 #include <QVector>
 #include "qfextension.h"
 #include "qfextensionlinearstage.h"
 #include "qfserialconnection.h"
 #include "qf3comportmanager.h"
-#include "qfextensionlinearstagepi2protocolhandler.h"
+#include "qfextensionlinearstagepi2rotprothandler.h"
 #include "pimercury863calibrationdialog.h"
 
 /*!
-    \defgroup qf3ext_StagePI2 QFExtensionLinearStage implementation for PI mercury stages
+    \defgroup qf3ext_StagePIRot QFExtensionLinearStage implementation for PI mercury stages with Rotational Stage
     \ingroup qf3extensionplugins
 */
 
-/*! \brief QFExtensionLinearStage implementation for PI mercury stages
-    \ingroup qf3ext_StagePI2
+/*! \brief QFExtensionLinearStage implementation for PI mercury stages with Rotational Stage
+    \ingroup qf3ext_StagePI2rot
+    The Stage is basically handled the same way as a linear stage would be, since otherwise the existing class may not be used.
  */
-class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public QFExtensionLinearStage {
+class QFExtensionLinearStagePI2Rot : public QObject, public QFExtensionBase, public QFExtensionLinearStage {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionLinearStage)
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFExtensionLinearStagePI2")
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFExtensionLinearStagePI2Rot")
 #endif
 
     public:
         /** Default constructor */
-        QFExtensionLinearStagePI2(QObject* parent=NULL);
+        QFExtensionLinearStagePI2Rot(QObject* parent=NULL);
         /** Default destructor */
-        virtual ~QFExtensionLinearStagePI2();
+        virtual ~QFExtensionLinearStagePI2Rot();
 
 
     /////////////////////////////////////////////////////////////////////////////
     // QFExtension routines
     /////////////////////////////////////////////////////////////////////////////
         /** \copydoc QFExtension::getID() */
-        virtual QString getID() const  { return QString("stage_pi863_2"); };
+        virtual QString getID() const  { return QString("stage_pi863_2_rot"); };
         /** \copydoc QFExtension::getName() */
-        virtual QString getName() const  { return tr("Linear PI Merc. 863 v2"); };
+        virtual QString getName() const  { return tr("Rot.: PI Merc. 863 v2 Rot"); };
         /** \copydoc QFExtension::getDescription() */
-        virtual QString getDescription() const  { return tr("Linear Stage: PI Mercury 863 v2"); };
+        virtual QString getDescription() const  { return tr("Rotational Stage: PI Mercury 863 v2 Rot"); };
         /** \copydoc QFExtension::getAuthor() */
-        virtual QString getAuthor() const  { return tr("Jan Krieger"); };
+        virtual QString getAuthor() const  { return tr("Jan Krieger, Lukas Lau"); };
         /** \copydoc QFExtension::getCopyright() */
-        virtual QString getCopyright() const  { return tr("(c) 2013 by Jan Krieger"); };
+        virtual QString getCopyright() const  { return tr("(c) 2013 by Jan Krieger, 2016 Lukas Lau"); };
         /** \copydoc QFExtension::getWeblink() */
         virtual QString getWeblink() const  { return tr(""); };
         /** \copydoc QFExtension::getIconFilename() */
@@ -167,9 +168,9 @@ class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public
                 acceleration=1000000;
                 maxVelocity=2000;
                 initVelocity=1000;
-                lengthFactor=6.9e-3;
-                velocityFactor=6.9e-3;
-                accelerationFactor=6.9e-3;
+                lengthFactor=2.57e-5;
+                velocityFactor=2.57e-5;
+                accelerationFactor=2.57e-5;
             }
 
             /** \brief ID of the Mercury C-863 controller for the axis
@@ -180,7 +181,7 @@ class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public
              QChar ID;
 
              int port;
-             QFExtensionLinearStagePI2ProtocolHandler* serial;
+             QFExtensionLinearStagePI2RotProtHandler* serial;
 
              QFExtensionLinearStage::AxisState state;
              /** \brief indicates whether the joystick is enabled or not */
@@ -222,4 +223,4 @@ class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public
         friend class PIMercury863CalibrationDialog;
 };
 
-#endif // STAGE_PI2_H
+#endif // STAGE_PI2_ROT_H
