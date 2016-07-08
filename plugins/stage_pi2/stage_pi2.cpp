@@ -90,6 +90,8 @@ void QFExtensionLinearStagePI2::initExtension() {
             d.acceleration=inifile.value(axisname+"/acceleration", defaultAD.acceleration).toDouble();
             d.initVelocity=inifile.value(axisname+"/initvelocity", defaultAD.initVelocity).toDouble();
             d.maxVelocity=inifile.value(axisname+"/maxvelocity", defaultAD.maxVelocity).toDouble();
+            d.maxCoord=inifile.value(axisname+"/maxcoord", defaultAD.maxCoord).toDouble();
+            d.minCoord=inifile.value(axisname+"/mincoord", defaultAD.minCoord).toDouble();
 
 
 
@@ -131,6 +133,8 @@ void QFExtensionLinearStagePI2::deinit() {
         inifile.setValue(axisname+"/initvelocity", axes[i].initVelocity);
         inifile.setValue(axisname+"/maxvelocity", axes[i].maxVelocity);
         inifile.setValue(axisname+"/label", axes[i].label);
+        inifile.setValue(axisname+"/maxcoord", axes[i].maxCoord);
+        inifile.setValue(axisname+"/mincoord", axes[i].minCoord);
     }
 }
 
@@ -296,6 +300,16 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int i) {
             serial->sendCommand("SA"+inttostr(axes[i].acceleration));
             serial->sendCommand("MN");
             serial->sendCommand("DH");
+//            if (i==2) {serial->sendCommand("FE"); // Find Origin, z-dir: positive, negative else
+//                else  {serial->sendCommand("FE1");
+            if (i==0) {
+                serial->sendCommand("FE1"); // Test Origin finding in one x-dir
+                double dist=getPosition(i);
+                serial->sendCommand("DH");
+//                move(i, -dist+4); // Always approach from same side
+                move(i, -dist);
+            }
+            serial->sendCommand("DH");
             axes[i].velocity=axes[i].initVelocity;
             axes[i].joystickEnabled=false;
 
@@ -317,6 +331,9 @@ void QFExtensionLinearStagePI2::disconnectDevice(unsigned int axis) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
+        serial->selectAxis(axes[axis].ID);
+        serial->sendCommand("JF");
+        axes[axis].joystickEnabled=false;
         com->close();
         axes[axis].state=QFExtensionLinearStage::Disconnected;
     }
@@ -415,10 +432,17 @@ void QFExtensionLinearStagePI2::move(unsigned int axis, double newPosition) {
         serial->selectAxis(axes[axis].ID);
         if (com->isConnectionOpen() && (axes[axis].state==QFExtensionLinearStage::Ready) && (!axes[axis].joystickEnabled)) {
             long xx=(long)round(newPosition/axes[axis].lengthFactor);
-            if (!com->hasErrorOccured()) {
-                serial->sendCommand("SV"+inttostr((long)round(axes[axis].velocity/axes[axis].velocityFactor))+",MA"+inttostr(xx));
+            if ( (axes[axis].maxCoord !=0  && newPosition>axes[axis].maxCoord) || (axes[axis].minCoord !=0 && newPosition<axes[axis].minCoord) ) {
+                axes[axis].state=QFExtensionLinearStage::Error;
+                log_error(tr(LOG_PREFIX " error on axis %1: Move attempt with position exceeding limits").arg(axis));
+                axes[axis].state=QFExtensionLinearStage::Ready;
             }
-            axes[axis].state=QFExtensionLinearStage::Moving;
+            else {
+                if (!com->hasErrorOccured()) {
+                    serial->sendCommand("SV"+inttostr((long)round(axes[axis].velocity/axes[axis].velocityFactor))+",MA"+inttostr(xx+(4/axes[axis].lengthFactor))+",MA"+inttostr(xx)); // Always approach from same side,4 mu correction
+                }
+                axes[axis].state=QFExtensionLinearStage::Moving;
+            }
         }
     }
 }

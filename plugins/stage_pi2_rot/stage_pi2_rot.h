@@ -38,7 +38,7 @@
     \ingroup qf3extensionplugins
 */
 
-/*! \brief QFExtensionLinearStage implementation for PI mercury stages with Rotational Stage
+/*! \brief QFExtensionLinearStage implementation for PI mercury stages with Rotational Stage PI RS-40
     \ingroup qf3ext_StagePI2rot
     The Stage is basically handled the same way as a linear stage would be, since otherwise the existing class may not be used.
  */
@@ -171,6 +171,8 @@ class QFExtensionLinearStagePI2Rot : public QObject, public QFExtensionBase, pub
                 lengthFactor=2.57e-5;
                 velocityFactor=2.57e-5;
                 accelerationFactor=2.57e-5;
+                maxCoord=0;
+                minCoord=0;
             }
 
             /** \brief ID of the Mercury C-863 controller for the axis
@@ -205,14 +207,17 @@ class QFExtensionLinearStagePI2Rot : public QObject, public QFExtensionBase, pub
              double initVelocity;
              /** \brief settings of max. velocity */
              double maxVelocity;
+             /** \brief movement limitations for each axis */
+             double maxCoord;
+             double minCoord;
 
-             /** \brief this factor is used to get the control electronics position from the position in micron, given in microns/unit */
+             /** \brief this factor is used to get the control electronics position from the position in degrees, given in degrees/unit */
              double lengthFactor;
 
-             /** \brief this factor is used to get the control electronics velocity from the velocity in micron/sec, given in (micron/sec)/unit */
+             /** \brief this factor is used to get the control electronics velocity from the velocity in degrees/sec, given in (degrees/sec)/unit */
              double velocityFactor;
 
-             /** \brief this factor is used to get the control electronics acceleration from the acceleration in micron/sec^2, given in (micron/sec^2)/unit */
+             /** \brief this factor is used to get the control electronics acceleration from the acceleration in degrees/sec^2, given in (degrees/sec^2)/unit */
              double accelerationFactor;
         };
 
