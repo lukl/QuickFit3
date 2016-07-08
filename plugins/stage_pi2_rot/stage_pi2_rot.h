@@ -173,6 +173,7 @@ class QFExtensionLinearStagePI2Rot : public QObject, public QFExtensionBase, pub
                 accelerationFactor=2.57e-5;
                 maxCoord=0;
                 minCoord=0;
+                backlashCorr=1;
             }
 
             /** \brief ID of the Mercury C-863 controller for the axis
@@ -210,6 +211,8 @@ class QFExtensionLinearStagePI2Rot : public QObject, public QFExtensionBase, pub
              /** \brief movement limitations for each axis */
              double maxCoord;
              double minCoord;
+             /** \brief backlash correction for each axis in deg */
+             double backlashCorr;
 
              /** \brief this factor is used to get the control electronics position from the position in degrees, given in degrees/unit */
              double lengthFactor;

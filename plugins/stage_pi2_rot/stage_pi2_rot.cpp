@@ -92,6 +92,7 @@ void QFExtensionLinearStagePI2Rot::initExtension() {
             d.maxVelocity=inifile.value(axisname+"/maxvelocity", defaultAD.maxVelocity).toDouble();
             d.maxCoord=inifile.value(axisname+"/maxcoord", defaultAD.maxCoord).toDouble();
             d.minCoord=inifile.value(axisname+"/mincoord", defaultAD.minCoord).toDouble();
+            d.backlashCorr=inifile.value(axisname+"/backlashcorr", defaultAD.backlashCorr).toDouble();
 
 
 
@@ -135,6 +136,7 @@ void QFExtensionLinearStagePI2Rot::deinit() {
         inifile.setValue(axisname+"/label", axes[i].label);
         inifile.setValue(axisname+"/maxcoord", axes[i].maxCoord);
         inifile.setValue(axisname+"/mincoord", axes[i].minCoord);
+        inifile.setValue(axisname+"/backlashcorr", axes[i].backlashCorr);
     }
 }
 
@@ -434,7 +436,7 @@ void QFExtensionLinearStagePI2Rot::move(unsigned int axis, double newPosition) {
             else {
 
                 if (!com->hasErrorOccured()) {
-                    serial->sendCommand("SV"+inttostr((long)round(axes[axis].velocity/axes[axis].velocityFactor))+",MA"+inttostr(xx+(1/axes[axis].lengthFactor))+",MA"+inttostr(xx)); // Always approach from same side, 1 deg correction
+                    serial->sendCommand("SV"+inttostr((long)round(axes[axis].velocity/axes[axis].velocityFactor))+",MA"+inttostr(xx+(axes[axis].backlashCorr/axes[axis].lengthFactor))+",MA"+inttostr(xx)); // Always approach from same side, default 1 deg correction
                 }
                 axes[axis].state=QFExtensionLinearStage::Moving;
             }

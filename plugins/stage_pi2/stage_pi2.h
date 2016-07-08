@@ -172,6 +172,7 @@ class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public
                 accelerationFactor=6.9e-3;
                 maxCoord=0;
                 minCoord=0;
+                backlashCorr=4;
             }
 
             /** \brief ID of the Mercury C-863 controller for the axis
@@ -209,6 +210,8 @@ class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public
              /** \brief movement limitations for each axis */
              double maxCoord;
              double minCoord;
+             /** \brief backlash correction for each axis in microns */
+             double backlashCorr;
 
              /** \brief this factor is used to get the control electronics position from the position in micron, given in microns/unit */
              double lengthFactor;
