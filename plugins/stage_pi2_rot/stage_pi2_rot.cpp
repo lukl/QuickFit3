@@ -46,7 +46,7 @@ QFExtensionLinearStagePI2Rot::~QFExtensionLinearStagePI2Rot() {
 }
 
 void QFExtensionLinearStagePI2Rot::initExtension() {
-    /* do initializations here but do not yet connect to the camera! */
+    /* do initializations here but do not yet connect to the stage! */
     QString ini=services->getGlobalConfigFileDirectory()+QString("/stage_pi863_2_rot.ini");
     if (!QFile::exists(ini)) ini=services->getConfigFileDirectory()+QString("/stage_pi863_2_rot.ini");
     if (!QFile::exists(ini)) ini=services->getAssetsDirectory()+QString("plugins/")+getID()+QString("/stage_pi863_2_rot.ini");
@@ -63,17 +63,15 @@ void QFExtensionLinearStagePI2Rot::initExtension() {
        There are max. 16 axes per controller */
 
     if (axisCount==0) {
-        int j=0;
         for (int i=0; i<16; i++) {
-            if (inifile.contains(QString("axis%1").arg(i)+"/id")) {j++;};
+            if (inifile.contains(QString("axis%1").arg(i)+"/id")) {axisCount++;};
         };
-        axisCount=j;
     };
 
 
     axes.clear();
-    for (int i=0; i<axisCount; i++) {
-        QString axisname=QString("axis%1").arg(i);
+    for (int axis=0; axis<axisCount; axis++) {
+        QString axisname=QString("axis%1").arg(axis);
         if (inifile.contains(axisname+"/id")) {
             AxisDescription d;
             QString s=inifile.value(axisname+"/id", '0').toString();
@@ -100,12 +98,12 @@ void QFExtensionLinearStagePI2Rot::initExtension() {
             d.joystickEnabled=false;
             d.state=QFExtensionLinearStage::Disconnected;
             d.name=axisname;
-            d.label=inifile.value(axisname+"/label", tr("PI Mercury 863, axis %1").arg(i)).toString();
+            d.label=inifile.value(axisname+"/label", tr("Rot PI Mercury 863, axis %1").arg(axis)).toString();
             axes.append(d);
         }
     }
 
-    actCalibrateJoysticks=new QFActionWithNoMenuRole(QIcon(":/stage_pi/pi_joystick.png"), tr("calibrate PI stage joysticks, v2"), this);
+    actCalibrateJoysticks=new QFActionWithNoMenuRole(QIcon(":/stage_pi/pi_joystick.png"), tr("calibrate PI stage joysticks, v2 Rot"), this);
     connect(actCalibrateJoysticks, SIGNAL(triggered()), this, SLOT(calibrateJoysticks()));
     if (services) {
         QMenu* m=services->getMenu("extensions");
@@ -122,26 +120,26 @@ void QFExtensionLinearStagePI2Rot::deinit() {
 
 
     inifile.setValue("axis_count", axes.size());
-    for (int i=0; i<axes.size(); i++) {
-        QString axisname=QString("axis%1").arg(i);
-        inifile.setValue(axisname+"/id", axes[i].ID);
+    for (int axis=0; axis<axes.size(); axis++) {
+        QString axisname=QString("axis%1").arg(axis);
+        inifile.setValue(axisname+"/id", axes[axis].ID);
 
-        inifile.setValue(axisname+"/pterm", axes[i].PTerm);
-        inifile.setValue(axisname+"/iterm", axes[i].iTerm);
-        inifile.setValue(axisname+"/dterm", axes[i].DTerm);
-        inifile.setValue(axisname+"/ilimit", axes[i].iLimit);
-        inifile.setValue(axisname+"/acceleration", axes[i].acceleration);
-        inifile.setValue(axisname+"/initvelocity", axes[i].initVelocity);
-        inifile.setValue(axisname+"/maxvelocity", axes[i].maxVelocity);
-        inifile.setValue(axisname+"/label", axes[i].label);
-        inifile.setValue(axisname+"/maxcoord", axes[i].maxCoord);
-        inifile.setValue(axisname+"/mincoord", axes[i].minCoord);
-        inifile.setValue(axisname+"/backlashcorr", axes[i].backlashCorr);
+        inifile.setValue(axisname+"/pterm", axes[axis].PTerm);
+        inifile.setValue(axisname+"/iterm", axes[axis].iTerm);
+        inifile.setValue(axisname+"/dterm", axes[axis].DTerm);
+        inifile.setValue(axisname+"/ilimit", axes[axis].iLimit);
+        inifile.setValue(axisname+"/acceleration", axes[axis].acceleration);
+        inifile.setValue(axisname+"/initvelocity", axes[axis].initVelocity);
+        inifile.setValue(axisname+"/maxvelocity", axes[axis].maxVelocity);
+        inifile.setValue(axisname+"/label", axes[axis].label);
+        inifile.setValue(axisname+"/maxcoord", axes[axis].maxCoord);
+        inifile.setValue(axisname+"/mincoord", axes[axis].minCoord);
+        inifile.setValue(axisname+"/backlashcorr", axes[axis].backlashCorr);
     }
 }
 
 void QFExtensionLinearStagePI2Rot::projectChanged(QFProject* /*oldProject*/, QFProject* /*project*/) {
-	/* usually cameras do not have to react to a change of the project in QuickFit .. so you don't need to do anything here
+    /* usually stages do not have to react to a change of the project in QuickFit .. so you don't need to do anything here
 	   But: possibly you could read config information from the project here
 	 */
 }
@@ -187,7 +185,7 @@ void QFExtensionLinearStagePI2Rot::showSettingsDialog(unsigned int /*axis*/, QWi
 //    bool globalIniWritable=QSettings(services->getGlobalConfigFileDirectory()+"/stage_pi863_2_rot.ini", QSettings::IniFormat).isWritable();
 
 
-//    /* open a dialog that configures the camera.
+//    /* open a dialog that configures the stage.
 
 //       usually you should display a modal QDialog descendent which writes back config when the user clicks OK
 
@@ -276,51 +274,54 @@ void QFExtensionLinearStagePI2Rot::calibrateJoysticks() {
 
 
 
-bool QFExtensionLinearStagePI2Rot::isConnected(unsigned int i) {
-    if (((int64_t)i<axes.size())) {
-        QMutexLocker locker(axes[i].serial->getMutex());
-        return axes[i].serial->getCOM()->isConnectionOpen();
+bool QFExtensionLinearStagePI2Rot::isConnected(unsigned int axis) {
+    if (((int64_t)axis<axes.size())) {
+        QMutexLocker locker(axes[axis].serial->getMutex());
+        return axes[axis].serial->getCOM()->isConnectionOpen();
     }
     return false;
 }
 
-void QFExtensionLinearStagePI2Rot::connectDevice(unsigned int i) {
-    if (((int64_t)i<axes.size())) {
-        QMutexLocker locker(axes[i].serial->getMutex());
-        QFSerialConnection* com=axes[i].serial->getCOM();
-        QFExtensionLinearStagePI2RotProtHandler* serial=axes[i].serial;
+void QFExtensionLinearStagePI2Rot::connectDevice(unsigned int axis) {
+    if (((int64_t)axis<axes.size())) {
+        log_text((tr("Connecting Rotational Mercury C-863 Motor Controller Axis %1 ...").arg(axis)));
+        QMutexLocker locker(axes[axis].serial->getMutex());
+        QFSerialConnection* com=axes[axis].serial->getCOM();
+        QFExtensionLinearStagePI2RotProtHandler* serial=axes[axis].serial;
         com->open();
         if (com->isConnectionOpen()) {
-            serial->selectAxis(axes[i].ID);
-            serial->selectAxis(axes[i].ID);
+            serial->selectAxis(axes[axis].ID);
+            serial->selectAxis(axes[axis].ID);
             serial->queryCommand("VE");
-            serial->sendCommand("DP"+inttostr(axes[i].PTerm));
+            serial->sendCommand("DP"+inttostr(axes[axis].PTerm));
             serial->queryCommand("GP");
-            serial->sendCommand("DI"+inttostr(axes[i].iTerm));
-            serial->sendCommand("DD"+inttostr(axes[i].DTerm));
-            serial->sendCommand("DL"+inttostr(axes[i].iLimit));
-            serial->sendCommand("SA"+inttostr(axes[i].acceleration));
+            serial->sendCommand("DI"+inttostr(axes[axis].iTerm));
+            serial->sendCommand("DD"+inttostr(axes[axis].DTerm));
+            serial->sendCommand("DL"+inttostr(axes[axis].iLimit));
+            serial->sendCommand("SA"+inttostr(axes[axis].acceleration));
             serial->sendCommand("MN");
             serial->sendCommand("DH");
-            if (i==0) {
+            log_text(tr("Finding origin..."));
+            if (axis==0) {
                 serial->sendCommand("FE1"); // Test Origin finding in one rot-dir
-                double dist=getPosition(i);
+                double dist=getPosition(axis);
                 serial->sendCommand("DH");
 //                move(i, -(dist+1));
-                move(i, -dist);
+                move(axis, -dist);
             }
-            axes[i].velocity=axes[i].initVelocity;
-            axes[i].joystickEnabled=false;
+            log_text(tr("Done.\n"));
+            axes[axis].velocity=axes[axis].initVelocity;
+            axes[axis].joystickEnabled=false;
 
             if (com->hasErrorOccured()) {
-                axes[i].state=QFExtensionLinearStage::Error;
+                axes[axis].state=QFExtensionLinearStage::Error;
             } else {
-                axes[i].state=QFExtensionLinearStage::Ready;
+                axes[axis].state=QFExtensionLinearStage::Ready;
             }
         } else {
-            log_error(tr(LOG_PREFIX " Could not connect to Mercury C-863 Motor Controller!!!\n"));
+            log_error(tr(LOG_PREFIX " Could not connect to Rotational Mercury C-863 Motor Controller !!!\n"));
             log_error(tr(LOG_PREFIX " reason: %1\n").arg(com->getLastError().c_str()));
-            axes[i].state=QFExtensionLinearStage::Disconnected;
+            axes[axis].state=QFExtensionLinearStage::Disconnected;
         }
     }
 }
@@ -429,8 +430,8 @@ void QFExtensionLinearStagePI2Rot::move(unsigned int axis, double newPosition) {
         if (com->isConnectionOpen() && (axes[axis].state==QFExtensionLinearStage::Ready) && (!axes[axis].joystickEnabled)) {
             long xx=(long)round(newPosition/axes[axis].lengthFactor);
             if ( (axes[axis].maxCoord !=0  && newPosition>axes[axis].maxCoord) || (axes[axis].minCoord !=0 && newPosition<axes[axis].minCoord) ) {
-                log_error(tr(LOG_PREFIX " error on axis %1: Move attempt with position exceeding limits").arg(axis));
                 axes[axis].state=QFExtensionLinearStage::Error;
+                log_error(tr(LOG_PREFIX " error on axis %1: Move attempt with position exceeding limits").arg(axis));
                 axes[axis].state=QFExtensionLinearStage::Ready;
             }
             else {
@@ -526,7 +527,7 @@ QFExtensionLinearStage::AxisState QFExtensionLinearStagePI2Rot::getAxisState(uns
 
 QString QFExtensionLinearStagePI2Rot::getStageName(unsigned int axis) const
 {
-    QString n=tr("Rot PI Mercury 863 v2, axis %1").arg(axis);
+    QString n=tr("Rotational PI Mercury 863, axis %1").arg(axis);
     if ( (int64_t)axis<axes.size()) n=axes[axis].label;
     return n;
 }

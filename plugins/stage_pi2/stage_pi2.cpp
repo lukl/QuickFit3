@@ -63,17 +63,15 @@ void QFExtensionLinearStagePI2::initExtension() {
        There are max. 16 axes per controller */
 
     if (axisCount==0) {
-        int j=0;
         for (int i=0; i<16; i++) {
-            if (inifile.contains(QString("axis%1").arg(i)+"/id")) {j++;};
+            if (inifile.contains(QString("axis%1").arg(i)+"/id")) {axisCount++;};
         };
-        axisCount=j;
     };
 
 
     axes.clear();
-    for (int i=0; i<axisCount; i++) {
-        QString axisname=QString("axis%1").arg(i);
+    for (int axis=0; axis<axisCount; axis++) {
+        QString axisname=QString("axis%1").arg(axis);
         if (inifile.contains(axisname+"/id")) {
             AxisDescription d;
             QString s=inifile.value(axisname+"/id", '0').toString();
@@ -100,7 +98,7 @@ void QFExtensionLinearStagePI2::initExtension() {
             d.joystickEnabled=false;
             d.state=QFExtensionLinearStage::Disconnected;
             d.name=axisname;
-            d.label=inifile.value(axisname+"/label", tr("PI Mercury 863, axis %1").arg(i)).toString();
+            d.label=inifile.value(axisname+"/label", tr("PI Mercury 863 (v2), axis %1").arg(axis)).toString();
             axes.append(d);
         }
     }
@@ -122,26 +120,26 @@ void QFExtensionLinearStagePI2::deinit() {
 
 
     inifile.setValue("axis_count", axes.size());
-    for (int i=0; i<axes.size(); i++) {
-        QString axisname=QString("axis%1").arg(i);
-        inifile.setValue(axisname+"/id", axes[i].ID);
+    for (int axis=0; axis<axes.size(); axis++) {
+        QString axisname=QString("axis%1").arg(axis);
+        inifile.setValue(axisname+"/id", axes[axis].ID);
 
-        inifile.setValue(axisname+"/pterm", axes[i].PTerm);
-        inifile.setValue(axisname+"/iterm", axes[i].iTerm);
-        inifile.setValue(axisname+"/dterm", axes[i].DTerm);
-        inifile.setValue(axisname+"/ilimit", axes[i].iLimit);
-        inifile.setValue(axisname+"/acceleration", axes[i].acceleration);
-        inifile.setValue(axisname+"/initvelocity", axes[i].initVelocity);
-        inifile.setValue(axisname+"/maxvelocity", axes[i].maxVelocity);
-        inifile.setValue(axisname+"/label", axes[i].label);
-        inifile.setValue(axisname+"/maxcoord", axes[i].maxCoord);
-        inifile.setValue(axisname+"/mincoord", axes[i].minCoord);
-        inifile.setValue(axisname+"/backlashcorr", axes[i].backlashCorr);
+        inifile.setValue(axisname+"/pterm", axes[axis].PTerm);
+        inifile.setValue(axisname+"/iterm", axes[axis].iTerm);
+        inifile.setValue(axisname+"/dterm", axes[axis].DTerm);
+        inifile.setValue(axisname+"/ilimit", axes[axis].iLimit);
+        inifile.setValue(axisname+"/acceleration", axes[axis].acceleration);
+        inifile.setValue(axisname+"/initvelocity", axes[axis].initVelocity);
+        inifile.setValue(axisname+"/maxvelocity", axes[axis].maxVelocity);
+        inifile.setValue(axisname+"/label", axes[axis].label);
+        inifile.setValue(axisname+"/maxcoord", axes[axis].maxCoord);
+        inifile.setValue(axisname+"/mincoord", axes[axis].minCoord);
+        inifile.setValue(axisname+"/backlashcorr", axes[axis].backlashCorr);
     }
 }
 
 void QFExtensionLinearStagePI2::projectChanged(QFProject* /*oldProject*/, QFProject* /*project*/) {
-	/* usually cameras do not have to react to a change of the project in QuickFit .. so you don't need to do anything here
+    /* usually stages do not have to react to a change of the project in QuickFit .. so you don't need to do anything here
 	   But: possibly you could read config information from the project here
 	 */
 }
@@ -187,7 +185,7 @@ void QFExtensionLinearStagePI2::showSettingsDialog(unsigned int /*axis*/, QWidge
 //    bool globalIniWritable=QSettings(services->getGlobalConfigFileDirectory()+"/stage_pi863_2.ini", QSettings::IniFormat).isWritable();
 
 
-//    /* open a dialog that configures the camera.
+//    /* open a dialog that configures the stage.
 
 //       usually you should display a modal QDialog descendent which writes back config when the user clicks OK
 
@@ -259,7 +257,7 @@ void QFExtensionLinearStagePI2::showSettingsDialog(unsigned int /*axis*/, QWidge
 void QFExtensionLinearStagePI2::calibrateJoysticks() {
 
     for (unsigned int axis=0; axis<getAxisCount(); axis++) {
-        QMessageBox::StandardButton answer=QMessageBox::question(NULL, tr("PI Mercury C863 joystick calibration"), tr("Do you want to calibrate a joystick on axis %1?").arg(axis), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::Yes);
+        QMessageBox::StandardButton answer=QMessageBox::question(NULL, tr("PI Mercury C863 v2 joystick calibration"), tr("Do you want to calibrate a joystick on axis %1?").arg(axis), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::Yes);
         if (answer==QMessageBox::Yes) {
             bool wasConnected=isConnected(axis);
             if (!wasConnected) connectDevice(axis);
@@ -276,54 +274,57 @@ void QFExtensionLinearStagePI2::calibrateJoysticks() {
 
 
 
-bool QFExtensionLinearStagePI2::isConnected(unsigned int i) {
-    if (((int64_t)i<axes.size())) {
-        QMutexLocker locker(axes[i].serial->getMutex());
-        return axes[i].serial->getCOM()->isConnectionOpen();
+bool QFExtensionLinearStagePI2::isConnected(unsigned int axis) {
+    if (((int64_t)axis<axes.size())) {
+        QMutexLocker locker(axes[axis].serial->getMutex());
+        return axes[axis].serial->getCOM()->isConnectionOpen();
     }
     return false;
 }
 
-void QFExtensionLinearStagePI2::connectDevice(unsigned int i) {
-    if (((int64_t)i<axes.size())) {
-        QMutexLocker locker(axes[i].serial->getMutex());
-        QFSerialConnection* com=axes[i].serial->getCOM();
-        QFExtensionLinearStagePI2ProtocolHandler* serial=axes[i].serial;
+void QFExtensionLinearStagePI2::connectDevice(unsigned int axis) {
+    log_text((tr("Connecting Mercury C-863 Motor Controller (v2) Axis %1 ...").arg(axis)));
+    if (((int64_t)axis<axes.size())) {
+        QMutexLocker locker(axes[axis].serial->getMutex());
+        QFSerialConnection* com=axes[axis].serial->getCOM();
+        QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
         com->open();
         if (com->isConnectionOpen()) {
-            serial->selectAxis(axes[i].ID);
-            serial->selectAxis(axes[i].ID);
+            serial->selectAxis(axes[axis].ID);
+            serial->selectAxis(axes[axis].ID);
             serial->queryCommand("VE");
-            serial->sendCommand("DP"+inttostr(axes[i].PTerm));
+            serial->sendCommand("DP"+inttostr(axes[axis].PTerm));
             serial->queryCommand("GP");
-            serial->sendCommand("DI"+inttostr(axes[i].iTerm));
-            serial->sendCommand("DD"+inttostr(axes[i].DTerm));
-            serial->sendCommand("DL"+inttostr(axes[i].iLimit));
-            serial->sendCommand("SA"+inttostr(axes[i].acceleration));
+            serial->sendCommand("DI"+inttostr(axes[axis].iTerm));
+            serial->sendCommand("DD"+inttostr(axes[axis].DTerm));
+            serial->sendCommand("DL"+inttostr(axes[axis].iLimit));
+            serial->sendCommand("SA"+inttostr(axes[axis].acceleration));
             serial->sendCommand("MN");
             serial->sendCommand("DH");
-//            if (i==2) {serial->sendCommand("FE"); // Find Origin, z-dir: positive, negative else
+            log_text(tr("Finding origin..."));
+//            if (axis==2) {serial->sendCommand("FE"); // Find Origin, z-dir: positive, negative else
 //                else  {serial->sendCommand("FE1");
-            if (i==0) {
+            if (axis==0) {
                 serial->sendCommand("FE1"); // Test Origin finding in one x-dir
-                double dist=getPosition(i);
+                double dist=getPosition(axis);
                 serial->sendCommand("DH");
-//                move(i, -dist+4); // Always approach from same side
-                move(i, -dist);
+//                move(axis, -dist+4); // Always approach from same side
+                move(axis, -dist);
             }
             serial->sendCommand("DH");
-            axes[i].velocity=axes[i].initVelocity;
-            axes[i].joystickEnabled=false;
+            log_text(tr("Done.\n"));
+            axes[axis].velocity=axes[axis].initVelocity;
+            axes[axis].joystickEnabled=false;
 
             if (com->hasErrorOccured()) {
-                axes[i].state=QFExtensionLinearStage::Error;
+                axes[axis].state=QFExtensionLinearStage::Error;
             } else {
-                axes[i].state=QFExtensionLinearStage::Ready;
+                axes[axis].state=QFExtensionLinearStage::Ready;
             }
         } else {
-            log_error(tr(LOG_PREFIX " Could not connect to Mercury C-863 Motor Controller!!!\n"));
+            log_error(tr(LOG_PREFIX " Could not connect to Mercury C-863 Motor Controller (v2)!!!\n"));
             log_error(tr(LOG_PREFIX " reason: %1\n").arg(com->getLastError().c_str()));
-            axes[i].state=QFExtensionLinearStage::Disconnected;
+            axes[axis].state=QFExtensionLinearStage::Disconnected;
         }
     }
 }
