@@ -705,7 +705,7 @@ void QFESPIMB040SampleStageConfig::updateStates() {
     //if (!anyconn) locked=false;
 }
 
-void QFESPIMB040SampleStageConfig::disConnectX() {
+void QFESPIMB040SampleStageConfig::disConnectX() { // Connect or Disconnect stage
     QApplication::setOverrideCursor(Qt::WaitCursor);
     if (useThread) stageThread->stopThread();
     bool conn=actConnectX->isChecked();
@@ -1092,29 +1092,29 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
             labPos->setText(QLocale::system().toString(position, 'f', 2));
         }
 
-//        stage=getRStage();
-//        axis=getRStageAxis();
-//        labPos=labRPosition;
-//        labState=labRState;
-//        labSpeed=labRSpeed;
-//        if (stage) {
-//            anyconn=anyconn||stage->isConnected(axis);
-//            QFExtensionLinearStage::AxisState state=stage->getAxisState(axis);
-//            double position=stage->getPosition(axis);
-//            double speed=stage->getSpeed(axis);
-//            switch(state) {
-//                case QFExtensionLinearStage::Ready : labState->setPixmap(iconReady); break;
-//                case QFExtensionLinearStage::Disconnected : labState->setPixmap(iconDisconnected); break;
-//                case QFExtensionLinearStage::Moving : {
-//          if (speed>0) labState->setPixmap(iconMoving);
-//          else labState->setPixmap(iconMovingOpposite);
-//        } break;
-//                case QFExtensionLinearStage::Error : labState->setPixmap(iconError); break;
-//                default: labState->setText(tr("?")); break;
-//            }
-//            labSpeed->setText(QLocale::system().toString(speed, 'f', 2));
-//            labPos->setText(QLocale::system().toString(position, 'f', 2));
-//        }
+        stage=getRStage();
+        axis=getRStageAxis();
+        labPos=labRPosition;
+        labState=labRState;
+        labSpeed=labRSpeed;
+        if (stage) {
+            anyconn=anyconn||stage->isConnected(axis);
+            QFExtensionLinearStage::AxisState state=stage->getAxisState(axis);
+            double position=stage->getPosition(axis);
+            double speed=stage->getSpeed(axis);
+            switch(state) {
+                case QFExtensionLinearStage::Ready : labState->setPixmap(iconReady); break;
+                case QFExtensionLinearStage::Disconnected : labState->setPixmap(iconDisconnected); break;
+                case QFExtensionLinearStage::Moving : {
+          if (speed>0) labState->setPixmap(iconMoving);
+          else labState->setPixmap(iconMovingOpposite);
+        } break;
+                case QFExtensionLinearStage::Error : labState->setPixmap(iconError); break;
+                default: labState->setText(tr("?")); break;
+            }
+            labSpeed->setText(QLocale::system().toString(speed, 'f', 2));
+            labPos->setText(QLocale::system().toString(position, 'f', 2));
+        }
 
         updateStates();
         if (widVisible) setUpdatesEnabled(updt);

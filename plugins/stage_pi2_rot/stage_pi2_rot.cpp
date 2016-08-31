@@ -284,7 +284,7 @@ bool QFExtensionLinearStagePI2Rot::isConnected(unsigned int axis) {
 
 void QFExtensionLinearStagePI2Rot::connectDevice(unsigned int axis) {
     if (((int64_t)axis<axes.size())) {
-        log_text((tr("Connecting Rotational Mercury C-863 Motor Controller Axis %1 ...").arg(axis)));
+        log_text((tr("Connecting Rotational Mercury C-863 Motor Controller Axis %1 ...\n").arg(axis)));
         QMutexLocker locker(axes[axis].serial->getMutex());
         QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2RotProtHandler* serial=axes[axis].serial;
@@ -292,20 +292,32 @@ void QFExtensionLinearStagePI2Rot::connectDevice(unsigned int axis) {
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[axis].ID);
             serial->selectAxis(axes[axis].ID);
-            serial->queryCommand("VE");
-            serial->sendCommand("DP"+inttostr(axes[axis].PTerm));
-            serial->queryCommand("GP");
-            serial->sendCommand("DI"+inttostr(axes[axis].iTerm));
-            serial->sendCommand("DD"+inttostr(axes[axis].DTerm));
-            serial->sendCommand("DL"+inttostr(axes[axis].iLimit));
-            serial->sendCommand("SA"+inttostr(axes[axis].acceleration));
-            serial->sendCommand("MN");
-            serial->sendCommand("DH");
+            serial->queryCommand("ERR?");
+            log_text(tr("Controller Version: %1 ").arg(serial->queryCommand("VER?").c_str()));
+            log_text(tr("Device Identification: %1 ").arg(serial->queryCommand("*IDN?").c_str()));
+            if(serial->queryCommand("CSV?").c_str()!=std::string("2.0\n")) {
+                log_warning(tr("Potentially incompatible Controller GCS Syntax version: %1Plugin written for 2.0\n").arg(serial->queryCommand("CSV?").c_str()));
+            }
+//            serial->sendCommand("DP"+inttostr(axes[axis].PTerm)); // Old native 2 char commands
+//            serial->queryCommand("GP");
+//            serial->sendCommand("DI"+inttostr(axes[axis].iTerm));
+//            serial->sendCommand("DD"+inttostr(axes[axis].DTerm));
+//            serial->sendCommand("DL"+inttostr(axes[axis].iLimit));
+//            serial->sendCommand("SA"+inttostr(axes[axis].acceleration));
+//            serial->sendCommand("MN");
+            serial->sendCommand("SVO "+inttostr(axis+1)+" 1");
+            if(serial->queryCommand("SVO? "+inttostr(axis+1))!=inttostr(axis+1)+"=1\n") {
+                log_error("Switching on servo failed.\n");
+                log_error(tr("Result off SVO? command was %1").arg(serial->queryCommand("SVO? "+inttostr(axis+1)).c_str()));
+            }
+            serial->sendCommand("DFH "+inttostr(axis+1));
+            serial->sendCommand("VEL "+inttostr(axis+1)+" 4");
             log_text(tr("Finding origin..."));
             if (axis==0) {
-                serial->sendCommand("FE1"); // Test Origin finding in one rot-dir
+                serial->sendCommand("FED "+inttostr(axis+1)+" 3 0"); // Find reference switch position
+                while("0\x00a"!=serial->queryCommand("\x005")) {sleep(0.1);}
                 double dist=getPosition(axis);
-                serial->sendCommand("DH");
+                serial->sendCommand("DFH "+inttostr(axis+1));
 //                move(i, -(dist+1));
                 move(axis, -dist);
             }
@@ -331,6 +343,13 @@ void QFExtensionLinearStagePI2Rot::disconnectDevice(unsigned int axis) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2RotProtHandler* serial=axes[axis].serial;
+        if (com->isConnectionOpen()) {
+            serial->sendCommand("SVO "+inttostr(axis+1)+" 0");
+            if(serial->queryCommand("SVO? "+inttostr(axis+1))!=inttostr(axis+1)+"=0\n") {
+                log_error("Switching off servo failed.\n");
+                log_error(tr("Result off SVO? command was %1").arg(serial->queryCommand("SVO? "+inttostr(axis+1)).c_str()));
+            }
+        }
         com->close();
         axes[axis].state=QFExtensionLinearStage::Disconnected;
     }
@@ -348,11 +367,12 @@ void QFExtensionLinearStagePI2Rot::setJoystickActive(unsigned int axis, bool ena
 
         if (enabled) {
             serial->selectAxis(axes[axis].ID);
-            serial->sendCommand("JN"+inttostr((long)round(maxVelocity/axes[axis].velocityFactor)));
+//            serial->sendCommand("JN"+inttostr((long)round(maxVelocity/axes[axis].velocityFactor)));
+            serial->sendCommand("JON 1 1"+inttostr((long)round(maxVelocity/axes[axis].velocityFactor)));
             axes[axis].joystickEnabled=true;
         } else {
             serial->selectAxis(axes[axis].ID);
-            serial->sendCommand("JF");
+            serial->sendCommand("JON 1 0");
             axes[axis].joystickEnabled=false;
         }
     }
@@ -372,7 +392,7 @@ void QFExtensionLinearStagePI2Rot::stop(unsigned int axis) {
         QFExtensionLinearStagePI2RotProtHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[axis].ID);
-            serial->sendCommand("AB");
+            serial->sendCommand("STP");
         }
     }
 }
@@ -384,13 +404,22 @@ double QFExtensionLinearStagePI2Rot::getSpeed(unsigned int axis) {
         QFExtensionLinearStagePI2RotProtHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[axis].ID);
-            std::string r=serial->queryCommand("TV")+"\n";
-            double v=0;
+            std::string reply=serial->queryCommand("\x005");
             if (!com->hasErrorOccured()) {
-                if (sscanf(r.c_str(), "V:%lf", &v)) {
-                    return v*axes[axis].velocityFactor;
+                double moving=0, vel=0;
+                int controller_axis=axis+1; // Controller axis enumeration begins at 1
+                if (sscanf(reply.c_str(), "%lf", &moving)) {
+                    if (moving!=0) {
+                        if(sscanf(serial->queryCommand(std::string("VEL? ")+inttostr(axis+1)).c_str(), "%i=%lf", &controller_axis, &vel)) {
+                            return vel*axes[axis].velocityFactor;
+                        }
+                        else {
+                           log_error(tr(LOG_PREFIX " invalid result string from VEL? after ASCII #5 command [expected <axis>=<speed>] from axis %1. String was '%2'.\n").arg(axis).arg(toprintablestr(reply).c_str()));
+                        }
+                    }
+                    else return moving;
                 } else {
-                    log_error(tr(LOG_PREFIX " invalid result string from TV command [expected V:<number>] from axis %1. String was '%2'.\n").arg(axis).arg(toprintablestr(r).c_str()));
+                    log_error(tr(LOG_PREFIX " invalid result string from ASCII #5 command (Request Motion Status) [expected <bool>] from axis %1. String was '%2'.\n").arg(axis).arg(toprintablestr(reply).c_str()));
                 }
             }
         }
@@ -399,6 +428,7 @@ double QFExtensionLinearStagePI2Rot::getSpeed(unsigned int axis) {
     return 0;
 }
 
+
 double QFExtensionLinearStagePI2Rot::getPosition(unsigned int axis) {
     if (((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
@@ -406,13 +436,14 @@ double QFExtensionLinearStagePI2Rot::getPosition(unsigned int axis) {
         QFExtensionLinearStagePI2RotProtHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[axis].ID);
-            std::string r=serial->queryCommand("TP")+"\n";
-            double v=0;
+            std::string r=serial->queryCommand("POS? "+inttostr(axis+1));
+            double pos=0;
+            int controller_axis=axis+1; // Controller axis enumeration begins at 1
             if (!com->hasErrorOccured()) {
-                if (sscanf(r.c_str(), "P:%lf", &v)) {
-                    return v*axes[axis].lengthFactor;
+                if (sscanf(r.c_str(), "%i=%lf", &controller_axis, &pos)) {
+                    return pos*axes[axis].lengthFactor;
                 } else {
-                    log_error(tr(LOG_PREFIX " invalid result string from TP command [expected P:<number>] from axis %1. String was '%2'.\n").arg(axis).arg(toprintablestr(r).c_str()));
+                    log_error(tr(LOG_PREFIX " invalid result string from POS? command [expected <axis>=<double position>] from axis %1. String was '%2'.\n").arg(axis).arg(toprintablestr(r).c_str()));
                 }
             }
         }    }
@@ -436,8 +467,12 @@ void QFExtensionLinearStagePI2Rot::move(unsigned int axis, double newPosition) {
             }
             else {
 
-                if (!com->hasErrorOccured()) {
-                    serial->sendCommand("SV"+inttostr((long)round(axes[axis].velocity/axes[axis].velocityFactor))+",MA"+inttostr(xx+(axes[axis].backlashCorr/axes[axis].lengthFactor))+",MA"+inttostr(xx)); // Always approach from same side, default 1 deg correction
+                if (!com->hasErrorOccured() && newPosition!=getPosition(axis)) {
+                    serial->sendCommand("MOV "+inttostr(axis+1)+" "+inttostr(xx+(axes[axis].backlashCorr/axes[axis].lengthFactor))); // Always approach from same side, default 1 deg correction
+                    axes[axis].state=QFExtensionLinearStage::Moving;
+                    while("0\x00a"!=serial->queryCommand("\x005")) {sleep(0.2);}
+                    serial->sendCommand("MOV "+inttostr(axis+1)+" "+inttostr(xx));
+
                 }
                 axes[axis].state=QFExtensionLinearStage::Moving;
             }
@@ -455,57 +490,94 @@ QFExtensionLinearStage::AxisState QFExtensionLinearStagePI2Rot::getAxisState(uns
         std::string failedaxes="";
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[axis].ID);
-            std::string r=serial->queryCommand("TS")+"\n";
-            int B1=0, B2=0, B3=0, B4=0, B5=0, B6=0;
+            std::string reply=serial->queryCommand(std::string("\x004"));
+            std::string binstat=hextobin(reply.substr(2,4));
+            int BZERO=0, B1=0, B2=0, B3=0, B4=0, B5=0, B6=0, B7=0, B8=0, B9=0, B10=0, B11=0, B12=0, B13=0, B14=0, B15=0;
             if (!com->hasErrorOccured()) {
-                if (sscanf(r.c_str(), "S:%x %x %x %x %x %x", &B1, &B2, &B3, &B4, &B5, &B6)) {
+                if (sscanf(binstat.c_str(), "%1x %1x %1x %1x %1x %1x %1x %1x %1x %1x %1x %1x %1x %1x %1x %1x", &B15, &B14, &B13, &B12, &B11, &B10, &B9, &B8, &B7, &B6, &B5, &B4, &B3, &B2, &B1, &BZERO)) {
                     //std::cout<<"\n\n"<<std::string(1, (char)('x'+i-1))<<": "<<r<<"\n\n";
-                    if (B6==1) {
-                        log_error(tr(LOG_PREFIX " error on axis %1: RS-232 timeout\n").arg(axis));
+                    if (B8!=0) {
+                        log_error(tr(LOG_PREFIX " error on axis %1: Error flag (Bit #8) is set\n").arg(axis));
                         axes[axis].state=QFExtensionLinearStage::Error;
-                    } else if (B6==2) {
-                        log_error(tr(LOG_PREFIX " error on axis %1: RS-232 overflow\n").arg(axis));
-                        axes[axis].state=QFExtensionLinearStage::Error;
-                    } else if (B6==3) {
-                        log_error(tr(LOG_PREFIX " error on axis %1: Macro storage full\n").arg(axis));
-                        axes[axis].state=QFExtensionLinearStage::Error;
-                    } else if (B6==4) {
-                        log_error(tr(LOG_PREFIX " error on axis %1: Macro out of range\n").arg(axis));
-                        axes[axis].state=QFExtensionLinearStage::Error;
-                    } else if (B6==5) {
-                        log_error(tr(LOG_PREFIX " error on axis %1: Macro wrong com\n").arg(axis));
-                        axes[axis].state=QFExtensionLinearStage::Error;
-                    } else if (B6==6) {
-                        log_error(tr(LOG_PREFIX " error on axis %1: wrong command\n").arg(axis));
-                        axes[axis].state=QFExtensionLinearStage::Error;
-                    } else if (B6==7) {
-                        log_error(tr(LOG_PREFIX " error on axis %1: hard stop\n").arg(axis));
-                        axes[axis].state=QFExtensionLinearStage::Error;
-                    } else if (B6==8) {
-                        log_error(tr(LOG_PREFIX " error on axis %1: not defined\n").arg(axis));
-                        axes[axis].state=QFExtensionLinearStage::Error;
-                    } else if (B6==9) {
-                        log_error(tr(LOG_PREFIX " error on axis %1: Position following error\n").arg(axis));
-                        axes[axis].state=QFExtensionLinearStage::Error;
-                    } else if (B6==10) {
-                        log_error(tr(LOG_PREFIX " error on axis %1: Move attempt while servo off\n").arg(axis));
-                        axes[axis].state=QFExtensionLinearStage::Error;
-                    } else if (B6==11) {
-                        log_error(tr(LOG_PREFIX " error on axis %1: Move attempt while joystick on\n").arg(axis));
-                        axes[axis].state=QFExtensionLinearStage::Error;
+                        std::string error=serial->queryCommand(std::string("ERR?"));
+                        error.erase(std::remove(error.begin(), error.end(), '\n'), error.end());
+                        log_error(tr(LOG_PREFIX " error on axis %1: Error code: %2\n").arg(axis).arg(toprintablestr(error).c_str()));
+                        if (error==inttostr(0)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Controller says: No error. Therefore Software Error\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else if (error==inttostr(1)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Parameter syntax error\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else if (error==inttostr(2)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Unknown command\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else if (error==inttostr(3)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Command length out of limits or command buffer overrun\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else if (error==inttostr(4)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Error while scanning\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else if (error==inttostr(5)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Unallowable move attempted on unreferenced axis, or move attempted with servo off\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else if (error==inttostr(6)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Parameter for SGA not valid\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else if (error==inttostr(7)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Position out of limits\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else if (error==inttostr(8)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Velocity out of limits\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else if (error==inttostr(9)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Attempt to set pivot point while U,V and W not all 0\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else if (error==inttostr(10)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Controller was stopped by command\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else if (error==inttostr(11)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Parameter for SST or for one of the embedded scan algorithms out of range\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else if (error==inttostr(15)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Invalid axis identifier\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else if (error==inttostr(17)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Parameter out of range\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else if (error==inttostr(23)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Illegal Axis\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else if (error==inttostr(24)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Incorrect number of parameters\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else if (error==inttostr(25)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Invalid floating point number\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else if (error==inttostr(26)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Parameter missing\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else if (error==inttostr(45)) {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Referencing failed\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        } else {
+                            log_error(tr(LOG_PREFIX " error on axis %1: Error Code unknown. See C-863 User Manual for further codes\n").arg(axis));
+                            axes[axis].state=QFExtensionLinearStage::Error;
+                        }
                     }
 
                     if (axes[axis].state!=QFExtensionLinearStage::Error) {
-                        // read current velocity
+                        // read current velocity/ check Moving state for Rot Stage
                         axes[axis].state=QFExtensionLinearStage::Ready;
                         locker.unlock();
                         double v=getSpeed(axis);
                         if (axes[axis].state!=QFExtensionLinearStage::Error) {
+
                             if (fabs(v)>0) axes[axis].state=QFExtensionLinearStage::Moving;
                         }
                     }
                 } else {
-                    log_error(tr(LOG_PREFIX " invalid result string from TS command [expected S:<6 blocks of 2 hex numbers>] in getAxisState() [axis %1]. String was '%2'.\n").arg(axis).arg(toprintablestr(r).c_str()));
+                    log_error(tr(LOG_PREFIX " invalid result string from ASCII #4 command [expected <hex numbers plus line feed>] in getAxisState() [axis %1]. String was '%2'.\n").arg(axis).arg(toprintablestr(reply).c_str()));
+
                     axes[axis].state=QFExtensionLinearStage::Error;
                 }
 

@@ -57,16 +57,15 @@ void QFExtensionLinearStagePI2RotProtHandler::selectAxis(QChar ID)
         //std::cout<<"selecting motor "<<IDx<<"\n";
         std::string s(2, ID.toLatin1());
         s[0]=1;
-        com->write(s);
         //com->write(s);
-        queryCommand("TB");
+      //  queryCommand("TVI?");
         currentID[com]=ID;
     }
 }
 
 void QFExtensionLinearStagePI2RotProtHandler::sendCommand(std::string command)
 {
-    com->write(command+"\x0D");
+    com->write(command+"\x00a");
 }
 
 std::string QFExtensionLinearStagePI2RotProtHandler::queryCommand(std::string command)
@@ -74,12 +73,12 @@ std::string QFExtensionLinearStagePI2RotProtHandler::queryCommand(std::string co
     std::string res="";
     //std::cout<<"\n\ncommand (stage "<<currentID<<"): '"<<command<<"'";
     com->clearBuffer();
-    if (com->write(command+"\x0D")) {
-        res=com->readUntil(3);
+    if (com->write(command+"\x00a")) {
+        res=com->readUntil(10);
         //std::cout<<" ... reading ... ";
     }
     //std::cout<<"   direct_result: '"<<toprintablestr(res)<<"' ";
-    if (res.size()>=3) res=res.erase(res.size()-3, 3);
+    //if (res.size()>=3) res=res.erase(res.size()-3, 3);
     //std::cout<<"   returned_result: '"<<toprintablestr(res)<<"'\n\n";
     return res;
 }

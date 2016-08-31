@@ -32,6 +32,7 @@
 #include "qf3comportmanager.h"
 #include "qfextensionlinearstagepi2rotprothandler.h"
 #include "pimercury863calibrationdialog.h"
+#include <unistd.h>
 
 /*!
     \defgroup qf3ext_StagePIRot QFExtensionLinearStage implementation for PI mercury stages with Rotational Stage
@@ -168,9 +169,9 @@ class QFExtensionLinearStagePI2Rot : public QObject, public QFExtensionBase, pub
                 acceleration=1000000;
                 maxVelocity=2000;
                 initVelocity=1000;
-                lengthFactor=2.57e-5;
-                velocityFactor=2.57e-5;
-                accelerationFactor=2.57e-5;
+                lengthFactor=1; //2.57e-5;
+                velocityFactor=1; //2.57e-5;
+                accelerationFactor=1; //2.57e-5;
                 maxCoord=0;
                 minCoord=0;
                 backlashCorr=1;

@@ -1338,5 +1338,7 @@ double getHighResolutionTime();
 
 /*@}*/
 
+QFLIB_EXPORT std::string hextobin(std::string data);
+
 
 #endif /* cpptools_h */
