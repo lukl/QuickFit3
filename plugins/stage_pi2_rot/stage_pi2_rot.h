@@ -175,6 +175,7 @@ class QFExtensionLinearStagePI2Rot : public QObject, public QFExtensionBase, pub
                 maxCoord=0;
                 minCoord=0;
                 backlashCorr=1;
+                ms=100;
             }
 
             /** \brief ID of the Mercury C-863 controller for the axis
@@ -223,6 +224,10 @@ class QFExtensionLinearStagePI2Rot : public QObject, public QFExtensionBase, pub
 
              /** \brief this factor is used to get the control electronics acceleration from the acceleration in degrees/sec^2, given in (degrees/sec^2)/unit */
              double accelerationFactor;
+
+             /** \brief refresh rate for checking if stage is still moving */
+             double ms;
+
         };
 
         QF3ComPortManager ports;

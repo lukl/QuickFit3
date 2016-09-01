@@ -91,6 +91,7 @@ void QFExtensionLinearStagePI2Rot::initExtension() {
             d.maxCoord=inifile.value(axisname+"/maxcoord", defaultAD.maxCoord).toDouble();
             d.minCoord=inifile.value(axisname+"/mincoord", defaultAD.minCoord).toDouble();
             d.backlashCorr=inifile.value(axisname+"/backlashcorr", defaultAD.backlashCorr).toDouble();
+            d.ms=inifile.value(axisname+"/ms", defaultAD.ms).toDouble();
 
 
 
@@ -315,7 +316,7 @@ void QFExtensionLinearStagePI2Rot::connectDevice(unsigned int axis) {
             log_text(tr("Finding origin..."));
             if (axis==0) {
                 serial->sendCommand("FED "+inttostr(axis+1)+" 3 0"); // Find reference switch position
-                while("0\x00a"!=serial->queryCommand("\x005")) {sleep(0.1);}
+                while("0\x00a"!=serial->queryCommand("\x005")) {QThread::msleep(axes[axis].ms);}
                 double dist=getPosition(axis);
                 serial->sendCommand("DFH "+inttostr(axis+1));
 //                move(i, -(dist+1));
@@ -407,10 +408,14 @@ double QFExtensionLinearStagePI2Rot::getSpeed(unsigned int axis) {
             std::string reply=serial->queryCommand("\x005");
             if (!com->hasErrorOccured()) {
                 double moving=0, vel=0;
-                int controller_axis=axis+1; // Controller axis enumeration begins at 1
                 if (sscanf(reply.c_str(), "%lf", &moving)) {
                     if (moving!=0) {
-                        if(sscanf(serial->queryCommand(std::string("VEL? ")+inttostr(axis+1)).c_str(), "%i=%lf", &controller_axis, &vel)) {
+                        std::string velreply=serial->queryCommand(std::string("VEL? ")+inttostr(axis+1)).c_str();
+                        QChar npunct=QLocale::system().decimalPoint();
+                        if(npunct.toLatin1()!='.') {
+                            std::replace(velreply.begin(),velreply.end(), '.', npunct.toLatin1());
+                        }
+                        if(sscanf(velreply.c_str(), "%*i=%lf\n", &vel)) {
                             return vel*axes[axis].velocityFactor;
                         }
                         else {
@@ -436,14 +441,19 @@ double QFExtensionLinearStagePI2Rot::getPosition(unsigned int axis) {
         QFExtensionLinearStagePI2RotProtHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[axis].ID);
-            std::string r=serial->queryCommand("POS? "+inttostr(axis+1));
+            QThread::msleep(axes[axis].ms);
+            std::string reply=serial->queryCommand("POS? "+inttostr(axis+1));
             double pos=0;
             int controller_axis=axis+1; // Controller axis enumeration begins at 1
             if (!com->hasErrorOccured()) {
-                if (sscanf(r.c_str(), "%i=%lf", &controller_axis, &pos)) {
+                QChar npunct=QLocale::system().decimalPoint();
+                if(npunct.toLatin1()!='.') {
+                std::replace(reply.begin(),reply.end(), '.', npunct.toLatin1());
+                }
+                if (sscanf(reply.c_str(), "%*i=%lf\n", &pos)) {
                     return pos*axes[axis].lengthFactor;
                 } else {
-                    log_error(tr(LOG_PREFIX " invalid result string from POS? command [expected <axis>=<double position>] from axis %1. String was '%2'.\n").arg(axis).arg(toprintablestr(r).c_str()));
+                    log_error(tr(LOG_PREFIX " invalid result string from POS? command [expected <axis>=<double position>] from axis %1. String was '%2'.\n").arg(axis).arg(toprintablestr(reply).c_str()));
                 }
             }
         }    }
@@ -459,7 +469,7 @@ void QFExtensionLinearStagePI2Rot::move(unsigned int axis, double newPosition) {
         QFExtensionLinearStagePI2RotProtHandler* serial=axes[axis].serial;
         serial->selectAxis(axes[axis].ID);
         if (com->isConnectionOpen() && (axes[axis].state==QFExtensionLinearStage::Ready) && (!axes[axis].joystickEnabled)) {
-            long xx=(long)round(newPosition/axes[axis].lengthFactor);
+            double xx=newPosition/axes[axis].lengthFactor;
             if ( (axes[axis].maxCoord !=0  && newPosition>axes[axis].maxCoord) || (axes[axis].minCoord !=0 && newPosition<axes[axis].minCoord) ) {
                 axes[axis].state=QFExtensionLinearStage::Error;
                 log_error(tr(LOG_PREFIX " error on axis %1: Move attempt with position exceeding limits").arg(axis));
@@ -467,14 +477,20 @@ void QFExtensionLinearStagePI2Rot::move(unsigned int axis, double newPosition) {
             }
             else {
 
-                if (!com->hasErrorOccured() && newPosition!=getPosition(axis)) {
-                    serial->sendCommand("MOV "+inttostr(axis+1)+" "+inttostr(xx+(axes[axis].backlashCorr/axes[axis].lengthFactor))); // Always approach from same side, default 1 deg correction
-                    axes[axis].state=QFExtensionLinearStage::Moving;
-                    while("0\x00a"!=serial->queryCommand("\x005")) {sleep(0.2);}
-                    serial->sendCommand("MOV "+inttostr(axis+1)+" "+inttostr(xx));
+                if (!com->hasErrorOccured()) {
+                    double currentPosition=getPosition(axis);
+                    if(currentPosition<newPosition) {
+                        serial->sendCommand("MOV "+inttostr(axis+1)+" "+floattostr(xx+(axes[axis].backlashCorr/axes[axis].lengthFactor),4,true)); // Always approach from same side, default 1 deg correction
+                        axes[axis].state=QFExtensionLinearStage::Moving;
+                        while("0\x00a"!=serial->queryCommand("\x005")) {QThread::msleep(axes[axis].ms);}
+                        serial->sendCommand("MOV "+inttostr(axis+1)+" "+floattostr(xx,4,true));
+                    }
+                    else if(currentPosition>newPosition) {
+                        serial->sendCommand("MOV "+inttostr(axis+1)+" "+floattostr(xx,4,true)); // Always approach from same side, default 1 deg correction
+                        axes[axis].state=QFExtensionLinearStage::Moving;
+                    }
 
                 }
-                axes[axis].state=QFExtensionLinearStage::Moving;
             }
         }
     }
