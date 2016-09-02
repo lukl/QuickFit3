@@ -285,7 +285,7 @@ bool QFExtensionLinearStagePI2Rot::isConnected(unsigned int axis) {
 
 void QFExtensionLinearStagePI2Rot::connectDevice(unsigned int axis) {
     if (((int64_t)axis<axes.size())) {
-        log_text((tr("Connecting Rotational Mercury C-863 Motor Controller Axis %1 ...\n").arg(axis)));
+        log_text((tr(LOG_PREFIX "Connecting Rotational Mercury C-863 Motor Controller Axis %1 ...\n").arg(axis)));
         QMutexLocker locker(axes[axis].serial->getMutex());
         QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2RotProtHandler* serial=axes[axis].serial;
@@ -294,10 +294,10 @@ void QFExtensionLinearStagePI2Rot::connectDevice(unsigned int axis) {
             serial->selectAxis(axes[axis].ID);
             serial->selectAxis(axes[axis].ID);
             serial->queryCommand("ERR?");
-            log_text(tr("Controller Version: %1 ").arg(serial->queryCommand("VER?").c_str()));
-            log_text(tr("Device Identification: %1 ").arg(serial->queryCommand("*IDN?").c_str()));
+            log_text(tr(LOG_PREFIX "Controller Version: %1").arg(serial->queryCommand("VER?").c_str()));
+            log_text(tr(LOG_PREFIX "Device Identification: %1").arg(serial->queryCommand("*IDN?").c_str()));
             if(serial->queryCommand("CSV?").c_str()!=std::string("2.0\n")) {
-                log_warning(tr("Potentially incompatible Controller GCS Syntax version: %1Plugin written for 2.0\n").arg(serial->queryCommand("CSV?").c_str()));
+                log_warning(tr(LOG_PREFIX "Potentially incompatible Controller GCS Syntax version: %1Plugin written for 2.0\n").arg(serial->queryCommand("CSV?").c_str()));
             }
 //            serial->sendCommand("DP"+inttostr(axes[axis].PTerm)); // Old native 2 char commands
 //            serial->queryCommand("GP");
@@ -308,21 +308,44 @@ void QFExtensionLinearStagePI2Rot::connectDevice(unsigned int axis) {
 //            serial->sendCommand("MN");
             serial->sendCommand("SVO "+inttostr(axis+1)+" 1");
             if(serial->queryCommand("SVO? "+inttostr(axis+1))!=inttostr(axis+1)+"=1\n") {
-                log_error("Switching on servo failed.\n");
-                log_error(tr("Result off SVO? command was %1").arg(serial->queryCommand("SVO? "+inttostr(axis+1)).c_str()));
+                log_error(tr(LOG_PREFIX "Switching on servo failed.\n"));
+                log_error(tr(LOG_PREFIX "Result off SVO? command was %1").arg(serial->queryCommand("SVO? "+inttostr(axis+1)).c_str()));
             }
             serial->sendCommand("DFH "+inttostr(axis+1));
             serial->sendCommand("VEL "+inttostr(axis+1)+" 4");
-            log_text(tr("Finding origin..."));
-            if (axis==0) {
-                serial->sendCommand("FED "+inttostr(axis+1)+" 3 0"); // Find reference switch position
-                while("0\x00a"!=serial->queryCommand("\x005")) {QThread::msleep(axes[axis].ms);}
-                double dist=getPosition(axis);
-                serial->sendCommand("DFH "+inttostr(axis+1));
-//                move(i, -(dist+1));
-                move(axis, -dist);
+            int isRefSet; //=serial->queryCommand("FRF? "+inttostr(axis+1)).c_str();
+            if(sscanf(serial->queryCommand("FRF? "+inttostr(axis+1)).c_str(), "%*i=%i\n", &isRefSet)) {
+                if(isRefSet==true) {
+                    log_text(tr(LOG_PREFIX "Reference Position is defined.(Undo by restarting Controller)\n"));
+                }
+                else {
+                    log_text(tr(LOG_PREFIX "Reference Position not defined (Controller restarted?). Referencing, returning to inital position..."));
+                    serial->sendCommand("FED "+inttostr(axis+1)+" 3 0"); // Find reference switch position
+                    while("0\x00a"!=serial->queryCommand("\x005")) {QThread::msleep(axes[axis].ms);};
+                    double startPosition=-getPosition(axis);
+                    serial->sendCommand("DFH "+inttostr(axis+1));
+                    if (!com->hasErrorOccured()) {
+                        double currentPosition=getPosition(axis);
+                        if(currentPosition<startPosition) {
+                            serial->sendCommand("MOV "+inttostr(axis+1)+" "+floattostr(startPosition+(axes[axis].backlashCorr/axes[axis].lengthFactor),4,true)); // Always approach from same side, default 1 deg correction
+                            //axes[axis].state=QFExtensionLinearStage::Moving;
+                            while("0\x00a"!=serial->queryCommand("\x005")) {QThread::msleep(axes[axis].ms);}
+                            serial->sendCommand("MOV "+inttostr(axis+1)+" "+floattostr(startPosition,4,true));
+                            while("0\x00a"!=serial->queryCommand("\x005")) {QThread::msleep(axes[axis].ms);}
+                        }
+                        else if(currentPosition>startPosition) {
+                            serial->sendCommand("MOV "+inttostr(axis+1)+" "+floattostr(startPosition,4,true)); // Always approach from same side, default 1 deg correction
+                            //axes[axis].state=QFExtensionLinearStage::Moving;
+                            while("0\x00a"!=serial->queryCommand("\x005")) {QThread::msleep(axes[axis].ms);}
+                        }
+                    log_text(tr("Done.\n"));
+                    }
+                }
             }
-            log_text(tr("Done.\n"));
+            else {
+                log_error(tr(LOG_PREFIX "Invalid result string from FRF? command (Getting Reference Result) [expected <axis>=<bool>] from axis %1").arg(inttostr(axis).c_str()));
+                log_error(tr(LOG_PREFIX "Result of FRF? command was %1").arg(serial->queryCommand("FRF? "+inttostr(axis+1)).c_str()));
+            }
             axes[axis].velocity=axes[axis].initVelocity;
             axes[axis].joystickEnabled=false;
 
@@ -347,8 +370,8 @@ void QFExtensionLinearStagePI2Rot::disconnectDevice(unsigned int axis) {
         if (com->isConnectionOpen()) {
             serial->sendCommand("SVO "+inttostr(axis+1)+" 0");
             if(serial->queryCommand("SVO? "+inttostr(axis+1))!=inttostr(axis+1)+"=0\n") {
-                log_error("Switching off servo failed.\n");
-                log_error(tr("Result off SVO? command was %1").arg(serial->queryCommand("SVO? "+inttostr(axis+1)).c_str()));
+                log_error(tr(LOG_PREFIX "Switching off servo failed.\n"));
+                log_error(tr(LOG_PREFIX "Result off SVO? command was %1").arg(serial->queryCommand("SVO? "+inttostr(axis+1)).c_str()));
             }
         }
         com->close();
@@ -368,7 +391,6 @@ void QFExtensionLinearStagePI2Rot::setJoystickActive(unsigned int axis, bool ena
 
         if (enabled) {
             serial->selectAxis(axes[axis].ID);
-//            serial->sendCommand("JN"+inttostr((long)round(maxVelocity/axes[axis].velocityFactor)));
             serial->sendCommand("JON 1 1"+inttostr((long)round(maxVelocity/axes[axis].velocityFactor)));
             axes[axis].joystickEnabled=true;
         } else {
@@ -441,10 +463,9 @@ double QFExtensionLinearStagePI2Rot::getPosition(unsigned int axis) {
         QFExtensionLinearStagePI2RotProtHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[axis].ID);
-            QThread::msleep(axes[axis].ms);
+            //QThread::msleep(axes[axis].ms); // Delay added if not ready
             std::string reply=serial->queryCommand("POS? "+inttostr(axis+1));
             double pos=0;
-            int controller_axis=axis+1; // Controller axis enumeration begins at 1
             if (!com->hasErrorOccured()) {
                 QChar npunct=QLocale::system().decimalPoint();
                 if(npunct.toLatin1()!='.') {
@@ -469,11 +490,9 @@ void QFExtensionLinearStagePI2Rot::move(unsigned int axis, double newPosition) {
         QFExtensionLinearStagePI2RotProtHandler* serial=axes[axis].serial;
         serial->selectAxis(axes[axis].ID);
         if (com->isConnectionOpen() && (axes[axis].state==QFExtensionLinearStage::Ready) && (!axes[axis].joystickEnabled)) {
-            double xx=newPosition/axes[axis].lengthFactor;
+            double xx=fmod(newPosition , 360)/axes[axis].lengthFactor; // Moves the other way around if given values beyon 360°
             if ( (axes[axis].maxCoord !=0  && newPosition>axes[axis].maxCoord) || (axes[axis].minCoord !=0 && newPosition<axes[axis].minCoord) ) {
-                axes[axis].state=QFExtensionLinearStage::Error;
-                log_error(tr(LOG_PREFIX " error on axis %1: Move attempt with position exceeding limits").arg(axis));
-                axes[axis].state=QFExtensionLinearStage::Ready;
+                log_warning(tr(LOG_PREFIX " error on axis %1: Move attempt with position exceeding limits").arg(axis));
             }
             else {
 

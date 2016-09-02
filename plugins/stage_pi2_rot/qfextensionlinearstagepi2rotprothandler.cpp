@@ -51,7 +51,7 @@ bool QFExtensionLinearStagePI2RotProtHandler::checkComConnected()
     return c;
 }
 
-void QFExtensionLinearStagePI2RotProtHandler::selectAxis(QChar ID)
+void QFExtensionLinearStagePI2RotProtHandler::selectAxis(QChar ID) // Command somewhat obsolete
 {
     if (!currentID.contains(com) || currentID[com]!=ID) {
         //std::cout<<"selecting motor "<<IDx<<"\n";

@@ -43,7 +43,7 @@
 
 
 
-QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QWidget* parent, bool useThread):
+QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QWidget* parent, bool useThread): //useThread=true by default
     QGroupBox(parent)
 {
     setTitle(tr(" Sample Translation and Rotation Stages: "));
@@ -398,7 +398,7 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     spinMoveZ->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
     gl->addWidget(spinMoveZ, 1,2);
     spinMoveR=new QDoubleSpinBox(this);
-    spinMoveR->setRange(-180,180);
+    spinMoveR->setRange(-360.1,360.1);
     spinMoveR->setSingleStep(1);
     spinMoveR->setDecimals(2);
     spinMoveR->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
