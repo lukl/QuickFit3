@@ -499,14 +499,14 @@ void QFExtensionLinearStagePI2Rot::move(unsigned int axis, double newPosition) {
                 if (!com->hasErrorOccured()) {
                     double currentPosition=getPosition(axis);
                     if(currentPosition<newPosition) {
-                        serial->sendCommand("MOV "+inttostr(axis+1)+" "+floattostr(xx+(axes[axis].backlashCorr/axes[axis].lengthFactor),4,true)); // Always approach from same side, default 1 deg correction
                         axes[axis].state=QFExtensionLinearStage::Moving;
+                        serial->sendCommand("MOV "+inttostr(axis+1)+" "+floattostr(xx+(axes[axis].backlashCorr/axes[axis].lengthFactor),4,true)); // Always approach from same side, default 1 deg correction
                         while("0\x00a"!=serial->queryCommand("\x005")) {QThread::msleep(axes[axis].ms);}
                         serial->sendCommand("MOV "+inttostr(axis+1)+" "+floattostr(xx,4,true));
                     }
                     else if(currentPosition>newPosition) {
-                        serial->sendCommand("MOV "+inttostr(axis+1)+" "+floattostr(xx,4,true)); // Always approach from same side, default 1 deg correction
                         axes[axis].state=QFExtensionLinearStage::Moving;
+                        serial->sendCommand("MOV "+inttostr(axis+1)+" "+floattostr(xx,4,true)); // Always approach from same side, default 1 deg correction
                     }
 
                 }
