@@ -621,7 +621,7 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
 
                            ui_filterchangers[id]=w;
                            filterChangerIndex<<id;
-                       } else if (type=="stages_xyz") {
+                       } else if (type=="stages_xyzR") {
                            QFESPIMB040SampleStageConfig* w=new QFESPIMB040SampleStageConfig(this);
                            widNew=w;
                            w->init(m_log, m_pluginServices);
@@ -631,21 +631,23 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            connect(ui->btnLockFiltersEtc, SIGNAL(toggled(bool)), w, SLOT(setReadOnly(bool)));
                            w->setReadOnly(ui->btnLockFiltersEtc->isChecked());
 
-                           connect(addShortCut(QString("xyzstage%1_x2").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: joystick speed x2").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(speedX2()));
-                           connect(addShortCut(QString("xyzstage%1_x10").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: joystick speed x10").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(speedX10()));
-                           connect(addShortCut(QString("xyzstage%1_d2").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: joystick speed /2").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(speedD2()));
-                           connect(addShortCut(QString("xyzstage%1_d10").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: joystick speed /10").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(speedD10()));
-                           connect(addShortCut(QString("xyzstage%1_stepx").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: step x").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepX()));
-                           connect(addShortCut(QString("xyzstage%1_stepmx").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: step -x").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepMinusX()));
-                           connect(addShortCut(QString("xyzstage%1_stepy").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: step y").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepY()));
-                           connect(addShortCut(QString("xyzstage%1_stepmy").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: step -y").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepMinusY()));
-                           connect(addShortCut(QString("xyzstage%1_stepz").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: step z").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepZ()));
-                           connect(addShortCut(QString("xyzstage%1_stepmz").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: step -z").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepMinusZ()));
-                           connect(addShortCut(QString("xyzstage%1_joysticktoggle").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: toggle joystick").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(toggleJoystick()));
-                           connect(addShortCut(QString("xyzstage%1_joystick_on").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: joystick on").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(joystickOn()));
-                           connect(addShortCut(QString("xyzstage%1_joystick_off").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: joystick off").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(joystickOff()));
+                           connect(addShortCut(QString("xyzRstage%1_x2").arg(ui_stageconfigs.size()), QString("XYZR translation stage %1: joystick speed x2").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(speedX2()));
+                           connect(addShortCut(QString("xyzRstage%1_x10").arg(ui_stageconfigs.size()), QString("XYZR translation stage %1: joystick speed x10").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(speedX10()));
+                           connect(addShortCut(QString("xyzRstage%1_d2").arg(ui_stageconfigs.size()), QString("XYZR translation stage %1: joystick speed /2").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(speedD2()));
+                           connect(addShortCut(QString("xyzRstage%1_d10").arg(ui_stageconfigs.size()), QString("XYZR translation stage %1: joystick speed /10").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(speedD10()));
+                           connect(addShortCut(QString("xyzRstage%1_stepx").arg(ui_stageconfigs.size()), QString("XYZR translation stage %1: step x").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepX()));
+                           connect(addShortCut(QString("xyzRstage%1_stepmx").arg(ui_stageconfigs.size()), QString("XYZR translation stage %1: step -x").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepMinusX()));
+                           connect(addShortCut(QString("xyzRstage%1_stepy").arg(ui_stageconfigs.size()), QString("XYZR translation stage %1: step y").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepY()));
+                           connect(addShortCut(QString("xyzRstage%1_stepmy").arg(ui_stageconfigs.size()), QString("XYZR translation stage %1: step -y").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepMinusY()));
+                           connect(addShortCut(QString("xyzRstage%1_stepz").arg(ui_stageconfigs.size()), QString("XYZR translation stage %1: step z").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepZ()));
+                           connect(addShortCut(QString("xyzRstage%1_stepmz").arg(ui_stageconfigs.size()), QString("XYZR translation stage %1: step -z").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepMinusZ()));
+                           connect(addShortCut(QString("xyzRstage%1_stepR").arg(ui_stageconfigs.size()), QString("XYZR translation stage %1: step R").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepR()));
+                           connect(addShortCut(QString("xyzRstage%1_stepmR").arg(ui_stageconfigs.size()), QString("XYZR translation stage %1: step -R").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(stepMinusR()));
+                           connect(addShortCut(QString("xyzRstage%1_joysticktoggle").arg(ui_stageconfigs.size()), QString("XYZR translation stage %1: toggle joystick").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(toggleJoystick()));
+                           connect(addShortCut(QString("xyzRstage%1_joystick_on").arg(ui_stageconfigs.size()), QString("XYZR translation stage %1: joystick on").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(joystickOn()));
+                           connect(addShortCut(QString("xyzRstage%1_joystick_off").arg(ui_stageconfigs.size()), QString("XYZR translation stage %1: joystick off").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(joystickOff()));
 
-                           for (int ri=0; ri<qMin(3,special_role.size()); ri++) {
+                           for (int ri=0; ri<qMin(4,special_role.size()); ri++) {
                                QChar sr=special_role[ri].toLower();
                                /*char dev='x';
                                if (ri==1) dev='y';
@@ -669,6 +671,7 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            stageIndex<<qMakePair(id, 0);
                            stageIndex<<qMakePair(id, 1);
                            stageIndex<<qMakePair(id, 2);
+                           stageIndex<<qMakePair(id, 3);
                        } else if (type=="shutter") {
                            QFShutterConfigWidget* w=new QFShutterConfigWidget(this);
                            w->init(m_log, m_pluginServices);
@@ -1122,6 +1125,7 @@ void QFESPIMB040OpticsSetup2::loadPluginGlobalSettings(QSettings &settings, QStr
     ITERATEWIDGETMAP_LOADGLOBAL(QFESPIMB040SampleStageConfig*, ui_stageconfigs, getXStageExtensionObject, settings, prefix)
     ITERATEWIDGETMAP_LOADGLOBAL(QFESPIMB040SampleStageConfig*, ui_stageconfigs, getYStageExtensionObject, settings, prefix)
     ITERATEWIDGETMAP_LOADGLOBAL(QFESPIMB040SampleStageConfig*, ui_stageconfigs, getZStageExtensionObject, settings, prefix)
+    ITERATEWIDGETMAP_LOADGLOBAL(QFESPIMB040SampleStageConfig*, ui_stageconfigs, getRStageExtensionObject, settings, prefix)
     ITERATEWIDGETMAP_LOADGLOBAL(QFStageConfigWidget*, ui_stages, getXStageExtensionObject, settings, prefix)
     ITERATEWIDGETMAP_LOADGLOBAL(QFFilterChangerConfigWidget*, ui_filterchangers, getFilterChangerExtensionObject, settings, prefix)
     ITERATEWIDGETMAP_LOADGLOBAL(QFShutterConfigWidget*, ui_shutter, getShutterExtensionObject, settings, prefix)
@@ -1134,6 +1138,7 @@ void QFESPIMB040OpticsSetup2::storePluginGlobalSettings(QSettings &settings, QSt
     ITERATEWIDGETMAP_STOREGLOBAL(QFESPIMB040SampleStageConfig*, ui_stageconfigs, getXStageExtensionObject, settings, prefix)
     ITERATEWIDGETMAP_STOREGLOBAL(QFESPIMB040SampleStageConfig*, ui_stageconfigs, getYStageExtensionObject, settings, prefix)
     ITERATEWIDGETMAP_STOREGLOBAL(QFESPIMB040SampleStageConfig*, ui_stageconfigs, getZStageExtensionObject, settings, prefix)
+    ITERATEWIDGETMAP_STOREGLOBAL(QFESPIMB040SampleStageConfig*, ui_stageconfigs, getRStageExtensionObject, settings, prefix)
     ITERATEWIDGETMAP_STOREGLOBAL(QFStageConfigWidget*, ui_stages, getXStageExtensionObject, settings, prefix)
     ITERATEWIDGETMAP_STOREGLOBAL(QFFilterChangerConfigWidget*, ui_filterchangers, getFilterChangerExtensionObject, settings, prefix)
     ITERATEWIDGETMAP_STOREGLOBAL(QFShutterConfigWidget*, ui_shutter, getShutterExtensionObject, settings, prefix)
@@ -1315,7 +1320,7 @@ void QFESPIMB040OpticsSetup2::on_btnConnectDevices_clicked() {
     ITERATEWIDGETMAPAROUND3(LightsourceWidgets, ui_lightsource, if (!dlg->wasCanceled()) it.value().config->connectLightSource(), dlg->nextItem((it.value().config->isLightSourceConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed)), QApplication::processEvents())
     ITERATEWIDGETMAPAROUND3(QFFilterChangerConfigWidget*, ui_filterchangers, if (!dlg->wasCanceled()) it.value()->connectFilterChanger(), dlg->nextItem((it.value()->isFilterChangerConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed)), QApplication::processEvents())
     ITERATEWIDGETMAPAROUND3(QFStageConfigWidget*, ui_stages, if (!dlg->wasCanceled()) it.value()->connectStages(), dlg->nextItem((it.value()->isXStageConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed)), QApplication::processEvents())
-    ITERATEWIDGETMAPAROUND3(QFESPIMB040SampleStageConfig*, ui_stageconfigs, if (!dlg->wasCanceled()) it.value()->connectStages(), dlg->nextItem((it.value()->isXStageConnected()||it.value()->isYStageConnected()||it.value()->isZStageConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed)), QApplication::processEvents())
+    ITERATEWIDGETMAPAROUND3(QFESPIMB040SampleStageConfig*, ui_stageconfigs, if (!dlg->wasCanceled()) it.value()->connectStages(), dlg->nextItem((it.value()->isXStageConnected()||it.value()->isYStageConnected()||it.value()->isZStageConnected()||it.value()->isRStageConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed)), QApplication::processEvents())
     ITERATEWIDGETMAPAROUND3(QFMeasurementDeviceConfigWidget*, ui_measurementdevices, if (!dlg->wasCanceled()) it.value()->connectMeasurementDevice(), dlg->nextItem((it.value()->isMeasurementDeviceConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed)), QApplication::processEvents())
 
     dlg->close();
@@ -1566,6 +1571,7 @@ bool QFESPIMB040OpticsSetup2::isStageConnected(QFExtensionLinearStage* stage, in
             if (it.value() && stage==it.value()->getXStage()) { found=true; return it.value()->isXStageConnected(); }
             if (it.value() && stage==it.value()->getYStage()) { found=true; return it.value()->isYStageConnected(); }
             if (it.value() && stage==it.value()->getZStage()) { found=true; return it.value()->isZStageConnected(); }
+            if (it.value() && stage==it.value()->getRStage()) { found=true; return it.value()->isRStageConnected(); }
         }
     }
     {
@@ -1588,6 +1594,7 @@ int QFESPIMB040OpticsSetup2::getStageAxis(int stage)
             if (stageIndex[stage].second==0) return ui_stageconfigs[stageIndex[stage].first]->getXStageAxis();
             if (stageIndex[stage].second==1) return ui_stageconfigs[stageIndex[stage].first]->getYStageAxis();
             if (stageIndex[stage].second==2) return ui_stageconfigs[stageIndex[stage].first]->getZStageAxis();
+            if (stageIndex[stage].second==3) return ui_stageconfigs[stageIndex[stage].first]->getRStageAxis();
         }
     }
 
@@ -1623,6 +1630,7 @@ bool QFESPIMB040OpticsSetup2::isStageConnected(int stage) const
             if (num==0) return ui_stageconfigs[id]->isXStageConnected();
             if (num==1) return ui_stageconfigs[id]->isYStageConnected();
             if (num==2) return ui_stageconfigs[id]->isZStageConnected();
+            if (num==3) return ui_stageconfigs[id]->isRStageConnected();
         } else if (ui_stages.contains(id)) {
             return ui_stages[id]->isXStageConnected();
         }
@@ -1640,6 +1648,7 @@ QFExtension *QFESPIMB040OpticsSetup2::getStageExtension(int stage)
             if (num==0) return ui_stageconfigs[id]->getXStageExtension();
             if (num==1) return ui_stageconfigs[id]->getYStageExtension();
             if (num==2) return ui_stageconfigs[id]->getZStageExtension();
+            if (num==2) return ui_stageconfigs[id]->getRStageExtension();
         } else if (ui_stages.contains(id)) {
             return ui_stages[id]->getXStageExtension();
         }

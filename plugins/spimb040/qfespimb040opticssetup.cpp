@@ -95,6 +95,8 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidge
     connect(addShortCut("stage_stepmy", "translation stage: step -y"), SIGNAL(activated()), ui->stageSetup, SLOT(stepMinusY()));
     connect(addShortCut("stage_stepz", "translation stage: step z"), SIGNAL(activated()), ui->stageSetup, SLOT(stepZ()));
     connect(addShortCut("stage_stepmz", "translation stage: step -z"), SIGNAL(activated()), ui->stageSetup, SLOT(stepMinusZ()));
+    connect(addShortCut("stage_stepR", "translation stage: step R"), SIGNAL(activated()), ui->stageSetup, SLOT(stepR()));
+    connect(addShortCut("stage_stepmR", "translation stage: step -R"), SIGNAL(activated()), ui->stageSetup, SLOT(stepMinusR()));
     connect(addShortCut("stage_joysticktoggle", "translation stage: toggle joystick"), SIGNAL(activated()), ui->stageSetup, SLOT(toggleJoystick()));
     connect(addShortCut("stage_joystick_on", "translation stage: joystick on"), SIGNAL(activated()), ui->stageSetup, SLOT(joystickOn()));
     connect(addShortCut("stage_joystick_off", "translation stage: joystick off"), SIGNAL(activated()), ui->stageSetup, SLOT(joystickOff()));
@@ -312,6 +314,7 @@ void QFESPIMB040OpticsSetup::loadPluginGlobalSettings(QSettings &settings, QStri
     loadPluginGlobalSettings(settings, ui->stageSetup->getXStageExtensionObject(), prefix);
     loadPluginGlobalSettings(settings, ui->stageSetup->getYStageExtensionObject(), prefix);
     loadPluginGlobalSettings(settings, ui->stageSetup->getZStageExtensionObject(), prefix);
+    loadPluginGlobalSettings(settings, ui->stageSetup->getRStageExtensionObject(), prefix);
     loadPluginGlobalSettings(settings, ui->widMD1->getMeasurementDeviceExtensionObject(), prefix);
     loadPluginGlobalSettings(settings, ui->widMD2->getMeasurementDeviceExtensionObject(), prefix);
 }
@@ -330,6 +333,7 @@ void QFESPIMB040OpticsSetup::storePluginGlobalSettings(QSettings &settings, QStr
     storePluginGlobalSettings(settings, ui->stageSetup->getXStageExtensionObject(), prefix);
     storePluginGlobalSettings(settings, ui->stageSetup->getYStageExtensionObject(), prefix);
     storePluginGlobalSettings(settings, ui->stageSetup->getZStageExtensionObject(), prefix);
+    storePluginGlobalSettings(settings, ui->stageSetup->getRStageExtensionObject(), prefix);
     storePluginGlobalSettings(settings, ui->widMD1->getMeasurementDeviceExtensionObject(), prefix);
     storePluginGlobalSettings(settings, ui->widMD2->getMeasurementDeviceExtensionObject(), prefix);
 }
@@ -659,7 +663,7 @@ void QFESPIMB040OpticsSetup::on_btnConnectDevices_clicked() {
     dlg->nextItem((ui->lsTransmission->isLightSourceConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
     QApplication::processEvents();
     if (!dlg->wasCanceled()) ui->stageSetup->connectStages();
-    dlg->nextItem((ui->stageSetup->isXStageConnected()||ui->stageSetup->isYStageConnected()||ui->stageSetup->isZStageConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
+    dlg->nextItem((ui->stageSetup->isXStageConnected()||ui->stageSetup->isYStageConnected()||ui->stageSetup->isZStageConnected()||ui->stageSetup->isRStageConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
     QApplication::processEvents();
     if (!dlg->wasCanceled()) if (ui->chkDetectionFilterWheel->isChecked()) ui->filtcDetection->connectFilterChanger();
     dlg->nextItem((ui->filtcDetection->isFilterChangerConnected())?(QProgressListWidget::statusDone):(QProgressListWidget::statusFailed));
@@ -879,6 +883,7 @@ bool QFESPIMB040OpticsSetup::isStageConnected(QFExtensionLinearStage* stage, int
     if (stage==getStage(QFESPIMB040OpticsSetupBase::StageX) && id==getStageAxis(QFESPIMB040OpticsSetupBase::StageX)) return isStageConnected(QFESPIMB040OpticsSetupBase::StageX);
     if (stage==getStage(QFESPIMB040OpticsSetupBase::StageY) && id==getStageAxis(QFESPIMB040OpticsSetupBase::StageY)) return isStageConnected(QFESPIMB040OpticsSetupBase::StageY);
     if (stage==getStage(QFESPIMB040OpticsSetupBase::StageZ) && id==getStageAxis(QFESPIMB040OpticsSetupBase::StageZ)) return isStageConnected(QFESPIMB040OpticsSetupBase::StageZ);
+    if (stage==getStage(QFESPIMB040OpticsSetupBase::StageR) && id==getStageAxis(QFESPIMB040OpticsSetupBase::StageR)) return isStageConnected(QFESPIMB040OpticsSetupBase::StageR);
     found=false;
     return false;
 }
@@ -888,6 +893,7 @@ int QFESPIMB040OpticsSetup::getStageAxis(int stage)
     if (stage==QFESPIMB040OpticsSetupBase::StageX) return ui->stageSetup->getXStageAxis();
     if (stage==QFESPIMB040OpticsSetupBase::StageY) return ui->stageSetup->getYStageAxis();
     if (stage==QFESPIMB040OpticsSetupBase::StageZ) return ui->stageSetup->getZStageAxis();
+    if (stage==QFESPIMB040OpticsSetupBase::StageR) return ui->stageSetup->getRStageAxis();
     return -1;
 
 }
@@ -897,13 +903,14 @@ QString QFESPIMB040OpticsSetup::getStageName(int stage) const
     if (stage==QFESPIMB040OpticsSetupBase::StageX) return "x";
     if (stage==QFESPIMB040OpticsSetupBase::StageY) return "y";
     if (stage==QFESPIMB040OpticsSetupBase::StageZ) return "z";
+    if (stage==QFESPIMB040OpticsSetupBase::StageR) return "r";
     return "";
 
 }
 
 int QFESPIMB040OpticsSetup::getStageCount() const
 {
-    return 3;
+    return 4;
 }
 
 
@@ -912,6 +919,7 @@ bool QFESPIMB040OpticsSetup::isStageConnected(int stage) const
     if (stage==QFESPIMB040OpticsSetupBase::StageX) return ui->stageSetup->isXStageConnected();
     if (stage==QFESPIMB040OpticsSetupBase::StageY) return ui->stageSetup->isYStageConnected();
     if (stage==QFESPIMB040OpticsSetupBase::StageZ) return ui->stageSetup->isZStageConnected();
+    if (stage==QFESPIMB040OpticsSetupBase::StageR) return ui->stageSetup->isRStageConnected();
     return false;
 }
 
@@ -921,6 +929,7 @@ QFExtension *QFESPIMB040OpticsSetup::getStageExtension(int stage)
     if (stage==QFESPIMB040OpticsSetupBase::StageX) return ui->stageSetup->getXStageExtension();
     if (stage==QFESPIMB040OpticsSetupBase::StageY) return ui->stageSetup->getYStageExtension();
     if (stage==QFESPIMB040OpticsSetupBase::StageZ) return ui->stageSetup->getZStageExtension();
+    if (stage==QFESPIMB040OpticsSetupBase::StageR) return ui->stageSetup->getRStageExtension();
     return NULL;
 }
 
@@ -929,6 +938,7 @@ QFExtensionLinearStage *QFESPIMB040OpticsSetup::getStage(int stage)
     if (stage==QFESPIMB040OpticsSetupBase::StageX) return ui->stageSetup->getXStage();
     if (stage==QFESPIMB040OpticsSetupBase::StageY) return ui->stageSetup->getYStage();
     if (stage==QFESPIMB040OpticsSetupBase::StageZ) return ui->stageSetup->getZStage();
+    if (stage==QFESPIMB040OpticsSetupBase::StageR) return ui->stageSetup->getRStage();
     return NULL;
 }
 
@@ -1450,6 +1460,10 @@ QFESPIMB040OpticsSetup::measuredValues QFESPIMB040OpticsSetup::getMeasuredValues
         m.data["stagez/position"]=ui->stageSetup->getZStage()->getPosition(ui->stageSetup->getZStageAxis());
         m.data["stagez/velocity"]=ui->stageSetup->getZStage()->getSpeed(ui->stageSetup->getZStageAxis());
     }
+    if (ui->stageSetup->getRStage()) {
+        m.data["stageR/position"]=ui->stageSetup->getRStage()->getPosition(ui->stageSetup->getRStageAxis());
+        m.data["stageR/velocity"]=ui->stageSetup->getRStage()->getSpeed(ui->stageSetup->getRStageAxis());
+    }
 
     ui->camConfig1->storeMeasurements(m.data, "camera1/");
     ui->camConfig2->storeMeasurements(m.data, "camera2/");
@@ -1493,6 +1507,7 @@ QString QFESPIMB040OpticsSetup::getAxisNameForStage(QFExtensionLinearStage *stag
     if (ui->stageSetup->getXStage()==stage && ui->stageSetup->getXStageAxis()==axis) return "x";
     if (ui->stageSetup->getYStage()==stage && ui->stageSetup->getYStageAxis()==axis) return "y";
     if (ui->stageSetup->getZStage()==stage && ui->stageSetup->getZStageAxis()==axis) return "z";
+    if (ui->stageSetup->getRStage()==stage && ui->stageSetup->getRStageAxis()==axis) return "r";
     return "";
 }
 
