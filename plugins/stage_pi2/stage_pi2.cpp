@@ -334,9 +334,11 @@ void QFExtensionLinearStagePI2::disconnectDevice(unsigned int axis) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
-        serial->selectAxis(axes[axis].ID);
-        serial->sendCommand("JF");
-        axes[axis].joystickEnabled=false;
+        if (com->isConnectionOpen()) {
+            serial->selectAxis(axes[axis].ID);
+            serial->sendCommand("JF");
+            axes[axis].joystickEnabled=false;
+        }
         com->close();
         axes[axis].state=QFExtensionLinearStage::Disconnected;
     }
