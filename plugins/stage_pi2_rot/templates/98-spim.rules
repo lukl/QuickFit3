@@ -1,0 +1,5 @@
+#for the PI stage chain
+#Product ID: 0x1007, Vendor ID: 0x1a72
+KERNEL=="ttyUSB*", SUBSYSTEMS=="usb", ATTRS{idVendor}=="1a72", ATTRS{idProduct}=="1007", ATTRS{product}=="PI C-863 Mercury", ATTRS{serial}=="15URMF1!", SYMLINK+="ttyUSB_PI2"
+#SUBSYSTEMS=="usb", ATTRS{idProduct}=="1007", ATTRS{idVendor}=="1a72", ATTRS{serial}=="15URMF1!", RUN+="/root/bin/pi_mercury.sh"
+#SUBSYSTEMS=="usb", ATTRS{idProduct}=="1007", ATTRS{idVendor}=="1a72", ATTRS{serial}=="15URMF1!", RUN+="/usr/local/PI/bin32/pi_terminal"
