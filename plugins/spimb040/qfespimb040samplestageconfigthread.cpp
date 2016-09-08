@@ -77,8 +77,8 @@ void QFESPIMB040SampleStageConfigThread::start(Priority priority ) {
 void QFESPIMB040SampleStageConfigThread::nextInstruction() {
     //qDebug()<<"QFESPIMB040SampleStageConfigThread::nextInstruction()   stopped="<<stopped<<"  readCounter="<<readCounter;
     if (stopped) {
-       /* qDebug()<<"   quit";
-        quit();*/
+       /* qDebug()<<"   quit";*/
+        quit();
     } else {
         if (m_parent->getXStage()) connX=m_parent->getXStage()->isConnected(m_parent->getXStageAxis()); else connX=false;
         if (m_parent->getYStage()) connY=m_parent->getYStage()->isConnected(m_parent->getYStageAxis()); else connY=false;
@@ -366,7 +366,7 @@ void QFESPIMB040SampleStageConfigThread::setJoystick(bool enabled, double maxSpe
 
 void QFESPIMB040SampleStageConfigThread::stopThread() {
     stopped=true;
-    if (isRunning()) wait();
+    if (isRunning()) wait(1500); // Timeout 1500 ms, noting good ever happens after that
     //qDebug()<<"thread stopped";
 }
 
