@@ -84,6 +84,21 @@ std::string QFExtensionLinearStagePI2ProtocolHandler::queryCommand(std::string c
     return res;
 }
 
+std::string QFExtensionLinearStagePI2ProtocolHandler::queryCommandSingleChar(std::string command)
+{
+    std::string res="";
+    //std::cout<<"\n\ncommand (stage "<<currentID<<"): '"<<command<<"'";
+    com->clearBuffer();
+    if (com->write(command)) {
+        res=com->readUntil(3);
+        //std::cout<<" ... reading ... ";
+    }
+    //std::cout<<"   direct_result: '"<<toprintablestr(res)<<"' ";
+    if (res.size()>=3) res=res.erase(res.size()-3, 3);
+    //std::cout<<"   returned_result: '"<<toprintablestr(res)<<"'\n\n";
+    return res;
+}
+
 QMutex *QFExtensionLinearStagePI2ProtocolHandler::getMutex() const
 {
     return mutexSerial;
