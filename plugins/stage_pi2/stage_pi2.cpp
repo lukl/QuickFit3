@@ -283,7 +283,7 @@ bool QFExtensionLinearStagePI2::isConnected(unsigned int axis) {
 }
 
 void QFExtensionLinearStagePI2::connectDevice(unsigned int axis) {
-    log_text((tr(LOG_PREFIX "Connecting Mercury C-863 Motor Controller (v2) Axis %1 ...").arg(axis)));
+    log_text((tr(LOG_PREFIX "Connecting Mercury C-863 Motor Controller (v2) Axis %1 ...\n").arg(axis)));
     if (((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         QFSerialConnection* com=axes[axis].serial->getCOM();
@@ -291,7 +291,7 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int axis) {
         com->open();
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[axis].ID);
-            serial->selectAxis(axes[axis].ID);
+            //serial->selectAxis(axes[axis].ID);
             serial->queryCommand("VE");
             serial->sendCommand("DP"+inttostr(axes[axis].PTerm));
             serial->queryCommand("GP");
@@ -303,9 +303,10 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int axis) {
             if (!com->hasErrorOccured()) {
                 int isRefSet=0;
                 char block1[2];
-                if(sscanf(serial->queryCommand("TS").c_str(), "S:%1s%1s %*x %*x %*x %*x %*x", &block1[0], &block1[1])) {
+                if(sscanf(serial->queryCommandSingleChar("\x025").c_str(), "S:%*1s%*1s %*x %*x %*x %1s%1s %*x", &block1[0], &block1[1])) {
                     std::string binstr=twocharblockstrtobinstr(block1);
                     sscanf(binstr.c_str(),"%*4i%1i%*3i", &isRefSet);
+                    //isRefSet=0;
                     if (isRefSet==1) {
                         log_text(tr(LOG_PREFIX "Reference Position is defined.(Undo by restarting Controller)\n"));
                     }
@@ -313,28 +314,46 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int axis) {
                         log_text(tr(LOG_PREFIX "Reference Position not defined (Controller restarted?). Referencing, returning to inital position..."));
                         //if (axis==2) {serial->sendCommand("FE"); // Find Origin, z-dir: positive, negative else
                         //else  {serial->sendCommand("FE1");
-                        serial->sendCommand("DH0");
-                        int findingReference=1;
-                        char block4[2];
+                        //double dist_old=getPosition(axis);
+                        serial->sendCommand("DH");
                         if (axis==2) serial->sendCommand("FE0");
                         else serial->sendCommand("FE1");
-                        while(findingReference) {
-                            sscanf(serial->queryCommand("TS").c_str(), "S:%*x %*x %*x %1s%1s %*x %*x", &block4[0], &block4[1]);
-                            std::string binstr=twocharblockstrtobinstr(block4);
-                            sscanf(binstr.c_str(),"%*5i%1i%*2i", &findingReference);
-                            QThread::msleep(axes[axis].ms);
-                            }
-                            double dist=getPosition(axis);
-                            serial->sendCommand("DH0");
-                            move(axis, -dist);
+//                        int findingReference=1;
+//                        char block4[2];
+//                        while(findingReference) {
+//                            sscanf(serial->queryCommandSingleChar("\x025").c_str(), "S:%*x %*x %*x %1s%1s %*x %*x", &block4[0], &block4[1]);
+//                            std::string binstr=twocharblockstrtobinstr(block4);
+//                            sscanf(binstr.c_str(),"%*5i%1i%*2i", &findingReference);
+//                            if(findingReference) QThread::msleep(axes[axis].ms);
+//                            }
                             while("\x030"!=serial->queryCommandSingleChar("\x05c")) {QThread::msleep(axes[axis].ms);}
+                            QThread::msleep(axes[axis].ms);
+                            double dist=-(long)round(getPosition(axis)/axes[axis].lengthFactor);
+                            serial->sendCommand("DH0");
+                            //move(axis, -dist);
+//                            if (!com->hasErrorOccured()) {
+//                                    if(dist>0) {
+//                                        serial->sendCommand("MA"+inttostr((long)round(dist+(axes[axis].backlashCorr/axes[axis].lengthFactor)))); // Always approach from same side, default 50 microns correction
+//                                        //axes[axis].state=QFExtensionLinearStage::Moving;
+//                                        while("\x030"!=serial->queryCommandSingleChar("\x05c")) {QThread::msleep(axes[axis].ms);}
+//                                        serial->sendCommand("MA"+inttostr(dist));
+//                                    }
+//                                    else if (dist<0) {
+//                                        serial->sendCommand("SV"+inttostr((long)round(axes[axis].velocity/axes[axis].velocityFactor))+",MA"+inttostr(dist));
+//                                        //axes[axis].state=QFExtensionLinearStage::Moving;
+//                                        while("\x030"!=serial->queryCommandSingleChar("\x05c")) {QThread::msleep(axes[axis].ms);}
+//                                    }
+//                             }
+                            //while("\x030"!=serial->queryCommandSingleChar("\x05c")) {QThread::msleep(axes[axis].ms);}
                             //serial->sendCommand("DH0");
+                            serial->sendCommand("SV"+inttostr((long)round(axes[axis].velocity/axes[axis].velocityFactor))+",MA"+inttostr(dist));
+                            while("\x030"!=serial->queryCommandSingleChar("\x05c")) {QThread::msleep(axes[axis].ms);}
                             log_text(tr("Done.\n"));
                     }
                 }
                 else {
-                    log_error(tr(LOG_PREFIX "Invalid result string from TS command (Tell Status) in connectDevice [expected S:<6 blocks of 2 hex numbers>] from axis %1\n").arg(inttostr(axis).c_str()));
-                    log_error(tr(LOG_PREFIX "Result of FRF? command was %1").arg(serial->queryCommand("TS").c_str()));
+                    log_error(tr(LOG_PREFIX "Invalid result string from \x025 command (Tell Status) in connectDevice [expected S:<6 blocks of 2 hex numbers>] from axis %1\n").arg(inttostr(axis).c_str()));
+                    log_error(tr(LOG_PREFIX "Result of \x025 command was %1").arg(serial->queryCommandSingleChar("\x025").c_str()));
                 }
             }
             axes[axis].velocity=axes[axis].initVelocity;

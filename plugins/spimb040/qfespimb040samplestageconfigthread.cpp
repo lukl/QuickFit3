@@ -366,7 +366,7 @@ void QFESPIMB040SampleStageConfigThread::setJoystick(bool enabled, double maxSpe
 
 void QFESPIMB040SampleStageConfigThread::stopThread() {
     stopped=true;
-    if (isRunning()) wait(1500); // Timeout 1500 ms, noting good ever happens after that
+    if (isRunning()) wait(2*THREAD_TIMEOUT); // Thread timeout if not finishing
     //qDebug()<<"thread stopped";
 }
 
