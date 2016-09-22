@@ -345,12 +345,12 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int axis) {
                             serial->sendCommand("SV"+inttostr((long)round(axes[axis].velocity/axes[axis].velocityFactor))+",MA"+inttostr(dist));
                             while("\x030"!=serial->queryCommandSingleChar("\x05c")) {QThread::msleep(axes[axis].ms);}
                             log_text(tr("Done.\n"));
-                    //}
-                }
-                else {
-                    log_error(tr(LOG_PREFIX "Invalid result string from \x025 command (Tell Status) in connectDevice [expected S:<6 blocks of 2 hex numbers>] from axis %1\n").arg(inttostr(axis).c_str()));
-                    log_error(tr(LOG_PREFIX "Result of \x025 command was %1").arg(serial->queryCommandSingleChar("\x025").c_str()));
-                }
+                    }
+                //}
+//                else {
+//                    log_error(tr(LOG_PREFIX "Invalid result string from \x025 command (Tell Status) in connectDevice [expected S:<6 blocks of 2 hex numbers>] from axis %1\n").arg(inttostr(axis).c_str()));
+//                    log_error(tr(LOG_PREFIX "Result of \x025 command was %1").arg(serial->queryCommandSingleChar("\x025").c_str()));
+//                }
             }
             axes[axis].velocity=axes[axis].initVelocity;
             axes[axis].joystickEnabled=false;
