@@ -301,22 +301,19 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int axis) {
             serial->sendCommand("SA"+inttostr(axes[axis].acceleration));
             serial->sendCommand("MN");
             if (!com->hasErrorOccured()) {
-                int isRefSet=0;
-                char block1[2];
-                if(sscanf(serial->queryCommandSingleChar("\x025").c_str(), "S:%*1s%*1s %*x %*x %*x %1s%1s %*x", &block1[0], &block1[1])) {
-                    std::string binstr=twocharblockstrtobinstr(block1);
-                    sscanf(binstr.c_str(),"%*4i%1i%*3i", &isRefSet);
+                //int isRefSet=0;
+                //char block1[2];
+                //if(sscanf(serial->queryCommandSingleChar("\x025").c_str(), "S:%*1s%*1s %*x %*x %*x %1s%1s %*x", &block1[0], &block1[1])) {
+                //    std::string binstr=twocharblockstrtobinstr(block1);
+                //    sscanf(binstr.c_str(),"%*4i%1i%*3i", &isRefSet);
                     //isRefSet=0;
-                    if (isRefSet==1) {
-                        log_text(tr(LOG_PREFIX "Reference Position is defined.(Undo by restarting Controller)\n"));
+                    if (round(getPosition(axis))!=0) {
+                        log_text(tr(LOG_PREFIX "Reference Position apparently defined (nonzero initial position).(Undo by restarting Controller)\n"));
                     }
                     else {
                         log_text(tr(LOG_PREFIX "Reference Position not defined (Controller restarted?). Referencing, returning to inital position..."));
-                        //if (axis==2) {serial->sendCommand("FE"); // Find Origin, z-dir: positive, negative else
-                        //else  {serial->sendCommand("FE1");
-                        //double dist_old=getPosition(axis);
                         serial->sendCommand("DH");
-                        if (axis==2) serial->sendCommand("FE0");
+                        if (axis==2) serial->sendCommand("FE0");// Find Origin, z-dir: positive, negative else
                         else serial->sendCommand("FE1");
 //                        int findingReference=1;
 //                        char block4[2];
@@ -330,7 +327,6 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int axis) {
                             QThread::msleep(axes[axis].ms);
                             double dist=-(long)round(getPosition(axis)/axes[axis].lengthFactor);
                             serial->sendCommand("DH0");
-                            //move(axis, -dist);
 //                            if (!com->hasErrorOccured()) {
 //                                    if(dist>0) {
 //                                        serial->sendCommand("MA"+inttostr((long)round(dist+(axes[axis].backlashCorr/axes[axis].lengthFactor)))); // Always approach from same side, default 50 microns correction
@@ -349,7 +345,7 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int axis) {
                             serial->sendCommand("SV"+inttostr((long)round(axes[axis].velocity/axes[axis].velocityFactor))+",MA"+inttostr(dist));
                             while("\x030"!=serial->queryCommandSingleChar("\x05c")) {QThread::msleep(axes[axis].ms);}
                             log_text(tr("Done.\n"));
-                    }
+                    //}
                 }
                 else {
                     log_error(tr(LOG_PREFIX "Invalid result string from \x025 command (Tell Status) in connectDevice [expected S:<6 blocks of 2 hex numbers>] from axis %1\n").arg(inttostr(axis).c_str()));
