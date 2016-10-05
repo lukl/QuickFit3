@@ -462,7 +462,7 @@ QFExtensionLinearStage::AxisState QFExtensionLinearStagePI2::getAxisState(unsign
         std::string failedaxes="";
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[axis].ID);
-            std::string r=serial->queryCommand("TS")+"\n";
+            std::string r=serial->queryCommand("TS");
             int B1=0, B2=0, B3=0, B4=0, B5=0, B6=0;
             if (!com->hasErrorOccured()) {
                 if (sscanf(r.c_str(), "S:%x %x %x %x %x %x", &B1, &B2, &B3, &B4, &B5, &B6)) {
