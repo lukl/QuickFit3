@@ -311,7 +311,7 @@ void QFExtensionLinearStagePI2Rot::connectDevice(unsigned int axis) {
                 log_error(tr(LOG_PREFIX "Switching on servo failed.\n"));
                 log_error(tr(LOG_PREFIX "Result off SVO? command was %1").arg(serial->queryCommand("SVO? "+inttostr(axis+1)).c_str()));
             }
-            serial->sendCommand("DFH "+inttostr(axis+1));
+            //serial->sendCommand("DFH "+inttostr(axis+1));
             serial->sendCommand("VEL "+inttostr(axis+1)+" 4");
             int isRefSet; //=serial->queryCommand("FRF? "+inttostr(axis+1)).c_str();
             if(sscanf(serial->queryCommand("FRF? "+inttostr(axis+1)).c_str(), "%*i=%i\n", &isRefSet)) {
@@ -492,7 +492,7 @@ void QFExtensionLinearStagePI2Rot::move(unsigned int axis, double newPosition) {
         if (com->isConnectionOpen() && (axes[axis].state==QFExtensionLinearStage::Ready) && (!axes[axis].joystickEnabled)) {
             double xx=fmod(newPosition , 360)/axes[axis].lengthFactor; // Moves the other way around if given values beyon 360°
             if ( (axes[axis].maxCoord !=0  && newPosition>axes[axis].maxCoord) || (axes[axis].minCoord !=0 && newPosition<axes[axis].minCoord) ) {
-                log_warning(tr(LOG_PREFIX " error on axis %1: Move attempt with position exceeding limits").arg(axis));
+                log_warning(tr(LOG_PREFIX " Warning on axis %1: Move attempt with position exceeding limits\n").arg(axis));
             }
             else {
 

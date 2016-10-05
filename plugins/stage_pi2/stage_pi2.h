@@ -172,7 +172,8 @@ class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public
                 accelerationFactor=6.9e-3;
                 maxCoord=0;
                 minCoord=0;
-                backlashCorr=4;
+                backlashCorr=50;
+                ms=100;
             }
 
             /** \brief ID of the Mercury C-863 controller for the axis
@@ -212,6 +213,8 @@ class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public
              double minCoord;
              /** \brief backlash correction for each axis in microns */
              double backlashCorr;
+             /** \brief refresh rate for checking if stage is still moving */
+             double ms;
 
              /** \brief this factor is used to get the control electronics position from the position in micron, given in microns/unit */
              double lengthFactor;
@@ -226,6 +229,11 @@ class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public
         QF3ComPortManager ports;
 
         QVector<AxisDescription> axes;
+
+
+        /** \brief This function is specific to the old C-863 controller and converts a "TS"-query answer two char block to binary
+         *  (see also corresponding Manual "Native Commands MS176E Release 1.1.0", p. 80ff) */
+        std::string twocharblockstrtobinstr(std::string);
 
         friend class PIMercury863CalibrationDialog;
 };

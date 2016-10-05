@@ -59,6 +59,7 @@ class QFExtensionLinearStagePI2ProtocolHandler {
         /** \brief send a command to the Mercury controller (this automatically adds a command terminating character (carriage return)
          *         and returns the result (the standard finishing sequence CR LF ETX will be cut from the string) */
         std::string queryCommand(std::string command);
+        std::string queryCommandSingleChar(std::string command);
 
         QMutex* getMutex() const;
         QFSerialConnection* getCOM() const;
