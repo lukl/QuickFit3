@@ -314,37 +314,43 @@ void QFExtensionLinearStagePI2Rot::connectDevice(unsigned int axis) {
             //serial->sendCommand("DFH "+inttostr(axis+1));
             serial->sendCommand("VEL "+inttostr(axis+1)+" 4");
             int isRefSet; //=serial->queryCommand("FRF? "+inttostr(axis+1)).c_str();
-            if(sscanf(serial->queryCommand("FRF? "+inttostr(axis+1)).c_str(), "%*i=%i\n", &isRefSet)) {
-                if(isRefSet==true) {
-                    log_text(tr(LOG_PREFIX "Reference Position is defined.(Undo by restarting Controller)\n"));
+
+            if (axes[axis].doRefMove==true) {
+                if(sscanf(serial->queryCommand("FRF? "+inttostr(axis+1)).c_str(), "%*i=%i\n", &isRefSet)) {
+                    if(isRefSet==true) {
+                        log_text(tr(LOG_PREFIX "Reference Position is defined.(Undo by restarting Controller)\n"));
+                    }
+                    else {
+                        log_text(tr(LOG_PREFIX "Reference Position not defined (Controller restarted?). Referencing, returning to inital position..."));
+                        serial->sendCommand("FED "+inttostr(axis+1)+" 3 0"); // Find reference switch position
+                        while("0\x00a"!=serial->queryCommand("\x005")) {QThread::msleep(axes[axis].ms);};
+                        double startPosition=-getPosition(axis);
+                        serial->sendCommand("DFH "+inttostr(axis+1));
+                        if (!com->hasErrorOccured()) {
+                            double currentPosition=getPosition(axis);
+                            if(currentPosition<startPosition) {
+                                serial->sendCommand("MOV "+inttostr(axis+1)+" "+floattostr(startPosition+(axes[axis].backlashCorr/axes[axis].lengthFactor),4,true)); // Always approach from same side, default 1 deg correction
+                                //axes[axis].state=QFExtensionLinearStage::Moving;
+                                while("0\x00a"!=serial->queryCommand("\x005")) {QThread::msleep(axes[axis].ms);}
+                                serial->sendCommand("MOV "+inttostr(axis+1)+" "+floattostr(startPosition,4,true));
+                                while("0\x00a"!=serial->queryCommand("\x005")) {QThread::msleep(axes[axis].ms);}
+                            }
+                            else if(currentPosition>startPosition) {
+                                serial->sendCommand("MOV "+inttostr(axis+1)+" "+floattostr(startPosition,4,true)); // Always approach from same side, default 1 deg correction
+                                //axes[axis].state=QFExtensionLinearStage::Moving;
+                                while("0\x00a"!=serial->queryCommand("\x005")) {QThread::msleep(axes[axis].ms);}
+                            }
+                        log_text(tr("Done.\n"));
+                        }
+                    }
                 }
                 else {
-                    log_text(tr(LOG_PREFIX "Reference Position not defined (Controller restarted?). Referencing, returning to inital position..."));
-                    serial->sendCommand("FED "+inttostr(axis+1)+" 3 0"); // Find reference switch position
-                    while("0\x00a"!=serial->queryCommand("\x005")) {QThread::msleep(axes[axis].ms);};
-                    double startPosition=-getPosition(axis);
-                    serial->sendCommand("DFH "+inttostr(axis+1));
-                    if (!com->hasErrorOccured()) {
-                        double currentPosition=getPosition(axis);
-                        if(currentPosition<startPosition) {
-                            serial->sendCommand("MOV "+inttostr(axis+1)+" "+floattostr(startPosition+(axes[axis].backlashCorr/axes[axis].lengthFactor),4,true)); // Always approach from same side, default 1 deg correction
-                            //axes[axis].state=QFExtensionLinearStage::Moving;
-                            while("0\x00a"!=serial->queryCommand("\x005")) {QThread::msleep(axes[axis].ms);}
-                            serial->sendCommand("MOV "+inttostr(axis+1)+" "+floattostr(startPosition,4,true));
-                            while("0\x00a"!=serial->queryCommand("\x005")) {QThread::msleep(axes[axis].ms);}
-                        }
-                        else if(currentPosition>startPosition) {
-                            serial->sendCommand("MOV "+inttostr(axis+1)+" "+floattostr(startPosition,4,true)); // Always approach from same side, default 1 deg correction
-                            //axes[axis].state=QFExtensionLinearStage::Moving;
-                            while("0\x00a"!=serial->queryCommand("\x005")) {QThread::msleep(axes[axis].ms);}
-                        }
-                    log_text(tr("Done.\n"));
-                    }
+                    log_error(tr(LOG_PREFIX "Invalid result string from FRF? command (Getting Reference Result) [expected <axis>=<bool>] from axis %1").arg(inttostr(axis).c_str()));
+                    log_error(tr(LOG_PREFIX "Result of FRF? command was %1").arg(serial->queryCommand("FRF? "+inttostr(axis+1)).c_str()));
                 }
             }
             else {
-                log_error(tr(LOG_PREFIX "Invalid result string from FRF? command (Getting Reference Result) [expected <axis>=<bool>] from axis %1").arg(inttostr(axis).c_str()));
-                log_error(tr(LOG_PREFIX "Result of FRF? command was %1").arg(serial->queryCommand("FRF? "+inttostr(axis+1)).c_str()));
+                log_text(tr("Reference movement upon startup disabled.\n"));
             }
             axes[axis].velocity=axes[axis].initVelocity;
             axes[axis].joystickEnabled=false;
@@ -644,6 +650,10 @@ QFExtensionLinearStage::StageInfo QFExtensionLinearStagePI2Rot::getStageInfo(uns
     QFExtensionLinearStage::StageInfo info;
     info.maxSpeed=axes[axis].maxVelocity;
     return info;
+}
+
+void QFExtensionLinearStagePI2Rot::setRefMoveActive(unsigned int axis, bool enabled) {
+    axes[axis].doRefMove=enabled;
 }
 
 

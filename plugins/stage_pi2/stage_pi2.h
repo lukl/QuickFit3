@@ -115,6 +115,9 @@ class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public
         /** \copydoc QFExtensionLinearStage::isJoystickActive() */
         virtual bool isJoystickActive(unsigned int axis);
 
+        /** \copydoc QFExtensionLinearStage::setRefMoveActive() */
+        virtual void setRefMoveActive(unsigned int axis, bool enabled);
+
         /** \copydoc QFExtensionLinearStage::getAxisState() */
         virtual AxisState getAxisState(unsigned int axis);
 
@@ -174,6 +177,7 @@ class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public
                 minCoord=0;
                 backlashCorr=50;
                 ms=100;
+                doRefMove=true;
             }
 
             /** \brief ID of the Mercury C-863 controller for the axis
@@ -215,6 +219,8 @@ class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public
              double backlashCorr;
              /** \brief refresh rate for checking if stage is still moving */
              double ms;
+             /** \brief do Reference Movement on startup */
+             bool doRefMove;
 
              /** \brief this factor is used to get the control electronics position from the position in micron, given in microns/unit */
              double lengthFactor;

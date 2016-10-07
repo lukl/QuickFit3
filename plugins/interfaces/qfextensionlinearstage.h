@@ -125,6 +125,10 @@ class QFExtensionLinearStage {
          /** \brief return the current state of a given axis */
          virtual AxisState getAxisState(unsigned int axis)=0;
 
+        /** \brief sets reference movement at startup on/off */
+
+        virtual void setRefMoveActive(unsigned int axis, bool enabled)=0;
+
          /** \brief emergency stop an axis */
          virtual void stop(unsigned int axis)=0;
 

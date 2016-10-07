@@ -100,6 +100,7 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
 
         bool isJoystickChecked() const;
         double joystickMaxSpeed();
+        bool isRefMoveChecked() const;
 
     public slots:
         void setReadOnly(bool readonly);
@@ -111,6 +112,8 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         void toggleJoystick();
         void joystickOn();
         void joystickOff();
+        void RefMoveOn();
+        void RefMoveOff();
 
         void stepX();
         void stepY();
@@ -176,6 +179,9 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         QCheckBox* chkJoystick;
         /** \brief edit to give the maximum speed of the joystick in micron/sec */
         QDoubleSpinBox* spinJoystickMaxSpeed;
+
+        /** \brief checkbox to en-/disable the Referencing Move on startup for all axes at once */
+        QCheckBox* chkRefMove;
 
         /** \brief edit to give x coordinate for movement */
         QDoubleSpinBox* spinMoveX;
@@ -348,6 +354,7 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         void moveAbsolute();
         void moveRelative();
         void configSteps();
+        void updateRefMove();
 
 
 };

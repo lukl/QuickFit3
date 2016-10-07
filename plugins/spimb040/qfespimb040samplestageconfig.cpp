@@ -99,6 +99,7 @@ QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QWidget* parent, bool
 }
 
 
+
 QFESPIMB040SampleStageConfig::~QFESPIMB040SampleStageConfig()
 {
 }
@@ -268,6 +269,10 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create input widgets for camera devices
     ////////////////////////////////////////////////////////////////////////////////////////////////
+    l=new QLabel (tr("<b>Translational and Rotational Stages:</b>"), this);
+    l->setStyleSheet("background-color: 	aliceblue;");
+    stagelayout->addRow(l);
+
     btnConfigSteps=new QToolButton(this);
 
     cmbStageX=new QFStageComboBox(this);
@@ -332,7 +337,17 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     QFont fb=chkJoystick->font();
     fb.setBold(true);
     chkJoystick->setFont(fb);
+    chkJoystick->setStyleSheet("background-color: 	aliceblue;");
     connect(chkJoystick, SIGNAL(toggled(bool)), this, SLOT(updateJoystick()));
+    chkRefMove=new QCheckBox(tr("Reference Movement"), this);
+    chkRefMove->setFont(fb);
+    hbl->addWidget(chkJoystick);
+    hbl->addStretch();
+    hbl->addWidget(chkRefMove);
+    stagelayout->addRow(hbl);
+    hbl=new QHBoxLayout();
+    hbl->setContentsMargins(0,0,0,0);
+    connect(chkRefMove, SIGNAL(toggled(bool)), this, SLOT(updateRefMove()));
     hbl->addWidget(l=new QLabel("max. speed [&mu;m/s]: ", this));
     l->setTextFormat(Qt::RichText);
     spinJoystickMaxSpeed=new QDoubleSpinBox(this);
@@ -368,7 +383,6 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     connect(btnD10, SIGNAL(clicked()), this, SLOT(speedD10()));
     hbl->addStretch();
     //stagelayout->addRow(chkJoystick, hbl); // minor layout change:
-    stagelayout->addRow(chkJoystick);
     stagelayout->addRow(hbl);
 //    stagelayout->setItem(hbl, 0, );
 
@@ -414,7 +428,10 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     gl->setVerticalSpacing(1);
     connect(btnMoveAbsolute, SIGNAL(clicked()), this, SLOT(moveAbsolute()));
     connect(btnMoveRelative, SIGNAL(clicked()), this, SLOT(moveRelative()));
-    stagelayout->addRow(tr("<b>move:</b>"), gl);
+    l=new QLabel (tr("<b>Move:</b>"), this);
+    l->setStyleSheet("background-color: 	aliceblue;");
+    stagelayout->addRow(l, gl);
+    //stagelayout->addRow(tr("<b>move:</b>"), gl);
 
 
     gl=new QGridLayout();
@@ -455,51 +472,51 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     gl->addWidget(l, 3, 0);
 
     labXPosition=new QLabel(this);
-    labXPosition->setStyleSheet("background-color: 	lightgrey;");;
+    labXPosition->setStyleSheet("background-color: 	lightgrey;");
     labXPosition->setAutoFillBackground(true);
     labXPosition->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     labXSpeed=new QLabel(this);
-    labXSpeed->setStyleSheet("background-color: 	lightgrey;");;
+    labXSpeed->setStyleSheet("background-color: 	lightgrey;");
     labXSpeed->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     labXSpeed->setAutoFillBackground(true);
     labXState=new QLabel(this);
-    labXState->setStyleSheet("background-color: 	lightgrey;");;
+    labXState->setStyleSheet("background-color: 	lightgrey;");
     labXState->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     labXState->setAutoFillBackground(true);
     labYPosition=new QLabel(this);
-    labYPosition->setStyleSheet("background-color: 	lightgrey;");;
+    labYPosition->setStyleSheet("background-color: 	lightgrey;");
     labYPosition->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     labYPosition->setAutoFillBackground(true);
     labYSpeed=new QLabel(this);
-    labYSpeed->setStyleSheet("background-color: 	lightgrey;");;
+    labYSpeed->setStyleSheet("background-color: 	lightgrey;");
     labYSpeed->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     labYSpeed->setAutoFillBackground(true);
     labYState=new QLabel(this);
-    labYState->setStyleSheet("background-color: 	lightgrey;");;
+    labYState->setStyleSheet("background-color: 	lightgrey;");
     labYState->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     labYState->setAutoFillBackground(true);
     labZPosition=new QLabel(this);
-    labZPosition->setStyleSheet("background-color: 	lightgrey;");;
+    labZPosition->setStyleSheet("background-color: 	lightgrey;");
     labZPosition->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     labZPosition->setAutoFillBackground(true);
     labZSpeed=new QLabel(this);
-    labZSpeed->setStyleSheet("background-color: 	lightgrey;");;
+    labZSpeed->setStyleSheet("background-color: 	lightgrey;");
     labZSpeed->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     labZSpeed->setAutoFillBackground(true);
     labZState=new QLabel(this);
-    labZState->setStyleSheet("background-color: 	lightgrey;");;
+    labZState->setStyleSheet("background-color: 	lightgrey;");
     labZState->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     labZState->setAutoFillBackground(true);
     labRPosition=new QLabel(this);
-    labRPosition->setStyleSheet("background-color: 	lightgrey;");;
+    labRPosition->setStyleSheet("background-color: 	lightgrey;");
     labRPosition->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     labRPosition->setAutoFillBackground(true);
     labRSpeed=new QLabel(this);
-    labRSpeed->setStyleSheet("background-color: 	lightgrey;");;
+    labRSpeed->setStyleSheet("background-color: 	lightgrey;");
     labRSpeed->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     labRSpeed->setAutoFillBackground(true);
     labRState=new QLabel(this);
-    labRState->setStyleSheet("background-color: 	lightgrey;");;
+    labRState->setStyleSheet("background-color: 	lightgrey;");
     labRState->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     labRState->setAutoFillBackground(true);
 
@@ -531,7 +548,10 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     gl->setContentsMargins(0,0,0,0);
     gl->setHorizontalSpacing(1);
     gl->setVerticalSpacing(1);
-    stagelayout->addRow(tr("<b>status:</b>"), gl);
+    l=new QLabel (tr("<b>Status:</b>"), this);
+    l->setStyleSheet("background-color: 	aliceblue;");
+    stagelayout->addRow(l, gl);
+    //stagelayout->addRow(tr("<b>status:</b>"), gl);
 
 }
 
@@ -1504,6 +1524,37 @@ void QFESPIMB040SampleStageConfig::stagesConnectedChanged(bool connX, bool connY
 
 }
 
+void QFESPIMB040SampleStageConfig::updateRefMove() {
+
+    bool enabled=chkRefMove->isChecked();
+
+    QFExtensionLinearStage* stage;
+    int axis;
+
+    stage=getXStage();
+    axis=getXStageAxis();
+    if (stage) {
+        stage->setRefMoveActive(axis, enabled);
+    }
+    stage=getYStage();
+    axis=getYStageAxis();
+    if (stage) {
+        stage->setRefMoveActive(axis, enabled);
+    }
+    stage=getZStage();
+    axis=getZStageAxis();
+    if (stage) {
+        stage->setRefMoveActive(axis, enabled);
+    }
+    stage=getRStage();
+    axis=getRStageAxis();
+    if (stage) {
+        stage->setRefMoveActive(axis, enabled);
+    }
+    updateStates();
+
+}
+
 void QFESPIMB040SampleStageConfig::threadStarted() {
     //labThread->setText(tr("thread started ..."));
     QApplication::processEvents();
@@ -1532,6 +1583,10 @@ bool QFESPIMB040SampleStageConfig::isRStageConnected() const {
 
 bool QFESPIMB040SampleStageConfig::isJoystickChecked() const {
     return chkJoystick->isChecked();
+}
+
+bool QFESPIMB040SampleStageConfig::isRefMoveChecked() const {
+    return chkRefMove->isChecked();
 }
 
 double QFESPIMB040SampleStageConfig::joystickMaxSpeed() {
@@ -1563,6 +1618,14 @@ void QFESPIMB040SampleStageConfig::joystickOn() {
 
 void QFESPIMB040SampleStageConfig::joystickOff() {
     chkJoystick->setChecked(false);
+}
+
+void QFESPIMB040SampleStageConfig::RefMoveOn() {
+    chkRefMove->setChecked(true);
+}
+
+void QFESPIMB040SampleStageConfig::RefMoveOff() {
+    chkRefMove->setChecked(false);
 }
 
 void QFESPIMB040SampleStageConfig::stepX() {

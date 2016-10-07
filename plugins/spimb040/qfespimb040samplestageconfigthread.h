@@ -45,6 +45,7 @@ class QFESPIMB040SampleStageConfigThread: public QThread {
         void move(double x, double y, double z, double R);
         void moveRel(double x, double y, double z, double R);
         void setJoystick(bool enabled, double maxSpeed);
+        void setRefMove(bool enabled);
         /** \brief stop the thread and block until it is stopped! */
         void stopThread();
         bool anyConnected() const;

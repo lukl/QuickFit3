@@ -307,6 +307,7 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int axis) {
                 //    std::string binstr=twocharblockstrtobinstr(block1);
                 //    sscanf(binstr.c_str(),"%*4i%1i%*3i", &isRefSet);
                     //isRefSet=0;
+                if(axes[axis].doRefMove==true) {
                     if (round(getPosition(axis))!=0) {
                         log_text(tr(LOG_PREFIX "Reference Position apparently defined (nonzero initial position).(Undo by restarting Controller)\n"));
                     }
@@ -346,6 +347,10 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int axis) {
                             while("\x030"!=serial->queryCommandSingleChar("\x05c")) {QThread::msleep(axes[axis].ms);}
                             log_text(tr("Done.\n"));
                     }
+                }
+                else {
+                    log_text(tr("Reference movement upon startup disabled.\n"));
+                }
                 //}
 //                else {
 //                    log_error(tr(LOG_PREFIX "Invalid result string from \x025 command (Tell Status) in connectDevice [expected S:<6 blocks of 2 hex numbers>] from axis %1\n").arg(inttostr(axis).c_str()));
@@ -594,6 +599,11 @@ QFExtensionLinearStage::StageInfo QFExtensionLinearStagePI2::getStageInfo(unsign
     info.maxSpeed=axes[axis].maxVelocity;
     return info;
 }
+
+void QFExtensionLinearStagePI2::setRefMoveActive(unsigned int axis, bool enabled) {
+    axes[axis].doRefMove=enabled;
+}
+
 
 
 void QFExtensionLinearStagePI2::log_text(QString message) {
