@@ -179,7 +179,7 @@ class QFExtensionLinearStagePI2Rot : public QObject, public QFExtensionBase, pub
                 minCoord=0;
                 backlashCorr=1;
                 ms=100;
-                doRefMove=true;
+                doRefMove=false;
             }
 
             /** \brief ID of the Mercury C-863 controller for the axis

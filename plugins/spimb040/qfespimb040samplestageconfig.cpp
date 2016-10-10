@@ -341,7 +341,7 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     connect(chkJoystick, SIGNAL(toggled(bool)), this, SLOT(updateJoystick()));
     chkRefMove=new QCheckBox(tr("Reference Movement"), this);
     chkRefMove->setFont(fb);
-    chkRefMove->setChecked(true);
+    chkRefMove->setChecked(false);
     hbl->addWidget(chkJoystick);
     hbl->addStretch();
     hbl->addWidget(chkRefMove);
