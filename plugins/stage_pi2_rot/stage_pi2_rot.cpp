@@ -78,7 +78,7 @@ void QFExtensionLinearStagePI2Rot::initExtension() {
             d.ID='0';
             if (s.size()>0) d.ID=s[0];
 
-            d.port=ports.addCOMPort(inifile, axisname+"/", 38400);
+            d.port=ports.addCOMPort(inifile, axisname+"/", 115200);
             d.serial=new QFExtensionLinearStagePI2RotProtHandler(ports.getCOMPort(d.port), ports.getMutex(d.port), getName());
 
             d.PTerm=inifile.value(axisname+"/pterm", defaultAD.PTerm).toUInt();
@@ -136,6 +136,7 @@ void QFExtensionLinearStagePI2Rot::deinit() {
         inifile.setValue(axisname+"/maxcoord", axes[axis].maxCoord);
         inifile.setValue(axisname+"/mincoord", axes[axis].minCoord);
         inifile.setValue(axisname+"/backlashcorr", axes[axis].backlashCorr);
+        inifile.setValue(axisname+"/ms", axes[axis].ms);
     }
 }
 
@@ -227,6 +228,7 @@ void QFExtensionLinearStagePI2Rot::showSettingsDialog(unsigned int /*axis*/, QWi
 //        cmbSpeed->addItem("9600");
 //        cmbSpeed->addItem("19200");
 //        cmbSpeed->addItem("38400");
+//        cmbSpeed->addItem("115200");
 //        cmbSpeed->setCurrentIndex(cmbSpeed->findText(QString::number(COMPortSpeed)));
 //        formlayout->addRow(tr("serial port &baudrate*:"), cmbSpeed);
 

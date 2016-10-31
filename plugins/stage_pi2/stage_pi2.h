@@ -175,8 +175,8 @@ class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public
                 accelerationFactor=6.9e-3;
                 maxCoord=0;
                 minCoord=0;
-                backlashCorr=50;
-                ms=100;
+                backlashCorr=0.5;
+                ms=1;
                 doRefMove=false;
             }
 

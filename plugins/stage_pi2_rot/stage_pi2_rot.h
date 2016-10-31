@@ -178,7 +178,7 @@ class QFExtensionLinearStagePI2Rot : public QObject, public QFExtensionBase, pub
                 maxCoord=0;
                 minCoord=0;
                 backlashCorr=1;
-                ms=100;
+                ms=0.1;
                 doRefMove=false;
             }
 

@@ -91,6 +91,7 @@ void QFExtensionLinearStagePI2::initExtension() {
             d.maxCoord=inifile.value(axisname+"/maxcoord", defaultAD.maxCoord).toDouble();
             d.minCoord=inifile.value(axisname+"/mincoord", defaultAD.minCoord).toDouble();
             d.backlashCorr=inifile.value(axisname+"/backlashcorr", defaultAD.backlashCorr).toDouble();
+            d.backlashCorr=inifile.value(axisname+"/ms", defaultAD.ms).toDouble();
 
 
 
@@ -135,6 +136,7 @@ void QFExtensionLinearStagePI2::deinit() {
         inifile.setValue(axisname+"/maxcoord", axes[axis].maxCoord);
         inifile.setValue(axisname+"/mincoord", axes[axis].minCoord);
         inifile.setValue(axisname+"/backlashcorr", axes[axis].backlashCorr);
+        inifile.setValue(axisname+"/ms", axes[axis].ms);
     }
 }
 
