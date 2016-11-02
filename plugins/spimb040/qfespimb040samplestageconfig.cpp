@@ -391,9 +391,7 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     gl->addWidget(new QLabel("<b>x [&mu;m]:</b>", this), 0, 0);
     gl->addWidget(new QLabel("<b>y [&mu;m]:</b>", this), 0, 1);
     gl->addWidget(new QLabel("<b>z [&mu;m]:</b>", this), 0, 2);
-    gl->addWidget(new QLabel("<b>Rot [°]:</b>", this), 2, 2);
     gl->addWidget(new QLabel("<b>move ...</b>", this), 0, 3,1,2);
-    gl->addWidget(new QLabel("<b>Rotate:</b>", this), 3, 0);
     spinMoveX=new QDoubleSpinBox(this);
     spinMoveX->setRange(-1e6,1e6);
     spinMoveX->setSingleStep(1);
@@ -412,12 +410,6 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     spinMoveZ->setDecimals(2);
     spinMoveZ->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
     gl->addWidget(spinMoveZ, 1,2);
-    spinMoveR=new QDoubleSpinBox(this);
-    spinMoveR->setRange(-360.1,360.1);
-    spinMoveR->setSingleStep(1);
-    spinMoveR->setDecimals(2);
-    spinMoveR->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
-    gl->addWidget(spinMoveR, 3,2);
     btnMoveAbsolute=new QPushButton(QIcon(":/spimb040/move_abs.png"), "", this);
     btnMoveRelative=new QPushButton(QIcon(":/spimb040/move_rel.png"), "", this);
     gl->addWidget(btnMoveRelative, 1, 3);
@@ -432,7 +424,32 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     l=new QLabel (tr("<b>Move:</b>"), this);
     l->setStyleSheet("background-color: 	aliceblue;");
     stagelayout->addRow(l, gl);
-    //stagelayout->addRow(tr("<b>move:</b>"), gl);
+
+
+    // Rotation
+    l=new QLabel (tr("<b>Rotate:</b>"), this);
+    l->setStyleSheet("background-color: 	aliceblue;");
+    gl=new QGridLayout();
+    gl->addWidget(new QLabel("<b>rotate ...</b>", this), 0, 3,1,2);
+    gl->addWidget(new QLabel(" ", this), 1, 0);
+    gl->addWidget(new QLabel("<b>Rot [°]:</b>", this), 1, 1);
+    spinMoveR=new QDoubleSpinBox(this);
+    spinMoveR->setRange(-360.1,360.1);
+    spinMoveR->setSingleStep(1);
+    spinMoveR->setDecimals(2);
+    spinMoveR->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
+    gl->addWidget(spinMoveR, 1,2);
+    btnRotAbsolute=new QPushButton(QIcon(":/spimb040/move_abs.png"), "", this);
+    btnRotRelative=new QPushButton(QIcon(":/spimb040/move_rel.png"), "", this);
+    gl->addWidget(btnRotRelative, 1, 3);
+    gl->addWidget(btnRotAbsolute, 1, 4);
+    gl->setColumnStretch(0,10);
+    gl->setContentsMargins(0,0,0,0);
+    gl->setHorizontalSpacing(1);
+    gl->setVerticalSpacing(1);
+    connect(btnRotAbsolute, SIGNAL(clicked()), this, SLOT(RotAbsolute()));
+    connect(btnRotRelative, SIGNAL(clicked()), this, SLOT(RotRelative()));
+    stagelayout->addRow(l, gl);
 
 
     gl=new QGridLayout();
@@ -688,8 +705,8 @@ void QFESPIMB040SampleStageConfig::updateStates() {
         conn=false;
         if (stage) {
             conn=stage->isConnected(axis);
-            anyconn=anyconn||conn;
-            anyjoy=anyjoy||stage->isJoystickActive(axis);
+            //anyconn=anyconn||conn;
+            //anyjoy=anyjoy||stage->isJoystickActive(axis);
             if (conn) {
                 actConnectR->setChecked(true);
                 actConnectR->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
@@ -703,6 +720,8 @@ void QFESPIMB040SampleStageConfig::updateStates() {
         actConfigureR->setEnabled(true);
         cmbStageR->setEnabled(!conn);
         spinMoveR->setEnabled(conn);
+        btnRotAbsolute->setEnabled(conn);
+        btnRotRelative->setEnabled(conn);
 
 
         btnMoveAbsolute->setEnabled(anyconn);
@@ -835,9 +854,9 @@ void QFESPIMB040SampleStageConfig::disConnectR() {
     bool conn=actConnectR->isChecked();
     QFExtensionLinearStage* stage=getRStage();
     int axis=getRStageAxis();
-    bool oldJoystick=chkJoystick->isChecked();
-    chkJoystick->setChecked(false);
-    updateJoystick();
+    //bool oldJoystick=chkJoystick->isChecked();
+    //chkJoystick->setChecked(false);
+    //updateJoystick();
     if (stage) {
         if (conn) {
             stage->setLogging(m_log);
@@ -856,8 +875,8 @@ void QFESPIMB040SampleStageConfig::disConnectR() {
     } else {
         actConnectR->setChecked(false);
     }
-    chkJoystick->setChecked(oldJoystick);
-    updateJoystick();
+    //chkJoystick->setChecked(oldJoystick);
+    //updateJoystick();
     updateStates();
     QApplication::restoreOverrideCursor();
     if (useThread) stageThread->start(QThread::LowPriority);
@@ -1045,7 +1064,8 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
         labState=labXState;
         labSpeed=labXSpeed;
         if (stage) {
-            anyconn=anyconn||stage->isConnected(axis);
+            //anyconn=anyconn||stage->isConnected(axis);
+            anyconn=stage->isConnected(axis);
             QFExtensionLinearStage::AxisState state=stage->getAxisState(axis);
             double position=stage->getPosition(axis);
             double speed=stage->getSpeed(axis);
@@ -1179,11 +1199,50 @@ void QFESPIMB040SampleStageConfig::moveAbsolute() {
                 stage->move(axis, z);
             }
         }
+//        stage=getRStage();
+//        axis=getRStageAxis();
+//        if (stage) {
+//            if (stage->isConnected(axis)) {
+//                stage->move(axis, R);
+//            }
+//        }
+    }
+}
+
+
+void QFESPIMB040SampleStageConfig::RotAbsolute() {
+    double R=spinMoveR->value();
+
+    if (useThread) {
+        stageThread->rotate(R);
+    } else {
+        QFExtensionLinearStage* stage;
+        int axis;
+
         stage=getRStage();
         axis=getRStageAxis();
         if (stage) {
             if (stage->isConnected(axis)) {
                 stage->move(axis, R);
+            }
+        }
+    }
+}
+
+void QFESPIMB040SampleStageConfig::RotRelative() {
+    double R=spinMoveR->value();
+
+    if (useThread) {
+        stageThread->rotateRel(R);
+    } else {
+        QFExtensionLinearStage* stage;
+        int axis;
+
+        stage=getRStage();
+        axis=getRStageAxis();
+        if (stage) {
+            if (stage->isConnected(axis)) {
+                stage->move(axis, stage->getPosition(axis)+R);
             }
         }
     }
@@ -1238,13 +1297,13 @@ void QFESPIMB040SampleStageConfig::moveRelative(double x, double y, double z, do
                 stage->move(axis, stage->getPosition(axis)+z);
             }
         }
-        stage=getRStage();
-        axis=getRStageAxis();
-        if (stage) {
-            if (stage->isConnected(axis) && (R!=0)) {
-                stage->move(axis, stage->getPosition(axis)+R);
-            }
-        }
+//        stage=getRStage();
+//        axis=getRStageAxis();
+//        if (stage) {
+//            if (stage->isConnected(axis) && (R!=0)) {
+//                stage->move(axis, stage->getPosition(axis)+R);
+//            }
+//        }
     }
 
 
@@ -1495,7 +1554,7 @@ void QFESPIMB040SampleStageConfig::stagesConnectedChanged(bool connX, bool connY
 
 
     conn=connR;
-    anyconn=anyconn||conn;
+    //anyconn=anyconn||conn;
     if (conn) {
         if (!actConnectR->isChecked()) actConnectR->setChecked(true);
         QString txt=tr("Disconnect Rot-axis ...");
@@ -1514,6 +1573,8 @@ void QFESPIMB040SampleStageConfig::stagesConnectedChanged(bool connX, bool connY
     if (!actConfigureR->isEnabled()) actConfigureR->setEnabled(true);
     if (cmbStageR->isEnabled()!=!conn) cmbStageR->setEnabled(!conn);
     if (spinMoveR->isEnabled()!=conn) spinMoveR->setEnabled(conn);
+    if (btnRotAbsolute->isEnabled()!=conn) btnRotAbsolute->setEnabled(conn);
+    if (btnRotRelative->isEnabled()!=conn) btnRotRelative->setEnabled(conn);
 
 
 

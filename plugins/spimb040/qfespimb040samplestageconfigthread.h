@@ -44,6 +44,8 @@ class QFESPIMB040SampleStageConfigThread: public QThread {
         void run();
         void move(double x, double y, double z, double R);
         void moveRel(double x, double y, double z, double R);
+        void rotate(double R);
+        void rotateRel(double R);
         void setJoystick(bool enabled, double maxSpeed);
         void setRefMove(bool enabled);
         /** \brief stop the thread and block until it is stopped! */
@@ -63,7 +65,7 @@ class QFESPIMB040SampleStageConfigThread: public QThread {
         QMutex* InstructionMutex;
         bool stopped;
 
-        enum InstructionType { Move, MoveRel, SetJoystick };
+        enum InstructionType { Move, MoveRel, SetJoystick, Rotate, RotateRel };
         struct Instruction {
             InstructionType type;
             double pd1;

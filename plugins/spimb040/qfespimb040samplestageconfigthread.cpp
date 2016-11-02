@@ -244,13 +244,13 @@ void QFESPIMB040SampleStageConfigThread::nextInstruction() {
                         stage->move(axis, z);
                     }
                 }
-                stage=m_parent->getRStage();
-                axis=m_parent->getRStageAxis();
-                if (stage) {
-                    if (stage->isConnected(axis)) {
-                        stage->move(axis, R);
-                    }
-                }
+//                stage=m_parent->getRStage();
+//                axis=m_parent->getRStageAxis();
+//                if (stage) {
+//                    if (stage->isConnected(axis)) {
+//                        stage->move(axis, R);
+//                    }
+//                }
             } else if (inst.type==QFESPIMB040SampleStageConfigThread::MoveRel) {
                 /////////////////////////////////////////////////////////////////////////////
                 // move relative
@@ -258,7 +258,7 @@ void QFESPIMB040SampleStageConfigThread::nextInstruction() {
                 double x=inst.pd1;
                 double y=inst.pd2;
                 double z=inst.pd3;
-                double R=inst.pd4;
+                //double R=inst.pd4;
 
                 QFExtensionLinearStage* stage;
                 int axis;
@@ -284,6 +284,43 @@ void QFESPIMB040SampleStageConfigThread::nextInstruction() {
                         stage->move(axis, stage->getPosition(axis)+z);
                     }
                 }
+//                stage=m_parent->getRStage();
+//                axis=m_parent->getRStageAxis();
+//                if (stage) {
+//                    if (stage->isConnected(axis)) {
+//                        stage->move(axis, stage->getPosition(axis)+R);
+//                    }
+//                }
+            } else if (inst.type==QFESPIMB040SampleStageConfigThread::Rotate) {
+                    /////////////////////////////////////////////////////////////////////////////
+                    // Rotate
+                    /////////////////////////////////////////////////////////////////////////////
+                    //double x=inst.pd1;
+                    //double y=inst.pd2;
+                    //double z=inst.pd3;
+                    double R=inst.pd4;
+
+                    QFExtensionLinearStage* stage;
+                    int axis;
+
+                    stage=m_parent->getRStage();
+                    axis=m_parent->getRStageAxis();
+                    if (stage) {
+                        if (stage->isConnected(axis)) {
+                            stage->move(axis, R);
+                        }
+                    }
+            } else if (inst.type==QFESPIMB040SampleStageConfigThread::RotateRel) {
+                /////////////////////////////////////////////////////////////////////////////
+                // Rotate relative
+                /////////////////////////////////////////////////////////////////////////////
+                //double x=inst.pd1;
+                //double y=inst.pd2;
+                //double z=inst.pd3;
+                double R=inst.pd4;
+
+                QFExtensionLinearStage* stage;
+                int axis;
                 stage=m_parent->getRStage();
                 axis=m_parent->getRStageAxis();
                 if (stage) {
@@ -335,6 +372,15 @@ void QFESPIMB040SampleStageConfigThread::move(double x, double y, double z, doub
     inst.pd1=x;
     inst.pd2=y;
     inst.pd3=z;
+    inst.pd4=R; //not used
+    InstructionMutex->lock();
+    instructions.enqueue(inst);
+    InstructionMutex->unlock();
+}
+
+void QFESPIMB040SampleStageConfigThread::rotate(double R) {
+    QFESPIMB040SampleStageConfigThread::Instruction inst;
+    inst.type=QFESPIMB040SampleStageConfigThread::Rotate;
     inst.pd4=R;
     InstructionMutex->lock();
     instructions.enqueue(inst);
@@ -348,6 +394,15 @@ void QFESPIMB040SampleStageConfigThread::moveRel(double x, double y, double z, d
     inst.pd1=x;
     inst.pd2=y;
     inst.pd3=z;
+    inst.pd4=R; // not used
+    InstructionMutex->lock();
+    instructions.enqueue(inst);
+    InstructionMutex->unlock();
+}
+
+void QFESPIMB040SampleStageConfigThread::rotateRel(double R) {
+    QFESPIMB040SampleStageConfigThread::Instruction inst;
+    inst.type=QFESPIMB040SampleStageConfigThread::RotateRel;
     inst.pd4=R;
     InstructionMutex->lock();
     instructions.enqueue(inst);

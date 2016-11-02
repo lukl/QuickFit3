@@ -195,6 +195,10 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         QPushButton* btnMoveAbsolute;
         /** \brief button for relative movement */
         QPushButton* btnMoveRelative;
+        /** \brief button for absolute rotation */
+        QPushButton* btnRotAbsolute;
+        /** \brief button for relative rotation */
+        QPushButton* btnRotRelative;
 
 
 
@@ -353,6 +357,8 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         void displayAxisStates();
         void moveAbsolute();
         void moveRelative();
+        void RotAbsolute();
+        void RotRelative();
         void configSteps();
         void updateRefMove();
 
