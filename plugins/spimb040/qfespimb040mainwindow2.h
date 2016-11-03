@@ -72,6 +72,7 @@
 #include "qfespimb040scriptedacquisition.h"
 #include "qfespimb040configtabwidget.h"
 #include "qfespimb040overviewacquisitionconfigwidget.h"
+#include "qfespimb040trackcs.h"
 
 class QFESPIMB040; // forward
 

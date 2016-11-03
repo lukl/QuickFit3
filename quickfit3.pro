@@ -355,6 +355,7 @@ plg_curve_fit.depends = lib libqf3widgets
                     plg_qfextensioncoboltlaser.subdir=./plugins/lights_b040laserbox
                     plg_lights_b040laserbox.depends = lib libqf3widgets
 
+
                     !contains(QF3CONFIG, nonidaqmx) {
                         SUBDIRS += plg_qfe_alexcontrol
                         plg_qfe_alexcontrol.subdir=./plugins/qfe_alexcontrol

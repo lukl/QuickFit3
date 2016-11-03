@@ -622,58 +622,6 @@ p, li { white-space: pre-wrap; }
    </item>
    <item row="6" column="1">
     <layout class="QGridLayout" name="gridLayout_4">
-     <item row="1" column="1">
-      <widget class="QFEnhancedTabWidget" name="tabWidget">
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <widget class="QWidget" name="tab">
-        <attribute name="title">
-         <string>Stages</string>
-        </attribute>
-        <layout class="QGridLayout" name="gridLayout_5" rowstretch="0" columnstretch="0">
-         <item row="0" column="0">
-          <widget class="QFESPIMB040SampleStageConfig" name="stageSetup">
-           <property name="minimumSize">
-            <size>
-             <width>100</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="title">
-            <string>Stage Setup</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_2">
-        <attribute name="title">
-         <string>MD 1</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <item>
-          <widget class="QFMeasurementDeviceConfigWidget" name="widMD1" native="true"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_3">
-        <attribute name="title">
-         <string>MD 2</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
-         <item>
-          <widget class="QFMeasurementDeviceConfigWidget" name="widMD2" native="true"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_4">
-        <attribute name="title">
-         <string>Trail CS</string>
-        </attribute>
-       </widget>
-      </widget>
-     </item>
      <item row="0" column="1">
       <widget class="QLabel" name="image">
        <property name="sizePolicy">
@@ -735,6 +683,71 @@ p, li { white-space: pre-wrap; }
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QFEnhancedTabWidget" name="tabWidget">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tab">
+        <attribute name="title">
+         <string>Stages</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_5" rowstretch="0" columnstretch="0">
+         <item row="0" column="0">
+          <widget class="QFESPIMB040SampleStageConfig" name="stageSetup">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>Stage Setup</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_2">
+        <attribute name="title">
+         <string>MD 1</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QFMeasurementDeviceConfigWidget" name="widMD1" native="true"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_3">
+        <attribute name="title">
+         <string>MD 2</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QFMeasurementDeviceConfigWidget" name="widMD2" native="true"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_4">
+        <attribute name="title">
+         <string>Track CS</string>
+        </attribute>
+        <widget class="QFESPIMB040TrackCS" name="groupBox1" native="true">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>-1</x>
+           <y>-1</y>
+           <width>371</width>
+           <height>481</height>
+          </rect>
+         </property>
+        </widget>
+       </widget>
       </widget>
      </item>
     </layout>
@@ -1766,6 +1779,12 @@ p, li { white-space: pre-wrap; }
    <class>QFMeasurementDeviceConfigWidget</class>
    <extends>QWidget</extends>
    <header>qfmeasurementdeviceconfigwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFESPIMB040TrackCS</class>
+   <extends>QWidget</extends>
+   <header>qfespimb040trackcs.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

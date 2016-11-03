@@ -69,7 +69,8 @@ HEADERS += spimb040.h \
     qfespimb040opticssetup2.h \
     qfespimb040overviewacquisitionconfigwidget.h \
     qfespimb040finddialog.h \
-    spimb040optionswidget.h
+    spimb040optionswidget.h \
+    qfespimb040trackcs.h
 
 SOURCES += spimb040.cpp \
            qfespimb040cameraview.cpp \
@@ -98,7 +99,8 @@ SOURCES += spimb040.cpp \
     qfespimb040opticssetup2.cpp \
     qfespimb040overviewacquisitionconfigwidget.cpp \
     qfespimb040finddialog.cpp \
-    spimb040optionswidget.cpp
+    spimb040optionswidget.cpp \
+    qfespimb040trackcs.cpp
 FORMS = \
     qfespimb040opticssetup.ui \
     qfespimb00histogrammaskdialog.ui \
