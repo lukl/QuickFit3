@@ -368,10 +368,12 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         // Track Cover slip feature
     protected:
 
-        QPushButton* btnTrackCSstepright;
-        QPushButton* btnTrackCSstepleft;
+        QPushButton* btnTrackCSStepRight;
+        QPushButton* btnTrackCSStepLeft;
         QDoubleSpinBox* spinTrackCSstep;
         QDoubleSpinBox* spinTrackCSangle;
+
+    protected slots:
         void TrackCSStepLeft();
         void TrackCSStepRight();
 };

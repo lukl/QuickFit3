@@ -593,16 +593,16 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     spinTrackCSstep->setDecimals(2);
     spinTrackCSstep->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
     gl->addWidget(spinTrackCSstep, 1,2);
-    btnTrackCSstepleft=new QPushButton(QIcon(":/spimb040/move_CSleft.png"), "", this);
-    btnTrackCSstepright=new QPushButton(QIcon(":/spimb040/move_CSright.png"), "", this);
-    gl->addWidget(btnTrackCSstepleft, 1, 3);
-    gl->addWidget(btnTrackCSstepright, 1, 4);
+    btnTrackCSStepLeft=new QPushButton(QIcon(":/spimb040/move_CSleft.png"), "", this);
+    btnTrackCSStepRight=new QPushButton(QIcon(":/spimb040/move_CSright.png"), "", this);
+    connect(btnTrackCSStepRight, SIGNAL(clicked()), this, SLOT(TrackCSStepRight()));
+    connect(btnTrackCSStepLeft, SIGNAL(clicked()), this, SLOT(TrackCSStepLeft()));
+    gl->addWidget(btnTrackCSStepLeft, 1, 3);
+    gl->addWidget(btnTrackCSStepRight, 1, 4);
     gl->setColumnStretch(0,10);
     gl->setContentsMargins(0,0,0,0);
     gl->setHorizontalSpacing(1);
     gl->setVerticalSpacing(1);
-    connect(btnTrackCSstepright, SIGNAL(clicked()), this, SLOT(TrackCSStepRight()));
-    connect(btnTrackCSstepleft, SIGNAL(clicked()), this, SLOT(TrackCSStepLeft()));
     stagelayout->addRow(l, gl);
 
 }
@@ -778,8 +778,8 @@ void QFESPIMB040SampleStageConfig::updateStates() {
             labJoystick->setPixmap(QPixmap());
         }
 
-        btnTrackCSstepleft->setEnabled(xyzconn);
-        btnTrackCSstepright->setEnabled(xyzconn);
+        btnTrackCSStepLeft->setEnabled(xyzconn);
+        btnTrackCSStepRight->setEnabled(xyzconn);
         spinTrackCSangle->setEnabled(xyzconn);
         spinTrackCSstep->setEnabled(xyzconn);
     }
@@ -1627,8 +1627,8 @@ void QFESPIMB040SampleStageConfig::stagesConnectedChanged(bool connX, bool connY
     if (chkJoystick->isEnabled()!=anyconn) chkJoystick->setEnabled(anyconn);
 
     bool xyzconn=connX&&connY&&connZ;
-    if (btnTrackCSstepleft->isEnabled()!=xyzconn) btnTrackCSstepleft->setEnabled(xyzconn);
-    if (btnTrackCSstepright->isEnabled()!=xyzconn) btnTrackCSstepright->setEnabled(xyzconn);
+    if (btnTrackCSStepLeft->isEnabled()!=xyzconn) btnTrackCSStepLeft->setEnabled(xyzconn);
+    if (btnTrackCSStepRight->isEnabled()!=xyzconn) btnTrackCSStepRight->setEnabled(xyzconn);
     if (spinTrackCSangle->isEnabled()!=xyzconn) spinTrackCSangle->setEnabled(xyzconn);
     if (spinTrackCSstep->isEnabled()!=xyzconn) spinTrackCSstep->setEnabled(xyzconn);
     //setUpdatesEnabled(updt);
