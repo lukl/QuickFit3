@@ -228,8 +228,8 @@ void QFWizardPage::setButtonState(bool entering)
         layout << QWizard::Stretch;
         if (!m_switchoffPreviousButton) layout << QWizard::BackButton;
         layout<< QWizard::NextButton;
-        if (!m_switchoffCancelButton) layout<< QWizard::CancelButton;
         if (isFinalPage()) layout<< QWizard::FinishButton;
+        if (!m_switchoffCancelButton) layout<< QWizard::CancelButton;
         //if (!m_switchoffPreviousButton || !m_switchoffCancelButton) wizard()->setButtonLayout(layout);
         wizard()->setButtonLayout(layout);
         //qDebug()<<"finisheg set buttons is final="<<isFinalPage();
@@ -246,10 +246,10 @@ void QFWizardPage::setButtonState(bool entering)
         QList<QWizard::WizardButton> layout;
         layout << QWizard::Stretch;
         layout << QWizard::BackButton;
+        if (isFinalPage()) layout<< QWizard::FinishButton;
         layout<< QWizard::NextButton;
         layout<< QWizard::CancelButton;
         //qDebug()<<"finisheg set buttons is final="<<isFinalPage();
-        if (isFinalPage()) layout<< QWizard::FinishButton;
         //if (!m_switchoffPreviousButton || !m_switchoffCancelButton) wizard()->setButtonLayout(layout);
         wizard()->setButtonLayout(layout);
     }

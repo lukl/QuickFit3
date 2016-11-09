@@ -3563,7 +3563,7 @@ void MainWindow::displayNewVersionDlg()
 
 void MainWindow::displayWelcomeDlg()
 {
-    if (ProgramOptions::getConfigValue("quickfit/welcomescreen", true).toBool()) {
+    if (ProgramOptions::getConfigValue("quickfit/welcomescreen", false).toBool()) {
         openWelcomeScreen();
     }
 }
