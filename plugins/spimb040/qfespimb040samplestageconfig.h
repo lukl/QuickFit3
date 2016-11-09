@@ -47,6 +47,7 @@ class QFESPIMB040MainWindow; // forward
 #include <QThread>
 #include <QQueue>
 #include <QMutex>
+#include <QtCore/qmath.h>
 
 #include "programoptions.h"
 #include "jkqttools.h"
@@ -271,6 +272,7 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         QPixmap iconError;
         QPixmap iconMoving;
         QPixmap iconMovingOpposite;
+        QPixmap iconMovingAnyDirection;
         QPixmap iconJoystick;
         QPixmap iconNoJoystick;
 
@@ -363,6 +365,15 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
         void updateRefMove();
 
 
+        // Track Cover slip feature
+    protected:
+
+        QPushButton* btnTrackCSstepright;
+        QPushButton* btnTrackCSstepleft;
+        QDoubleSpinBox* spinTrackCSstep;
+        QDoubleSpinBox* spinTrackCSangle;
+        void TrackCSStepLeft();
+        void TrackCSStepRight();
 };
 
 #endif // QFESPIMB040SAMPLESTAGECONFIG_H

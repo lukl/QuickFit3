@@ -19,6 +19,7 @@
         <file alias="spimb040/stage_ready.png">../../images/16x16/stage_ready.png</file>
         <file alias="spimb040/stage_moving.png">../../images/16x16/stage_moving.png</file>
         <file alias="spimb040/stage_moving2.png">../../images/16x16/stage_moving2.png</file>
+        <file alias="spimb040/stage_moving_anydir.png">../../images/16x16/stage_moving_anydir.png</file>
         <file alias="spimb040/stage_disconnected.png">../../images/16x16/stage_disconnected.png</file>
         <file alias="spimb040/stage_joystick.png">../../images/16x16/joystick.png</file>
         <file alias="spimb040/stage_nojoystick.png">../../images/16x16/nojoystick.png</file>
@@ -44,6 +45,8 @@
         <file alias="optics_setup.png">icons/optics_setup.png</file>
         <file alias="move_abs.png">icons/move_abs.png</file>
         <file alias="move_rel.png">icons/move_rel.png</file>
+        <file alias="rot_abs.png">icons/rot_abs.png</file>
+        <file alias="rot_rel.png">icons/rot_rel.png</file>
         <file alias="lock_closed.png">icons/lock_closed.png</file>
         <file alias="lock_opened.png">icons/lock_opened.png</file>
         <file alias="connect_cameras.png">icons/connect_cameras.png</file>
@@ -107,5 +110,8 @@
         <file alias="script_indent.png">icons/script_format-indent-more.png</file>
         <file alias="savemulti.png">icons/savemulti.png</file>
         <file alias="savemultiseries.png">icons/savemultiseries.png</file>
+        <file alias="move_relleft.png">icons/move_relleft.png</file>
+        <file alias="move_CSright.png">icons/move_CSright.png</file>
+        <file alias="move_CSleft.png">icons/move_CSleft.png</file>
     </qresource>
 </RCC>

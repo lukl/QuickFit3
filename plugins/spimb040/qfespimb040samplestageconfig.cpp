@@ -78,6 +78,7 @@ QFESPIMB040SampleStageConfig::QFESPIMB040SampleStageConfig(QWidget* parent, bool
     iconError=QPixmap(":/spimb040/stage_error.png");
     iconMoving=QPixmap(":/spimb040/stage_moving.png");
     iconMovingOpposite=QPixmap(":/spimb040/stage_moving2.png");
+    iconMovingAnyDirection=QPixmap(":/spimb040/stage_moving_anydir.png");
     iconJoystick=QPixmap(":/spimb040/stage_joystick.png");
     iconNoJoystick=QPixmap(":/spimb040/stage_nojoystick.png");
     //timerDisplayUpdate.setInterval(stageStateUpdateInterval);
@@ -439,8 +440,8 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     spinMoveR->setDecimals(2);
     spinMoveR->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
     gl->addWidget(spinMoveR, 1,2);
-    btnRotAbsolute=new QPushButton(QIcon(":/spimb040/move_abs.png"), "", this);
-    btnRotRelative=new QPushButton(QIcon(":/spimb040/move_rel.png"), "", this);
+    btnRotAbsolute=new QPushButton(QIcon(":/spimb040/rot_abs.png"), "", this);
+    btnRotRelative=new QPushButton(QIcon(":/spimb040/rot_rel.png"), "", this);
     gl->addWidget(btnRotRelative, 1, 3);
     gl->addWidget(btnRotAbsolute, 1, 4);
     gl->setColumnStretch(0,10);
@@ -571,6 +572,39 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     stagelayout->addRow(l, gl);
     //stagelayout->addRow(tr("<b>status:</b>"), gl);
 
+
+    // Track Coverslip
+    l=new QLabel (tr("<b>Track CS:</b>"), this);
+    l->setStyleSheet("background-color: 	aliceblue;");
+    gl=new QGridLayout();
+    gl->addWidget(new QLabel("<b>Track CS ...</b>", this), 0, 3,1,2);
+    gl->addWidget(new QLabel(" ", this), 1, 0);
+    gl->addWidget(new QLabel("<b>Angle [°]:</b>", this), 0, 1);
+    gl->addWidget(new QLabel("<b>Step[&mu;m]:</b>", this), 0, 2);
+    spinTrackCSangle=new QDoubleSpinBox(this);
+    spinTrackCSangle->setRange(-360,360);
+    spinTrackCSangle->setSingleStep(1);
+    spinTrackCSangle->setDecimals(2);
+    spinTrackCSangle->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
+    gl->addWidget(spinTrackCSangle, 1,1);
+    spinTrackCSstep=new QDoubleSpinBox(this);
+    spinTrackCSstep->setRange(0,15000);
+    spinTrackCSstep->setSingleStep(0.1);
+    spinTrackCSstep->setDecimals(2);
+    spinTrackCSstep->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
+    gl->addWidget(spinTrackCSstep, 1,2);
+    btnTrackCSstepleft=new QPushButton(QIcon(":/spimb040/move_CSleft.png"), "", this);
+    btnTrackCSstepright=new QPushButton(QIcon(":/spimb040/move_CSright.png"), "", this);
+    gl->addWidget(btnTrackCSstepleft, 1, 3);
+    gl->addWidget(btnTrackCSstepright, 1, 4);
+    gl->setColumnStretch(0,10);
+    gl->setContentsMargins(0,0,0,0);
+    gl->setHorizontalSpacing(1);
+    gl->setVerticalSpacing(1);
+    connect(btnTrackCSstepright, SIGNAL(clicked()), this, SLOT(TrackCSStepRight()));
+    connect(btnTrackCSstepleft, SIGNAL(clicked()), this, SLOT(TrackCSStepLeft()));
+    stagelayout->addRow(l, gl);
+
 }
 
 void QFESPIMB040SampleStageConfig::createActions() {
@@ -622,6 +656,7 @@ void QFESPIMB040SampleStageConfig::updateStates() {
     QFExtensionLinearStage* stage;
     int axis;
     bool conn;
+    bool xyzconn=false;
 
     bool anyconn=false;
     bool anyjoy=false;
@@ -641,6 +676,7 @@ void QFESPIMB040SampleStageConfig::updateStates() {
         if (stage) {
             conn=stage->isConnected(axis);
             anyconn=anyconn||conn;
+            xyzconn=conn;
             anyjoy=anyjoy||stage->isJoystickActive(axis);
             if (conn) {
                 actConnectX->setChecked(true);
@@ -663,6 +699,7 @@ void QFESPIMB040SampleStageConfig::updateStates() {
         if (stage) {
             conn=stage->isConnected(axis);
             anyconn=anyconn||conn;
+            xyzconn=xyzconn&&conn;
             anyjoy=anyjoy||stage->isJoystickActive(axis);
             if (conn) {
                 actConnectY->setChecked(true);
@@ -685,6 +722,7 @@ void QFESPIMB040SampleStageConfig::updateStates() {
         if (stage) {
             conn=stage->isConnected(axis);
             anyconn=anyconn||conn;
+            xyzconn=xyzconn&&conn;
             anyjoy=anyjoy||stage->isJoystickActive(axis);
             if (conn) {
                 actConnectZ->setIcon(QIcon(":/spimb040/stagedisconnect.png"));
@@ -739,6 +777,11 @@ void QFESPIMB040SampleStageConfig::updateStates() {
         } else {
             labJoystick->setPixmap(QPixmap());
         }
+
+        btnTrackCSstepleft->setEnabled(xyzconn);
+        btnTrackCSstepright->setEnabled(xyzconn);
+        spinTrackCSangle->setEnabled(xyzconn);
+        spinTrackCSstep->setEnabled(xyzconn);
     }
 
 
@@ -1147,8 +1190,8 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
                 case QFExtensionLinearStage::Ready : labState->setPixmap(iconReady); break;
                 case QFExtensionLinearStage::Disconnected : labState->setPixmap(iconDisconnected); break;
                 case QFExtensionLinearStage::Moving : {
-          if (speed>0) labState->setPixmap(iconMoving);
-          else labState->setPixmap(iconMovingOpposite);
+          if (speed>0) labState->setPixmap(iconMovingAnyDirection);
+          //else labState->setPixmap(iconMovingOpposite);
         } break;
                 case QFExtensionLinearStage::Error : labState->setPixmap(iconError); break;
                 default: labState->setText(tr("?")); break;
@@ -1582,6 +1625,12 @@ void QFESPIMB040SampleStageConfig::stagesConnectedChanged(bool connX, bool connY
     if (btnMoveRelative->isEnabled()!=anyconn) btnMoveRelative->setEnabled(anyconn);
 
     if (chkJoystick->isEnabled()!=anyconn) chkJoystick->setEnabled(anyconn);
+
+    bool xyzconn=connX&&connY&&connZ;
+    if (btnTrackCSstepleft->isEnabled()!=xyzconn) btnTrackCSstepleft->setEnabled(xyzconn);
+    if (btnTrackCSstepright->isEnabled()!=xyzconn) btnTrackCSstepright->setEnabled(xyzconn);
+    if (spinTrackCSangle->isEnabled()!=xyzconn) spinTrackCSangle->setEnabled(xyzconn);
+    if (spinTrackCSstep->isEnabled()!=xyzconn) spinTrackCSstep->setEnabled(xyzconn);
     //setUpdatesEnabled(updt);
 
 }
@@ -1720,4 +1769,16 @@ void QFESPIMB040SampleStageConfig::stepMinusZ() {
 
 void QFESPIMB040SampleStageConfig::stepMinusR() {
     moveRelative(0,0,0,-m_stepR);
+}
+
+void QFESPIMB040SampleStageConfig::TrackCSStepLeft() {
+    double angle=spinTrackCSangle->value();
+    double step=spinTrackCSstep->value();
+    moveRelative(step*qCos(angle),0,step*qSin(angle),0);
+}
+
+void QFESPIMB040SampleStageConfig::TrackCSStepRight() {
+    double angle=spinTrackCSangle->value();
+    double step=spinTrackCSstep->value();
+    moveRelative(-step*qCos(angle),0,-step*qSin(angle),0);
 }

@@ -40,6 +40,7 @@ QFESPIMB040TrackCS::QFESPIMB040TrackCS(QWidget* parent):
 {
     setWindowTitle(tr(" Track Cover Slip Movement: "));
     createWidgets();
+    //setActive();
 
 }
 
@@ -65,6 +66,16 @@ stagelayout->addRow(l);
 
 btnConfigSteps=new QToolButton(this);
 stagelayout->addRow(btnConfigSteps);
+
+}
+
+
+void QFESPIMB040TrackCS::setWidgetsInActive() {
+
+    bool xyzstagesconnected=0;
+    //stageSetup->
+
+
 
 }
 

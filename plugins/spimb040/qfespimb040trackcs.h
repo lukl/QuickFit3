@@ -19,6 +19,7 @@ class QFESPIMB040TrackCS: public QWidget {
 
 
         void createWidgets();
+        void setWidgetsInActive();
     protected:
 
         QToolButton* btnConfigSteps;
