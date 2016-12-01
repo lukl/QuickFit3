@@ -2759,39 +2759,20 @@ void QFESPIMB040CameraView::calcXYLineFourierTransform(double *ft_x, double *ft_
     //transformery.rescale(ft_y);
     sharpness=0;
     if (ftsizex==ftsizey) {
-        for (uint i=0; i<ftsizex; i++) {
-            if (i<ftsizex/2) {
-                ft_x[i]=qSqrt(qPow(ft_x[i],2)+qPow(ft_x[ftsizex/2+1+i],2));
-                ft_y[i]=qSqrt(qPow(ft_y[i],2)+qPow(ft_y[ftsizex/2+1+i],2));
-                if (i>1) sharpness+=ft_x[i]+ft_y[i];
-            }
-            else {
-                ft_x[i]=0;
-                ft_y[i]=0;
-            }
+        for (uint i=1; i<ftsizex/2; i++) {
+            ft_x[i]=qSqrt(qPow(ft_x[i],2)+qPow(ft_x[ftsizex/2+i],2));
+            ft_y[i]=qSqrt(qPow(ft_y[i],2)+qPow(ft_y[ftsizex/2+i],2));
+            if (i>1 && ft_x[i]+ft_y[i]>1) sharpness+=ft_x[i]/ft_x[0]+ft_y[i]/ft_y[0];
         }
-
-        sharpness=sharpness/ft_x[0]*ft_y[0];
-
     } else {
-        for (uint i=0; i<ftsizex; i++) {
-            if (i<ftsizex/2) {
-                ft_x[i]=qSqrt(qPow(ft_x[i],2)+qPow(ft_x[ftsizex/2+1+i],2));
-                if (i>1) sharpness+=ft_x[i];
-            }
-//            else {
-//                ft_x[i]=0;
-//            }
+        for (uint i=1; i<ftsizex; i++) {
+            ft_x[i]=qSqrt(qPow(ft_x[i],2)+qPow(ft_x[ftsizex/2+i],2));
+            if (i>1 && ft_x[i]>1) sharpness+=ft_x[i];
         }
-            for (uint i=0; i<ftsizey; i++) {
-                if (i<ftsizey/2) {
-                    ft_y[i]=qSqrt(qPow(ft_y[i],2)+qPow(ft_y[ftsizey/2+1+i],2));
-                    if (i>1) sharpness+=ft_y[i];
-                }
-//                else {
-//                    ft_y[i]=0;
-//                }
-            }
+        for (uint i=0; i<ftsizey; i++) {
+            ft_y[i]=qSqrt(qPow(ft_y[i],2)+qPow(ft_y[ftsizey/2+i],2));
+            if (i>1 && ft_y[i]>1) sharpness+=ft_y[i];
+        }
 
     }
 }
