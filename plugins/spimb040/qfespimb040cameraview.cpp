@@ -40,6 +40,7 @@
 #else
 #include <QtGui>
 #endif
+#include "../../QRealFourier/code/headers/qfouriertransformer.h"
 
 
 #include <QtCore>
@@ -89,7 +90,7 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCa
 
     chkCountsRangeAutoHigh=NULL;
     chkCountsRangeAutoLow=NULL;
-    labImageStatisticsText="";
+    //labImageStatisticsText="";
     maskEmpty=true;
     pixelWidth=1;
     pixelHeight=1;
@@ -148,7 +149,34 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCa
     pltDataMarginalBottomYMin=0;
     pltDataMarginalBottomYMax=250;
 
+    //initalize fourier transform data array and other variables
 
+    ftsizex=image.width();
+    ftsizey=image.height();
+    ft_ix=(double*)malloc(ftsizex*sizeof(double));
+    ft_x=(double*)malloc(ftsizex*sizeof(double));
+    columnaverage_x=(double*)malloc(ftsizex*sizeof(double));
+    ft_iy=(double*)malloc(ftsizey*sizeof(double));
+    ft_y=(double*)malloc(ftsizey*sizeof(double));
+    lineaverage_y=(double*)malloc(ftsizey*sizeof(double));
+
+    for (unsigned int i=0; i<ftsizex; i++) {
+        ft_ix[i]=i;
+        ft_x[i]=0;
+        columnaverage_x[i]=0;
+    }
+    for (unsigned int i=0; i<ftsizey; i++) {
+        ft_iy[i]=i;
+        ft_y[i]=0;
+        lineaverage_y[i]=0;
+    }
+
+    imageFourierTransformCalculating=false;
+    transformerx.setSize(ftsizex);
+    transformery.setSize(ftsizey);
+    sharpness=0;
+    transformerx.setWindowFunction("Hamming");
+    transformery.setWindowFunction("Hamming");
 
     // create widgets and actions
     createMainWidgets();
@@ -173,8 +201,15 @@ void QFESPIMB040CameraView::init(int cameraID, QFCameraConfigComboBoxStartResume
 
 QFESPIMB040CameraView::~QFESPIMB040CameraView()
 {
+    image.clear();
     free(histogram_x);
     free(histogram_y);
+    free(ft_x);
+    free(ft_y);
+    free(ft_ix);
+    free(ft_iy);
+    free(lineaverage_y);
+    free(columnaverage_x);
     qfFree(pltDataMarginalLeftX);
     qfFree(pltDataMarginalLeftY);
     qfFree(pltDataMarginalBottomX);
@@ -243,7 +278,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
     pltMain->set_xAxisLabelVisible(false);
     pltMain->set_yAxisLabelVisible(false);
     pltMain->set_plotBorderLeft(30);
-    pltMain->set_plotBorderBottom(20);
+    pltMain->set_plotBorderBottom(30);
     plteFrame=new JKQTFPimagePlot(pltMain, image.data(), JKQTFP_double, image.width(), image.height(), JKQTFP_GRAY);
     pltMain->addPlot(plteFrame);
     plteMask=new JKQTFPimageOverlayPlot(pltMain, mask.data(), mask.width(), mask.height());
@@ -353,7 +388,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
     gl->addWidget(l, 0, 0);
     gl->addWidget(spinCountsLower,0,1);
     chkCountsRangeAutoLow=new QCheckBox(tr("&auto"), w);
-    gl->addWidget(chkCountsRangeAutoLow,1,1);
+    gl->addWidget(chkCountsRangeAutoLow,0,2);
     spinCountsUpper=new QDoubleSpinBox(w);
     spinCountsUpper->setMaximum(0xEFFFFF);
     spinCountsUpper->setMinimum(-0xEFFFFF);
@@ -363,45 +398,67 @@ void QFESPIMB040CameraView::createMainWidgets() {
 
     l=new QLabel(tr("m&ax. gray:"), w);
     l->setBuddy(spinCountsUpper);
-    gl->addWidget(l,0,2);
-    gl->addWidget(spinCountsUpper,0,3);
+    gl->addWidget(l,0,4);
+    gl->addWidget(spinCountsUpper,0,5);
     chkCountsRangeAutoHigh=new QCheckBox(tr("&auto"), w);
 
-    gl->addWidget(chkCountsRangeAutoHigh,1,3);
+    gl->addWidget(chkCountsRangeAutoHigh,0,6);
     gl->addWidget(new QWidget(w),0,4);
-    gl->setColumnStretch(4,1);
-    vbl->addLayout(gl);
+    gl->setColumnStretch(3,1);
 
     connect(chkCountsRangeAutoLow, SIGNAL(clicked(bool)), this, SLOT(setCountsAutoscale(bool)));
     connect(chkCountsRangeAutoHigh, SIGNAL(clicked(bool)), this, SLOT(setCountsAutoscale(bool)));
 
-
-    hbl=new QHBoxLayout();
     spinHistogramBins=new QSpinBox(w);
     spinHistogramBins->setMinimum(1);
     spinHistogramBins->setMaximum(0xEFFFFF);
     connect(spinHistogramBins, SIGNAL(valueChanged(int)), this, SLOT(displayImageStatistics()));
     l=new QLabel(tr("# bins:"), w);
     l->setBuddy(spinHistogramBins);
-    hbl->addWidget(l);
-    hbl->addWidget(spinHistogramBins);
+    gl->addWidget(l,1,0);
+    gl->addWidget(spinHistogramBins,1,1);
     chkHistogramBinsAuto=new QCheckBox(tr("&auto histogram bins"), w);
     connect(chkHistogramBinsAuto, SIGNAL(clicked(bool)), this, SLOT(setHistogramBinsAutoscale(bool)));
-    hbl->addWidget(chkHistogramBinsAuto);
-    hbl->addStretch(2);
-    vbl->addLayout(hbl);
+    gl->addWidget(chkHistogramBinsAuto,1,2);
     chkHistogramLog=new QCheckBox(tr("&log scale historam"), w);
     connect(chkHistogramLog, SIGNAL(stateChanged(int)), this, SLOT(displayImageStatistics()));
-    vbl->addWidget(chkHistogramLog);
+    gl->addWidget(chkHistogramLog,1,3);
+    vbl->addLayout(gl);
 
-    chkFindDefectivePixels=new QCheckBox(tr("&find defective pixels automatically"), w);
-    connect(chkFindDefectivePixels, SIGNAL(stateChanged(int)), this, SLOT(displayImageStatistics()));
-    vbl->addWidget(chkFindDefectivePixels);
+    //chkFindDefectivePixels=new QCheckBox(tr("&find defective pixels automatically"), w);
+    //connect(chkFindDefectivePixels, SIGNAL(stateChanged(int)), this, SLOT(displayImageStatistics()));
+    //vbl->addWidget(chkFindDefectivePixels);
 
     //labImageStatistics=new QLabel(w);
     labImageStatistics=new QFastTableLabel(w);
     labImageStatistics->setGrid(false);
     vbl->addWidget(labImageStatistics);
+
+    QHBoxLayout* fthbl=new QHBoxLayout();
+    vbl->addLayout(fthbl);
+    fthbl->setContentsMargins(0,0,0,0);
+    chkFourierTransform=new QCheckBox(tr("fourier transform"), w);
+    fthbl->addWidget(chkFourierTransform);
+    fthbl->addStretch();
+    labelSharpness=new QLabel(tr("Sharpness: %1").arg(sharpness));
+    fthbl->addWidget(labelSharpness);
+    fthbl->addStretch();
+    connect(chkFourierTransform, SIGNAL(toggled(bool)), this, SLOT(ftMemoryRealloc()));
+
+
+    pltFourierTransform=new JKQTFastPlotter(w);
+    //QColor bt=QColor("blue");
+    bt.setAlphaF(0.5);
+    plteFourierTransformLine=new JKQTFPLinePlot(pltFourierTransform, ftsizex, ft_ix, ft_x, QColor("red"), Qt::SolidLine, 2);
+    plteFourierTransformRangeX=new JKQTFPXRangePlot(pltFourierTransform, 0, ftsizex, bt, Qt::SolidLine, 1, Qt::SolidPattern);
+    plteFourierTransformRangeY=new JKQTFPYRangePlot(pltFourierTransform, 0, 255, bt, Qt::SolidLine, 1);
+    pltFourierTransform->addPlot(plteFourierTransformLine);
+    pltFourierTransform->addPlot(plteFourierTransformRangeX);
+    pltFourierTransform->addPlot(plteFourierTransformRangeY);
+    pltFourierTransform->set_xAxisLabel("frequency 1/pixel");
+    pltFourierTransform->set_yAxisLabel("Fourier Transform x-dir");
+    vbl->addWidget(pltFourierTransform);
+
 
     //labMarginalFitResults=new QLabel(w);
     labMarginalFitResults=new QFastTableLabel(w);
@@ -794,6 +851,7 @@ void QFESPIMB040CameraView::loadSettings(QSettings& settings, QString prefix) {
     lastMaskHistogramMode=settings.value(prefix+"last_mask_histogram_mode", lastMaskHistogramMode).toInt();
     lastMaskHistogramPixels=settings.value(prefix+"last_mask_histogram_pixels", lastMaskHistogramMode).toInt();
     chkImageStatisticsHistogram->setChecked(settings.value(prefix+"display_imagestatistics", chkImageStatisticsHistogram->isChecked()).toBool());
+    chkFourierTransform->setChecked(settings.value(prefix+"display_fouriertransform", chkFourierTransform->isChecked()).toBool());
 
     chkGrid->setChecked(settings.value(prefix+"grid", false).toBool());
     spinGridWidth->setValue(settings.value(prefix+"grid_width", 32).toInt());
@@ -860,6 +918,7 @@ void QFESPIMB040CameraView::loadSettings(QFManyFilesSettings &settings, QString 
      lastMaskHistogramMode=settings.value(prefix+"last_mask_histogram_mode", lastMaskHistogramMode).toInt();
      lastMaskHistogramPixels=settings.value(prefix+"last_mask_histogram_pixels", lastMaskHistogramMode).toInt();
      chkImageStatisticsHistogram->setChecked(settings.value(prefix+"display_imagestatistics", chkImageStatisticsHistogram->isChecked()).toBool());
+     chkFourierTransform->setChecked(settings.value(prefix+"display_fouriertransform", chkFourierTransform->isChecked()).toBool());
 
      chkGrid->setChecked(settings.value(prefix+"grid", false).toBool());
      spinGridWidth->setValue(settings.value(prefix+"grid_width", 32).toInt());
@@ -912,6 +971,7 @@ void QFESPIMB040CameraView::storeSettings(QSettings& settings, QString prefix) {
     settings.setValue(prefix+"imagesettings.marginal_ypixel", pltDataMarginalYPixel);
 
     settings.setValue(prefix+"display_imagestatistics", chkImageStatisticsHistogram->isChecked());
+    settings.setValue(prefix+"display_fouriertransform", chkFourierTransform->isChecked());
     settings.setValue(prefix+"last_mask_histogram_mode", lastMaskHistogramMode);
     settings.setValue(prefix+"last_mask_histogram_pixels", lastMaskHistogramMode);
 
@@ -970,6 +1030,7 @@ void QFESPIMB040CameraView::storeSettings(QFManyFilesSettings &settings, QString
     settings.setValue(prefix+"imagesettings.marginal_ypixel", pltDataMarginalYPixel);
 
     settings.setValue(prefix+"display_imagestatistics", chkImageStatisticsHistogram->isChecked());
+    settings.setValue(prefix+"display_fouriertransform", chkFourierTransform->isChecked());
     settings.setValue(prefix+"last_mask_histogram_mode", lastMaskHistogramMode);
     settings.setValue(prefix+"last_mask_histogram_pixels", lastMaskHistogramMode);
 
@@ -1262,24 +1323,29 @@ void QFESPIMB040CameraView::redrawFrame() {
 
 }
 
+
 void QFESPIMB040CameraView::redrawFrameRecalc(bool forceHisto) {
     if (currentlyRedrawing) return;
     bool updt=updatesEnabled();
     bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     currentlyRedrawing=true;
-    QTime tim;
-    tim.start();
+    //QTime tim;
+    //tim.start();
     prepareImage();
     //qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   prepareImage = "<<tim.elapsed()<<" ms";
-    tim.start();
+    //tim.start();
     displayImageStatistics(chkImageStatisticsHistogram->isChecked(), forceHisto);
     //qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   displayImageStatistics = "<<tim.elapsed()<<" ms";
-    tim.start();
+    //tim.start();
+    displayFourierTransform(chkFourierTransform->isChecked());
+    //qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   displayImageStatistics = "<<tim.elapsed()<<" ms";
+    //tim.start();
     redrawFrame();
     //qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   redrawFrame = "<<tim.elapsed()<<" ms";
     currentlyRedrawing=false;
     if (widVisible) setUpdatesEnabled(updt);
 }
+
 
 void QFESPIMB040CameraView::prepareImage() {
     marginalResults="";
@@ -1415,6 +1481,7 @@ void QFESPIMB040CameraView::prepareImage() {
                 marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">average = </td><td width=\"20%\">%1 px</td><td width=\"20%\">standard deviation = </td><td width=\"20%\">%2 px</td></tr>").arg(roundWithError(avg, sqrt(var), 1)).arg(roundError(sqrt(var), 1));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(avg*pixelH, sqrt(var)*pixelH, 1)).arg(roundError(sqrt(var)*pixelH, 1));
                 marginalResultsSimple+=tr(">b20|20|20|20|20\n");
+                marginalResultsSimple+=tr("Marginal Evaluation:||||\n");
                 marginalResultsSimple+=tr(" | average | | stddev |\n");
                 marginalResultsSimple+=tr("left: | %1 px | %3 %5m |%2 px | %4 %5m\n").arg(roundWithError(avg, sqrt(var), 0)).arg(roundError(sqrt(var), 1)).arg(roundWithError(avg*pixelH, sqrt(var)*pixelH, 1)).arg(roundError(sqrt(var)*pixelH, 1)).arg(QChar(0xB5));
                 var=0;
@@ -1453,6 +1520,7 @@ void QFESPIMB040CameraView::prepareImage() {
                 MarginalLeftPosition=pout[2]*pixelH;
 
                 marginalResultsSimple+=tr(">b20|20|20|20|20\n");
+                marginalResultsSimple+=tr("Marginal Evaluation:||||\n");
                 marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">average = </td><td width=\"20%\">%1 px</td><td width=\"20%\">&nbsp;&nbsp;1/e<sup>2</sup>-width = </td><td width=\"20%\">%2 px</td></tr>").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 2)).arg(roundError(sqrt(fabs(pout[3])), 2));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelH, sqrt(fabs(pout[3]))*pixelH, 2)).arg(roundError(sqrt(fabs(pout[3]))*pixelH, 2));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
@@ -1510,6 +1578,7 @@ void QFESPIMB040CameraView::prepareImage() {
                 MarginalLeftWidth=fabs(pout[3])*pixelH;
                 MarginalLeftPosition=pout[2]*pixelH;
                 marginalResultsSimple+=tr(">b20|20|20|20|20\n");
+                marginalResultsSimple+=tr("Marginal Evaluation:||||\n");
                 marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">average = </td><td width=\"20%\">%1 px</td><td width=\"20%\">&nbsp;&nbsp;x<sub>1. Zero</sub> = </td><td width=\"20%\">%2 px</td></tr>").arg(roundWithError(pout[2], fabs(pout[3]), 1)).arg(roundError(fabs(pout[3]), 1));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelH, fabs(pout[3])*pixelH, 1)).arg(roundError(fabs(pout[3])*pixelH, 1));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
@@ -1565,6 +1634,7 @@ void QFESPIMB040CameraView::prepareImage() {
                 MarginalLeftWidth=fabs(pout[3])*pixelH;
                 MarginalLeftPosition=pout[2]*pixelH;
                 marginalResultsSimple+=tr(">b20|20|20|20|20\n");
+                marginalResultsSimple+=tr("Marginal Evaluation:||||\n");
                 marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">center = </td><td width=\"20%\">%1 px</td><td width=\"20%\">&nbsp;&nbsp;width = </td><td width=\"20%\">%2 px</td></tr>").arg(roundError(pout[2], 2)).arg(roundError(pout[3], 2));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundError(pout[2]*pixelH, 2)).arg(roundError(pout[3]*pixelH, 2));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
@@ -1614,8 +1684,9 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram, bool forc
     double histogram_fmax=0;
     histogram_n=spinHistogramBins->value();
     if (!imageStatisticsCalculated) {
-        if(chkFindDefectivePixels->isChecked()) {
-          if(image.findDefectivePixels(mask.data()))maskEmpty=false;
+//        if(chkFindDefectivePixels->isChecked()) {
+        if(false) { // Defective Pixels not working anyways
+          if(image.findDefectivePixels(mask.data())) maskEmpty=false;
         }
         if (withHistogram) {
             if (!maskEmpty) image.calcImageStatistics(mask.data(), &imageBrokenPixels, &imageSum, &imageMean, &imageStddev, &imageImin, &imageImax, &histogram_x, &histogram_y, &histogram_n, &histogram_min, &histogram_max, &histogram_fmax, chkHistogramBinsAuto->isChecked());
@@ -1745,13 +1816,13 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram, bool forc
                 break;
             default: break;
         }
-        labImageStatisticsText=tr("<b>Image Statistics:</b><br><center><table border=\"0\" width=\"90%\"><tr><td width=\"20%\">size = </td><td width=\"40%\">%1 &times; %2</td><td width=\"40%\">= %14 &times; %15 &mu;m<sup>2</sup></td></tr><tr><td>broken pixels = </td><td>%3</td><td></td></tr>%16<tr><td>&nbsp;</td><td></td><td></td></tr><tr><td></td><td><b># photons</b></td><td><b>count rate [kHz]</b></td></tr> <tr><td>sum = </td><td>%4</td><td>%5</td></tr> <tr><td>average = </td><td>%6 &plusmn; %7</td><td>%8 &plusmn; %9</td></tr> <tr><td>min ... max = </td><td>%10 ... %11</td><td>%12 ... %13</td></tr> </table></center>")
-                        .arg(image.width()).arg(image.height()).arg(imageBrokenPixels).arg(floattohtmlstr(imageSum).c_str())
-                        .arg(floattohtmlstr(imageSum/imageExposureTime/1000.0, 3).c_str())
-                        .arg(roundWithError(imageMean, imageStddev, 1)).arg(roundError(imageStddev, 1))
-                        .arg(roundWithError(imageMean/imageExposureTime/1000.0, imageStddev/imageExposureTime/1000.0, 1)).arg(roundError(imageStddev/imageExposureTime/1000.0, 1))
-                        .arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0).arg((double)image.width()*pixelWidth).arg((double)image.height()*pixelHeight).arg(correlation);
-        //labImageStatistics->setText(labImageStatisticsText);
+//        labImageStatisticsText=tr("<b>Image Statistics:</b><br><center><table border=\"0\" width=\"90%\"><tr><td width=\"20%\">size = </td><td width=\"40%\">%1 &times; %2</td><td width=\"40%\">= %14 &times; %15 &mu;m<sup>2</sup></td></tr><tr><td>broken pixels = </td><td>%3</td><td></td></tr>%16<tr><td>&nbsp;</td><td></td><td></td></tr><tr><td></td><td><b># photons</b></td><td><b>count rate [kHz]</b></td></tr> <tr><td>sum = </td><td>%4</td><td>%5</td></tr> <tr><td>average = </td><td>%6 &plusmn; %7</td><td>%8 &plusmn; %9</td></tr> <tr><td>min ... max = </td><td>%10 ... %11</td><td>%12 ... %13</td></tr> </table></center>")
+//                        .arg(image.width()).arg(image.height()).arg(imageBrokenPixels).arg(floattohtmlstr(imageSum).c_str())
+//                        .arg(floattohtmlstr(imageSum/imageExposureTime/1000.0, 3).c_str())
+//                        .arg(roundWithError(imageMean, imageStddev, 1)).arg(roundError(imageStddev, 1))
+//                        .arg(roundWithError(imageMean/imageExposureTime/1000.0, imageStddev/imageExposureTime/1000.0, 1)).arg(roundError(imageStddev/imageExposureTime/1000.0, 1))
+//                        .arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0).arg((double)image.width()*pixelWidth).arg((double)image.height()*pixelHeight).arg(correlation);
+//        //labImageStatistics->setText(labImageStatisticsText);
         correlation="";
         switch (cmbImageTransformModeCurrentIndex()) {
             case 1:
@@ -1763,21 +1834,33 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram, bool forc
             default:
                 break;
         }
-        QString s=tr(">b20|40|40\n"
-                     "Image Statistics:\n"
-                     "size = |%1 %18 %2|= %14 %18 %15 %16m%17\n"
-                     "broken pixels = |%3\n%20"
-                     "||\n"
-                     "|# photons|count rate [kHz]\n"
-                     "sum = |%4|%5\n"
-                     "average = |%6 %19 %7|%8 %19 %9\n"
-                     "min ... max = |%10 ... %11|%12 ... %13")
-                  .arg(image.width()).arg(image.height()).arg(imageBrokenPixels).arg(imageSum)
-                  .arg(roundError(imageSum/imageExposureTime/1000.0, 3))
-                  .arg(roundWithError(imageMean, imageStddev, 1)).arg(roundError(imageStddev, 1))
-                  .arg(roundWithError(imageMean/imageExposureTime/1000.0, imageStddev/imageExposureTime/1000.0, 1)).arg(roundError(imageStddev/imageExposureTime/1000.0, 1))
-                  .arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0).arg((double)image.width()*pixelWidth).arg((double)image.height()*pixelHeight)
-                  .arg(QChar(0xB5)).arg(QChar(0xB2)).arg('x').arg(QChar(0xB1)).arg(correlation);
+//        QString s=tr(">b20|40|40\n"
+//                     "Image Statistics:\n"
+//                     "size = |%1 %18 %2|= %14 %18 %15 %16m%17\n"
+//                     "broken pixels = |%3\n%20"
+//                     "||\n"
+//                     "|# photons|count rate [kHz]\n"
+//                     "sum = |%4|%5\n"
+//                     "average = |%6 %19 %7|%8 %19 %9\n"
+//                     "min ... max = |%10 ... %11|%12 ... %13")
+//                  .arg(image.width()).arg(image.height()).arg(imageBrokenPixels).arg(imageSum)
+//                  .arg(roundError(imageSum/imageExposureTime/1000.0, 3))
+//                  .arg(roundWithError(imageMean, imageStddev, 1)).arg(roundError(imageStddev, 1))
+//                  .arg(roundWithError(imageMean/imageExposureTime/1000.0, imageStddev/imageExposureTime/1000.0, 1)).arg(roundError(imageStddev/imageExposureTime/1000.0, 1))
+//                  .arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0).arg((double)image.width()*pixelWidth).arg((double)image.height()*pixelHeight)
+//                  .arg(QChar(0xB5)).arg(QChar(0xB2)).arg('x').arg(QChar(0xB1)).arg(correlation);
+        QString s=tr(">b20|20|20\n"
+                     "Camera: |Pixels: %1 %18 %2|Area: %14 %18 %15 %16m%17\n"
+                     "Image Statistics:|# photons|count rate [kHz]\n"
+                     "Sum|%4|%5\n"
+                     "Average|%6 %19 %7|%8 %19 %9\n"
+                     "Min ... Max|%10 ... %11|%12 ... %13\n")
+                .arg(image.width()).arg(image.height()).arg(imageSum)
+                .arg(roundError(imageSum/imageExposureTime/1000.0, 3))
+                .arg(roundWithError(imageMean, imageStddev, 1)).arg(roundError(imageStddev, 1))
+                .arg(roundWithError(imageMean/imageExposureTime/1000.0, imageStddev/imageExposureTime/1000.0, 1)).arg(roundError(imageStddev/imageExposureTime/1000.0, 1))
+                .arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0).arg((double)image.width()*pixelWidth).arg((double)image.height()*pixelHeight)
+                .arg(QChar(0xB5)).arg(QChar(0xB2)).arg('x').arg(QChar(0xB1)).arg(correlation);
         labImageStatistics->setData(s);
         labelUpdateTime.start();
     }
@@ -2250,7 +2333,7 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
     {
         QTextCursor tabCursor=table->cellAt(0, 1).firstCursorPosition();
         //tabCursor.insertHtml(labImageStatistics->text());
-        tabCursor.insertHtml(labImageStatisticsText);
+        //tabCursor.insertHtml(labImageStatisticsText);
         tabCursor.insertBlock();
         tabCursor.insertBlock();
         tabCursor.insertHtml(marginalResults);
@@ -2268,6 +2351,7 @@ void QFESPIMB040CameraView::saveReport() {
 
     if (m_stopresume) m_stopresume->resume();
 }
+
 
 void QFESPIMB040CameraView::printReport() {
     if (m_stopresume) m_stopresume->stop();
@@ -2296,6 +2380,7 @@ void QFESPIMB040CameraView::printReport() {
     if (m_stopresume) m_stopresume->resume();
 }
 
+
 void QFESPIMB040CameraView::setTableFontsize(int size)
 {
     QFont f=labImageStatistics->font();
@@ -2303,6 +2388,7 @@ void QFESPIMB040CameraView::setTableFontsize(int size)
     labImageStatistics->setFont(f);
     labMarginalFitResults->setFont(f);
 }
+
 
 void QFESPIMB040CameraView::saveData() {
 
@@ -2532,6 +2618,7 @@ void QFESPIMB040CameraView::transformImage(JKImage<QFESPIMB040CameraView_interna
 
 }
 
+
 void QFESPIMB040CameraView::graphParameterChanged() {
     plteGraphDataX.clear();
     plteGraphDataY.clear();
@@ -2539,11 +2626,13 @@ void QFESPIMB040CameraView::graphParameterChanged() {
     updateGraph();
 }
 
+
 void QFESPIMB040CameraView::enableGraph(bool enabled) {
     if (enabled) {
 
     }
 }
+
 
 void QFESPIMB040CameraView::updateGraph() {
     pltGraph->set_doDrawing(false);
@@ -2604,4 +2693,149 @@ void QFESPIMB040CameraView::clearGraph() {
     plteGraphDataY.clear();
     graphTime.start();
     updateGraph();
+}
+
+
+void QFESPIMB040CameraView::displayFourierTransform(bool withFourierTransform) {
+    if (!ft_x || !ft_y) return;
+    if (image.width()!=ftsizex || image.height()!=ftsizey) {
+        if(ftMemoryRealloc()==1) {
+            chkFourierTransform->setChecked(false);
+            chkFourierTransform->setCheckable(true);
+            return;
+        }
+    }
+
+    // CALCULATE FOURIER TRANSFORM OF TRANSFORMED IMAGE AND DRAW IF ACTIVATED
+    if (!imageFourierTransformCalculating && withFourierTransform) {
+
+        // Calculate Fourier Transform
+
+        imageFourierTransformCalculating=true;
+        image.copyColumnAverage(columnaverage_x);
+        image.copyLineAverage(lineaverage_y);
+        calcXYLineFourierTransform(ft_x, ft_y, columnaverage_x, lineaverage_y);
+
+        // Redraw corresponding image
+
+        pltFourierTransform->set_doDrawing(false);
+
+        plteFourierTransformLine->set_data(ft_ix, ft_x, ftsizex/2-2);
+        ft_x_min=0;
+        ft_x_max=0;
+        for (uint i=0; i<ftsizex/2-2;i++) {
+            if(ft_x[i]>ft_x_max) ft_x_max=ft_x[i];
+            if(ft_x[i]<ft_x_min) ft_x_min=ft_x[i];
+        }
+        ft_y_min=0;
+        ft_y_max=0;
+        for (uint i=0; i<ftsizey/2-2;i++) {
+            if(ft_y[i]>ft_y_max) ft_y_max=ft_y[i];
+            if(ft_x[i]<ft_y_min) ft_y_min=ft_y[i];
+        }
+
+        plteFourierTransformRangeY->set_ymin(ft_x_min);
+        plteFourierTransformRangeY->set_ymax(ft_x_max);
+        pltFourierTransform->setYRange(ft_x_min, ceil(ft_x_max), false);
+        pltFourierTransform->set_yTickDistance(ceil(ft_x_max/10));
+
+        pltFourierTransform->set_doDrawing(true);
+        pltFourierTransform->update_plot();
+
+        labelSharpness->setText(tr("Sharpness: %1").arg(sharpness));
+
+        imageFourierTransformCalculating=false;
+    }
+
+}
+
+
+void QFESPIMB040CameraView::calcXYLineFourierTransform(double *ft_x, double *ft_y, double *imglinex, double *imgliney) {
+
+
+    transformerx.forwardTransform(imglinex,ft_x);
+    //transformerx.rescale(ft_x);
+    transformery.forwardTransform(imgliney,ft_y);
+    //transformery.rescale(ft_y);
+    sharpness=0;
+    if (ftsizex==ftsizey) {
+        for (uint i=0; i<ftsizex; i++) {
+            if (i<ftsizex/2) {
+                ft_x[i]=qSqrt(qPow(ft_x[i],2)+qPow(ft_x[ftsizex/2+1+i],2));
+                ft_y[i]=qSqrt(qPow(ft_y[i],2)+qPow(ft_y[ftsizex/2+1+i],2));
+                if (i>1) sharpness+=ft_x[i]+ft_y[i];
+            }
+            else {
+                ft_x[i]=0;
+                ft_y[i]=0;
+            }
+        }
+
+        sharpness=sharpness/ft_x[0]*ft_y[0];
+
+    } else {
+        for (uint i=0; i<ftsizex; i++) {
+            if (i<ftsizex/2) {
+                ft_x[i]=qSqrt(qPow(ft_x[i],2)+qPow(ft_x[ftsizex/2+1+i],2));
+                if (i>1) sharpness+=ft_x[i];
+            }
+//            else {
+//                ft_x[i]=0;
+//            }
+        }
+            for (uint i=0; i<ftsizey; i++) {
+                if (i<ftsizey/2) {
+                    ft_y[i]=qSqrt(qPow(ft_y[i],2)+qPow(ft_y[ftsizey/2+1+i],2));
+                    if (i>1) sharpness+=ft_y[i];
+                }
+//                else {
+//                    ft_y[i]=0;
+//                }
+            }
+
+    }
+}
+
+bool QFESPIMB040CameraView::ftMemoryRealloc() {
+
+
+    if(transformerx.setSize(image.width()) == QFourierTransformer::InvalidSize) {
+        labelSharpness->setText("Invalid Size for FFT");
+        return true;
+    }
+    if(transformery.setSize(image.height()) == QFourierTransformer::InvalidSize) {
+        labelSharpness->setText("Invalid Size for FFT");
+        return true;
+    }
+
+    ftsizex=image.width();
+    ftsizey=image.height();
+
+    ft_ix=(double*)malloc(ftsizex*sizeof(double));
+    ft_x=(double*)malloc(ftsizex*sizeof(double));
+    columnaverage_x=(double*)malloc(ftsizex*sizeof(double));
+    ft_iy=(double*)malloc(ftsizey*sizeof(double));
+    ft_y=(double*)malloc(ftsizey*sizeof(double));
+    lineaverage_y=(double*)malloc(ftsizey*sizeof(double));
+
+    for (unsigned int i=0; i<ftsizex; i++) {
+        ft_ix[i]=i;
+        ft_x[i]=0;
+        columnaverage_x[i]=0;
+    }
+    for (unsigned int i=0; i<ftsizey; i++) {
+        ft_iy[i]=i;
+        ft_y[i]=0;
+        lineaverage_y[i]=0;
+    }
+
+    plteFourierTransformRangeX->set_xmin(0);
+    plteFourierTransformRangeX->set_xmax((double)ftsizex/2-2);
+    pltFourierTransform->set_xTickDistance((ftsizex/2-2)/20);
+    pltFourierTransform->setXRange(-1, ftsizex/2-2, false);
+
+
+    return false;
+
+
 }

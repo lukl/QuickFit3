@@ -70,7 +70,13 @@ HEADERS += spimb040.h \
     qfespimb040overviewacquisitionconfigwidget.h \
     qfespimb040finddialog.h \
     spimb040optionswidget.h \
-    qfespimb040trackcs.h
+    qfespimb040trackcs.h \
+    ../../extlibs/QRealFourier/code/headers/qcomplexnumber.h \
+    ../../extlibs/QRealFourier/code/headers/qfouriercalculator.h \
+    ../../extlibs/QRealFourier/code/headers/qfourierfixedcalculator.h \
+    ../../extlibs/QRealFourier/code/headers/qfouriertransformer.h \
+    ../../extlibs/QRealFourier/code/headers/qfouriervariablecalculator.h \
+    ../../extlibs/QRealFourier/code/headers/qwindowfunction.h
 
 SOURCES += spimb040.cpp \
            qfespimb040cameraview.cpp \
@@ -100,7 +106,13 @@ SOURCES += spimb040.cpp \
     qfespimb040overviewacquisitionconfigwidget.cpp \
     qfespimb040finddialog.cpp \
     spimb040optionswidget.cpp \
-    qfespimb040trackcs.cpp
+    qfespimb040trackcs.cpp \
+    ../../extlibs/QRealFourier/code/sources/qcomplexnumber.cpp \
+    ../../extlibs/QRealFourier/code/sources/qfouriercalculator.cpp \
+    ../../extlibs/QRealFourier/code/sources/qfourierfixedcalculator.cpp \
+    ../../extlibs/QRealFourier/code/sources/qfouriertransformer.cpp \
+    ../../extlibs/QRealFourier/code/sources/qfouriervariablecalculator.cpp \
+    ../../extlibs/QRealFourier/code/sources/qwindowfunction.cpp
 FORMS = \
     qfespimb040opticssetup.ui \
     qfespimb00histogrammaskdialog.ui \

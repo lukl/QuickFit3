@@ -58,6 +58,7 @@
 #include "qfmanyfilessettings.h"
 #include "qfespimb040acquisitiontools.h"
 #include "libtiff_tools.h"
+#include "../../QRealFourier/code/headers/qfouriertransformer.h"
 class QFESPIMB040OpticsSetupBase; // forward
 
 
@@ -251,7 +252,7 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief label for the image statistics output */
         QFastTableLabel* labImageStatistics;
         //QLabel* labImageStatistics;
-        QString labImageStatisticsText;
+        //QString labImageStatisticsText;
         /** \brief spin edit for number of histogram bins */
         QSpinBox* spinHistogramBins;
         /** \brief check box to use automatic histogram bin determination */
@@ -259,7 +260,7 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief check box to use logarithmic histogram y-scale */
         QCheckBox* chkHistogramLog;
         /** \brief check box to autimatically find defective pixels */
-        QCheckBox* chkFindDefectivePixels;
+        //QCheckBox* chkFindDefectivePixels;
 
         /** \brief checkbox that alows to switch a grid over the image on and off */
         QCheckBox* chkGrid;
@@ -624,6 +625,54 @@ class QFESPIMB040CameraView : public QWidget {
 
 
         void transformImage(JKImage<QFESPIMB040CameraView_internalImageType>& out, const JKImage<uint32_t>& raw);
+
+        // Fourier Transform Calculation
+protected:
+
+        /** \brief checkbox to switch image Fourier Transform on/off */
+        QCheckBox* chkFourierTransform;
+        /** \brief Fourier Transform image plotter widget */
+        JKQTFastPlotter* pltFourierTransform;
+        /** \brief plot used to display the fourier transform line */
+        JKQTFPLinePlot* plteFourierTransformLine;
+        /** \brief plot used to display the ranges in the Fourier Transform */
+        JKQTFPXRangePlot* plteFourierTransformRangeX;
+        JKQTFPYRangePlot* plteFourierTransformRangeY;
+        /** \brief label for sharpness value */
+        QLabel* labelSharpness;
+
+        /** \brief calculate and display image Fourier Transform */
+        void displayFourierTransform(bool withFourierTransform);
+
+        /*! \brief calculate the fourier transform of the given x and y average in x and y direction */
+        void calcXYLineFourierTransform(double* ft_x=NULL, double* ft_y=NULL, double* imglinex=NULL, double* imgliney=NULL);
+
+        /** \brief FT Memory Reallocation for resized image */
+
+        /** \brief fourier transform x-values and frequency scale (i)*/
+        double *ft_x;
+        double *ft_ix;
+        double *columnaverage_x;
+        uint ftsizex;
+        /** \brief fourier transform x-values and frequency scale (i)*/
+        double *ft_y;
+        double *ft_iy;
+        double *lineaverage_y;
+        uint ftsizey;
+        /** \brief sharpness measure */
+        double sharpness;
+        double ft_x_max;
+        double ft_x_min;
+        double ft_y_max;
+        double ft_y_min;
+        /** \brief when was the count rate histogram updated the last time */
+        //QElapsedTimer ftUpdateTime;
+        //QElapsedTimer ftlabelUpdateTime;
+        bool imageFourierTransformCalculating;
+        QFourierTransformer transformerx;
+        QFourierTransformer transformery;
+protected slots:
+        bool ftMemoryRealloc();
 
 
 };
