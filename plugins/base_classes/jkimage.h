@@ -848,8 +848,11 @@ class JKImage {
                     *histogram_min=0;
                     *histogram_max=1;
                     *histogram_fmax=1;
-                    memset(hx, hn*sizeof(double),0);
-                    memset(hy, hn*sizeof(double),0);
+
+                    memset(hx, 0, hn*sizeof(double));
+                    memset(hy, 0, hn*sizeof(double));
+//                    memset(hx, hn*sizeof(double), 0);
+//                    memset(hy, hn*sizeof(double), 0);
                 } else {
                     double dh=(double)hrange/(double)hn;
                     double hfmax=0;
@@ -982,8 +985,10 @@ class JKImage {
                     *histogram_min=0;
                     *histogram_max=1;
                     *histogram_fmax=1;
-                    memset(hx, hn*sizeof(double),0);
-                    memset(hy, hn*sizeof(double),0);
+//                    memset(hx, hn*sizeof(double),0);
+//                    memset(hy, hn*sizeof(double),0);
+                    memset(hx, 0, hn*sizeof(double));
+                    memset(hy, 0, hn*sizeof(double));
                 } else {
                     double dh=(double)hrange/(double)hn;
                     double hfmax=0;
