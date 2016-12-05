@@ -155,28 +155,27 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCa
     ftsizey=image.height();
     ft_ix=(double*)malloc(ftsizex*sizeof(double));
     ft_x=(double*)malloc(ftsizex*sizeof(double));
-    columnaverage_x=(double*)malloc(ftsizex*sizeof(double));
+    currentline_x=(double*)malloc(ftsizex*sizeof(double));
     ft_iy=(double*)malloc(ftsizey*sizeof(double));
     ft_y=(double*)malloc(ftsizey*sizeof(double));
-    lineaverage_y=(double*)malloc(ftsizey*sizeof(double));
+    currentline_y=(double*)malloc(ftsizey*sizeof(double));
 
     for (unsigned int i=0; i<ftsizex; i++) {
         ft_ix[i]=i;
         ft_x[i]=0;
-        columnaverage_x[i]=0;
+        currentline_x[i]=0;
     }
     for (unsigned int i=0; i<ftsizey; i++) {
         ft_iy[i]=i;
         ft_y[i]=0;
-        lineaverage_y[i]=0;
+        currentline_y[i]=0;
     }
 
     imageFourierTransformCalculating=false;
-    transformerx.setSize(ftsizex);
-    transformery.setSize(ftsizey);
-    sharpness=0;
-    transformerx.setWindowFunction("Hamming");
-    transformery.setWindowFunction("Hamming");
+    transformerxy.setSize(ftsizex);
+    sharpness_x=0;
+    sharpness_y=0;
+    transformerxy.setWindowFunction("Hamming");
 
     // create widgets and actions
     createMainWidgets();
@@ -208,8 +207,8 @@ QFESPIMB040CameraView::~QFESPIMB040CameraView()
     free(ft_y);
     free(ft_ix);
     free(ft_iy);
-    free(lineaverage_y);
-    free(columnaverage_x);
+    free(currentline_y);
+    free(currentline_x);
     qfFree(pltDataMarginalLeftX);
     qfFree(pltDataMarginalLeftY);
     qfFree(pltDataMarginalBottomX);
@@ -440,8 +439,13 @@ void QFESPIMB040CameraView::createMainWidgets() {
     chkFourierTransform=new QCheckBox(tr("fourier transform"), w);
     fthbl->addWidget(chkFourierTransform);
     fthbl->addStretch();
-    labelSharpness=new QLabel(tr("Sharpness: %1").arg(sharpness));
-    fthbl->addWidget(labelSharpness);
+    labelSharpness_x=new QLabel(tr("x-Sharpness: %1").arg(sharpness_x));
+    labelSharpness_x->setStyleSheet("font-weight:bold; font-size: 24px");
+    fthbl->addWidget(labelSharpness_x);
+    fthbl->addStretch();
+    labelSharpness_y=new QLabel(tr("y-Sharpness: %1").arg(sharpness_y));
+    labelSharpness_y->setStyleSheet("font-weight:bold; font-size: 24px");
+    fthbl->addWidget(labelSharpness_y);
     fthbl->addStretch();
     connect(chkFourierTransform, SIGNAL(toggled(bool)), this, SLOT(ftMemoryRealloc()));
 
@@ -455,7 +459,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
     pltFourierTransform->addPlot(plteFourierTransformLine);
     pltFourierTransform->addPlot(plteFourierTransformRangeX);
     pltFourierTransform->addPlot(plteFourierTransformRangeY);
-    pltFourierTransform->set_xAxisLabel("frequency 1/pixel");
+    pltFourierTransform->set_xAxisLabel("frequency [imagesize/pixel]");
     pltFourierTransform->set_yAxisLabel("Fourier Transform x-dir");
     vbl->addWidget(pltFourierTransform);
 
@@ -1338,7 +1342,7 @@ void QFESPIMB040CameraView::redrawFrameRecalc(bool forceHisto) {
     //qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   displayImageStatistics = "<<tim.elapsed()<<" ms";
     //tim.start();
     displayFourierTransform(chkFourierTransform->isChecked());
-    //qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   displayImageStatistics = "<<tim.elapsed()<<" ms";
+    //qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   displayFourierTransform = "<<tim.elapsed()<<" ms";
     //tim.start();
     redrawFrame();
     //qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   redrawFrame = "<<tim.elapsed()<<" ms";
@@ -2712,9 +2716,37 @@ void QFESPIMB040CameraView::displayFourierTransform(bool withFourierTransform) {
         // Calculate Fourier Transform
 
         imageFourierTransformCalculating=true;
-        image.copyColumnAverage(columnaverage_x);
-        image.copyLineAverage(lineaverage_y);
-        calcXYLineFourierTransform(ft_x, ft_y, columnaverage_x, lineaverage_y);
+        sharpness_x=0;
+        sharpness_y=0;
+        //image.copyColumnAverage(currentline_x);
+        //image.copyLineAverage(currentline_y);
+        if (ftsizex==ftsizey) {
+
+            for (uint i=0; i<ftsizex; i++) {
+                ft_x[i]=0;
+                ft_y[i]=0;
+            }
+
+            for (uint i=0; i<ftsizex; i++) {
+                image.copyLine(i, currentline_x);
+                image.copyColumn(i, currentline_y);
+                calcXYLineFourierTransform(ft_x, ft_y, currentline_x, currentline_y);
+            }
+        }
+        else {
+
+            for (uint i=0; i<ftsizex; i++) { ft_x[i]=0; }
+            for (uint i=0; i<ftsizey; i++) {
+                image.copyLine(i, currentline_x);
+                calcLineFourierTransform(ft_x, currentline_x, ftsizex, sharpness_x);
+            }
+
+            for (uint i=0; i<ftsizey; i++) { ft_y[i]=0; }
+            for (uint i=0; i<ftsizex; i++) {
+                image.copyColumn(i, currentline_y);
+                calcLineFourierTransform(ft_y, currentline_y,ftsizey, sharpness_y);
+            }
+        }
 
         // Redraw corresponding image
 
@@ -2742,7 +2774,8 @@ void QFESPIMB040CameraView::displayFourierTransform(bool withFourierTransform) {
         pltFourierTransform->set_doDrawing(true);
         pltFourierTransform->update_plot();
 
-        labelSharpness->setText(tr("Sharpness: %1").arg(sharpness));
+        labelSharpness_x->setText(tr("x-Sharpness: %1").arg(qRound(sharpness_x)));
+        labelSharpness_y->setText(tr("y-Sharpness: %1").arg(qRound(sharpness_y)));
 
         imageFourierTransformCalculating=false;
     }
@@ -2752,62 +2785,84 @@ void QFESPIMB040CameraView::displayFourierTransform(bool withFourierTransform) {
 
 void QFESPIMB040CameraView::calcXYLineFourierTransform(double *ft_x, double *ft_y, double *imglinex, double *imgliney) {
 
-
-    transformerx.forwardTransform(imglinex,ft_x);
-    //transformerx.rescale(ft_x);
-    transformery.forwardTransform(imgliney,ft_y);
-    //transformery.rescale(ft_y);
-    sharpness=0;
-    if (ftsizex==ftsizey) {
+    double threshold_frequency_min=1;
+    double threshold_frequency_max=ftsizex/3;
+    transformerxy.forwardTransform(imglinex,ft_x_tempstorage);
+    transformerxy.rescale(ft_x_tempstorage);
+    transformerxy.forwardTransform(imgliney,ft_y_tempstorage);
+    transformerxy.rescale(ft_y_tempstorage);
+    ft_x[0]+=ft_x_tempstorage[0];
+    ft_y[0]+=ft_y_tempstorage[0];
         for (uint i=1; i<ftsizex/2; i++) {
-            ft_x[i]=qSqrt(qPow(ft_x[i],2)+qPow(ft_x[ftsizex/2+i],2));
-            ft_y[i]=qSqrt(qPow(ft_y[i],2)+qPow(ft_y[ftsizex/2+i],2));
-            if (i>1 && ft_x[i]+ft_y[i]>1) sharpness+=ft_x[i]/ft_x[0]+ft_y[i]/ft_y[0];
+            ft_x[i]+=qSqrt(qPow(ft_x_tempstorage[i],2)+qPow(ft_x_tempstorage[ftsizex/2+i],2));
+            ft_y[i]+=qSqrt(qPow(ft_y_tempstorage[i],2)+qPow(ft_y_tempstorage[ftsizex/2+i],2));
+            if (i>threshold_frequency_min && i<threshold_frequency_max) {
+                if (ft_x_tempstorage[0]>0) sharpness_x+=qSqrt(qPow(ft_x_tempstorage[i],2)+qPow(ft_x_tempstorage[ftsizex/2+i],2))/ft_x_tempstorage[0];
+                if (ft_y_tempstorage[0]>0) sharpness_y+=qSqrt(qPow(ft_y_tempstorage[i],2)+qPow(ft_y_tempstorage[ftsizex/2+i],2))/ft_y_tempstorage[0];
+            }
         }
-    } else {
-        for (uint i=1; i<ftsizex; i++) {
-            ft_x[i]=qSqrt(qPow(ft_x[i],2)+qPow(ft_x[ftsizex/2+i],2));
-            if (i>1 && ft_x[i]>1) sharpness+=ft_x[i];
-        }
-        for (uint i=0; i<ftsizey; i++) {
-            ft_y[i]=qSqrt(qPow(ft_y[i],2)+qPow(ft_y[ftsizey/2+i],2));
-            if (i>1 && ft_y[i]>1) sharpness+=ft_y[i];
-        }
+}
+
+void QFESPIMB040CameraView::calcLineFourierTransform(double *linefouriertransform, double *imgline, uint length, double &linesharpness) {
+
+    double* lineft_tempstorage;
+    lineft_tempstorage=(double*)malloc(length*sizeof(double));
+
+    QFourierTransformer linetransformer(length, "Hamming");
+    double sharpness_temp=0;
+
+    linetransformer.forwardTransform(imgline,lineft_tempstorage);
+    linetransformer.rescale(lineft_tempstorage);
+
+    double threshold_frequency_min=1;
+    double threshold_frequency_max=length/3;
+
+    linefouriertransform[0]+=lineft_tempstorage[0];
+
+    for (uint i=1; i<length/2; i++) {
+
+        linefouriertransform[i]+=qSqrt(qPow(lineft_tempstorage[i],2)+qPow(lineft_tempstorage[length/2+i],2));
+        if (lineft_tempstorage[0]>0 && i>threshold_frequency_min && i<threshold_frequency_max)
+            sharpness_temp+=qSqrt(qPow(lineft_tempstorage[i],2)+qPow(lineft_tempstorage[length/2+i],2))/lineft_tempstorage[0];
 
     }
+    linesharpness+=sharpness_temp;
 }
 
 bool QFESPIMB040CameraView::ftMemoryRealloc() {
 
 
-    if(transformerx.setSize(image.width()) == QFourierTransformer::InvalidSize) {
-        labelSharpness->setText("Invalid Size for FFT");
+    if(transformerxy.setSize(image.width()) == QFourierTransformer::InvalidSize) {
+        labelSharpness_x->setText("x: Invalid Size for FFT");
         return true;
     }
-    if(transformery.setSize(image.height()) == QFourierTransformer::InvalidSize) {
-        labelSharpness->setText("Invalid Size for FFT");
+    if(transformerxy.setSize(image.height()) == QFourierTransformer::InvalidSize) {
+        labelSharpness_y->setText("y: Invalid Size for FFT");
         return true;
     }
 
     ftsizex=image.width();
     ftsizey=image.height();
 
+
     ft_ix=(double*)malloc(ftsizex*sizeof(double));
     ft_x=(double*)malloc(ftsizex*sizeof(double));
-    columnaverage_x=(double*)malloc(ftsizex*sizeof(double));
+    currentline_x=(double*)malloc(ftsizex*sizeof(double));
     ft_iy=(double*)malloc(ftsizey*sizeof(double));
     ft_y=(double*)malloc(ftsizey*sizeof(double));
-    lineaverage_y=(double*)malloc(ftsizey*sizeof(double));
+    currentline_y=(double*)malloc(ftsizey*sizeof(double));
+    ft_x_tempstorage=(double*)malloc(ftsizex*sizeof(double));
+    ft_y_tempstorage=(double*)malloc(ftsizey*sizeof(double));
 
     for (unsigned int i=0; i<ftsizex; i++) {
         ft_ix[i]=i;
         ft_x[i]=0;
-        columnaverage_x[i]=0;
+        currentline_x[i]=0;
     }
     for (unsigned int i=0; i<ftsizey; i++) {
         ft_iy[i]=i;
         ft_y[i]=0;
-        lineaverage_y[i]=0;
+        currentline_y[i]=0;
     }
 
     plteFourierTransformRangeX->set_xmin(0);

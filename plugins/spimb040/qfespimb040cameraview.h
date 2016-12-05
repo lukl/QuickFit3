@@ -639,28 +639,36 @@ protected:
         JKQTFPXRangePlot* plteFourierTransformRangeX;
         JKQTFPYRangePlot* plteFourierTransformRangeY;
         /** \brief label for sharpness value */
-        QLabel* labelSharpness;
+        QLabel* labelSharpness_x;
+        QLabel* labelSharpness_y;
 
         /** \brief calculate and display image Fourier Transform */
         void displayFourierTransform(bool withFourierTransform);
 
-        /*! \brief calculate the fourier transform of the given x and y average in x and y direction */
+        /*! \brief calculate the fourier transform in x and y direction and project on axis (x and y must be same length) */
         void calcXYLineFourierTransform(double* ft_x=NULL, double* ft_y=NULL, double* imglinex=NULL, double* imgliney=NULL);
+#       /*! \brief calculate the fourier transform of a single image line of given length */
+        void calcLineFourierTransform(double *fouriertransform, double *imgline, uint length, double &linesharpness);
 
         /** \brief FT Memory Reallocation for resized image */
 
         /** \brief fourier transform x-values and frequency scale (i)*/
         double *ft_x;
         double *ft_ix;
-        double *columnaverage_x;
+        double *currentline_x;
         uint ftsizex;
         /** \brief fourier transform x-values and frequency scale (i)*/
         double *ft_y;
         double *ft_iy;
-        double *lineaverage_y;
+        double *currentline_y;
         uint ftsizey;
+
+        /** temporary storage variables for ft calculation */
+        double *ft_x_tempstorage;
+        double *ft_y_tempstorage;
         /** \brief sharpness measure */
-        double sharpness;
+        double sharpness_x;
+        double sharpness_y;
         double ft_x_max;
         double ft_x_min;
         double ft_y_max;
@@ -669,8 +677,7 @@ protected:
         //QElapsedTimer ftUpdateTime;
         //QElapsedTimer ftlabelUpdateTime;
         bool imageFourierTransformCalculating;
-        QFourierTransformer transformerx;
-        QFourierTransformer transformery;
+        QFourierTransformer transformerxy;
 protected slots:
         bool ftMemoryRealloc();
 
