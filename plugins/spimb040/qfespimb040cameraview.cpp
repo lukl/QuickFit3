@@ -175,7 +175,7 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCa
     transformerxy.setSize(ftsizex);
     sharpness_x=0;
     sharpness_y=0;
-    transformerxy.setWindowFunction("Hamming");
+    transformerxy.setWindowFunction("Rectangular");
 
     // create widgets and actions
     createMainWidgets();
@@ -2808,7 +2808,7 @@ void QFESPIMB040CameraView::calcLineFourierTransform(double *linefouriertransfor
     double* lineft_tempstorage;
     lineft_tempstorage=(double*)malloc(length*sizeof(double));
 
-    QFourierTransformer linetransformer(length, "Hamming");
+    QFourierTransformer linetransformer(length, "Rectangular");
     double sharpness_temp=0;
 
     linetransformer.forwardTransform(imgline,lineft_tempstorage);
