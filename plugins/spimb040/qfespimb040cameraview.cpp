@@ -156,19 +156,23 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCa
     ft_ix=(double*)malloc(ftsizex*sizeof(double));
     ft_x=(double*)malloc(ftsizex*sizeof(double));
     currentline_x=(double*)malloc(ftsizex*sizeof(double));
+    ft_x_tempstorage=(double*)malloc(ftsizex*sizeof(double));
     ft_iy=(double*)malloc(ftsizey*sizeof(double));
     ft_y=(double*)malloc(ftsizey*sizeof(double));
     currentline_y=(double*)malloc(ftsizey*sizeof(double));
+    ft_y_tempstorage=(double*)malloc(ftsizey*sizeof(double));
 
     for (unsigned int i=0; i<ftsizex; i++) {
         ft_ix[i]=i;
         ft_x[i]=0;
         currentline_x[i]=0;
+        ft_x_tempstorage[i]=0;
     }
     for (unsigned int i=0; i<ftsizey; i++) {
         ft_iy[i]=i;
         ft_y[i]=0;
         currentline_y[i]=0;
+        ft_y_tempstorage[i]=0;
     }
 
     imageFourierTransformCalculating=false;
@@ -440,11 +444,11 @@ void QFESPIMB040CameraView::createMainWidgets() {
     fthbl->addWidget(chkFourierTransform);
     fthbl->addStretch();
     labelSharpness_x=new QLabel(tr("x-Sharpness: %1").arg(sharpness_x));
-    labelSharpness_x->setStyleSheet("font-weight:bold; font-size: 24px");
+    labelSharpness_x->setStyleSheet("font-weight:bold; font-size: 20px");
     fthbl->addWidget(labelSharpness_x);
     fthbl->addStretch();
     labelSharpness_y=new QLabel(tr("y-Sharpness: %1").arg(sharpness_y));
-    labelSharpness_y->setStyleSheet("font-weight:bold; font-size: 24px");
+    labelSharpness_y->setStyleSheet("font-weight:bold; font-size: 20px");
     fthbl->addWidget(labelSharpness_y);
     fthbl->addStretch();
     connect(chkFourierTransform, SIGNAL(toggled(bool)), this, SLOT(ftMemoryRealloc()));
@@ -2702,8 +2706,8 @@ void QFESPIMB040CameraView::clearGraph() {
 
 void QFESPIMB040CameraView::displayFourierTransform(bool withFourierTransform) {
     if (!ft_x || !ft_y) return;
-    if (image.width()!=ftsizex || image.height()!=ftsizey) {
-        if(ftMemoryRealloc()==1) {
+    if (image.width()!=ftsizex || image.height()!=ftsizey || !((ftsizex & (~ftsizex + 1)) == ftsizex) || !((ftsizey & (~ftsizey + 1)) == ftsizey)) {
+        if(ftMemoryRealloc()==true) {
             chkFourierTransform->setChecked(false);
             chkFourierTransform->setCheckable(true);
             return;
@@ -2720,6 +2724,7 @@ void QFESPIMB040CameraView::displayFourierTransform(bool withFourierTransform) {
         sharpness_y=0;
         //image.copyColumnAverage(currentline_x);
         //image.copyLineAverage(currentline_y);
+
         if (ftsizex==ftsizey) {
 
             for (uint i=0; i<ftsizex; i++) {
@@ -2774,8 +2779,8 @@ void QFESPIMB040CameraView::displayFourierTransform(bool withFourierTransform) {
         pltFourierTransform->set_doDrawing(true);
         pltFourierTransform->update_plot();
 
-        labelSharpness_x->setText(tr("x-Sharpness: %1").arg(qRound(sharpness_x)));
-        labelSharpness_y->setText(tr("y-Sharpness: %1").arg(qRound(sharpness_y)));
+        labelSharpness_x->setText(tr("x-Sharpness: %1").arg(sharpness_x));
+        labelSharpness_y->setText(tr("y-Sharpness: %1").arg(sharpness_y));
 
         imageFourierTransformCalculating=false;
     }
@@ -2785,6 +2790,8 @@ void QFESPIMB040CameraView::displayFourierTransform(bool withFourierTransform) {
 
 void QFESPIMB040CameraView::calcXYLineFourierTransform(double *ft_x, double *ft_y, double *imglinex, double *imgliney) {
 
+    if (!ft_x || !ft_y || !imglinex || !imgliney || !ft_x_tempstorage || !ft_y_tempstorage) return;
+    if(transformerxy.setSize(image.width()) == QFourierTransformer::InvalidSize) return;
     double threshold_frequency_min=1;
     double threshold_frequency_max=ftsizex/3;
     transformerxy.forwardTransform(imglinex,ft_x_tempstorage);
@@ -2804,6 +2811,8 @@ void QFESPIMB040CameraView::calcXYLineFourierTransform(double *ft_x, double *ft_
 }
 
 void QFESPIMB040CameraView::calcLineFourierTransform(double *linefouriertransform, double *imgline, uint length, double &linesharpness) {
+
+    if (!linefouriertransform || !imgline) return;
 
     double* lineft_tempstorage;
     lineft_tempstorage=(double*)malloc(length*sizeof(double));
@@ -2858,11 +2867,13 @@ bool QFESPIMB040CameraView::ftMemoryRealloc() {
         ft_ix[i]=i;
         ft_x[i]=0;
         currentline_x[i]=0;
+        ft_x_tempstorage[i]=0;
     }
     for (unsigned int i=0; i<ftsizey; i++) {
         ft_iy[i]=i;
         ft_y[i]=0;
         currentline_y[i]=0;
+        ft_y_tempstorage[i]=0;
     }
 
     plteFourierTransformRangeX->set_xmin(0);
