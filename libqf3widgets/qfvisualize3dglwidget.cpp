@@ -882,21 +882,21 @@ OPENGLFUNCTIONSCLASS *QFVisualize3DGLWidget::getOpenGLFunctions()
 
     OPENGLFUNCTIONSCLASS *GLFuncs = context->versionFunctions<OPENGLFUNCTIONSCLASS>();
     if (!GLFuncs) {
-        qDebug()<<"could not get OpenGL "OPENGLFUNCTIONSVERSIONSTR" compatibility functions!";
+        qDebug() << "could not get OpenGL OPENGLFUNCTIONSVERSIONSTR compatibility functions!";
         return NULL;
     } else {
-        //qDebug()<<"got OpenGL "OPENGLFUNCTIONSVERSIONSTR" compatibility functions!";
+        //qDebug()<<"got OpenGL OPENGLFUNCTIONSVERSIONSTR compatibility functions!";
     }
     if (!initedOpenGLFunctions32) {
         makeCurrent();
         if (!GLFuncs->initializeOpenGLFunctions()) {
-            qDebug()<<"could not initialize OpenGL "OPENGLFUNCTIONSVERSIONSTR" compatibility functions!";
+            qDebug() << "could not initialize OpenGL OPENGLFUNCTIONSVERSIONSTR compatibility functions!";
             return NULL;
         } else {
-            qDebug()<<"initialized OpenGL "OPENGLFUNCTIONSVERSIONSTR" compatibility functions!";
-            qDebug()<<"OpenGL context isOpenGLES: "<<context->isOpenGLES();
-            qDebug()<<"OpenGL context isValid: "<<context->isValid();
-            qDebug()<<"OpenGL context extensions: "<<context->extensions().toList();
+            qDebug() << "initialized OpenGL OPENGLFUNCTIONSVERSIONSTR compatibility functions!";
+            qDebug() << "OpenGL context isOpenGLES: "<<context->isOpenGLES();
+            qDebug() << "OpenGL context isValid: "<<context->isValid();
+            qDebug() << "OpenGL context extensions: "<<context->extensions().toList();
             initedOpenGLFunctions32=true;
         }
     }

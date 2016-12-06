@@ -648,25 +648,27 @@ protected:
         /*! \brief calculate the fourier transform in x and y direction and project on axis (x and y must be same length) */
         void calcXYLineFourierTransform(double* ft_x=NULL, double* ft_y=NULL, double* imglinex=NULL, double* imgliney=NULL);
 #       /*! \brief calculate the fourier transform of a single image line of given length */
-        void calcLineFourierTransform(double *fouriertransform, double *imgline, uint length, double &linesharpness);
+        void calcLineFourierTransform(double *fouriertransform=NULL, double *imgline=NULL, uint length=0, double &linesharpness=sharpness_dump);
 
         /** \brief FT Memory Reallocation for resized image */
 
         /** \brief fourier transform x-values and frequency scale (i)*/
-        double *ft_x;
-        double *ft_ix;
-        double *currentline_x;
+        double *ft_x=NULL;
+        double *ft_ix=NULL;
+        double *currentline_x=NULL;
         uint ftsizex;
         /** \brief fourier transform x-values and frequency scale (i)*/
-        double *ft_y;
-        double *ft_iy;
-        double *currentline_y;
+        double *ft_y=NULL;
+        double *ft_iy=NULL;
+        double *currentline_y=NULL;
         uint ftsizey;
 
         /** temporary storage variables for ft calculation */
-        double *ft_x_tempstorage;
-        double *ft_y_tempstorage;
+        double *ft_x_tempstorage=NULL;
+        double *ft_y_tempstorage=NULL;
+
         /** \brief sharpness measure */
+        static double sharpness_dump;
         double sharpness_x;
         double sharpness_y;
         double ft_x_max;
