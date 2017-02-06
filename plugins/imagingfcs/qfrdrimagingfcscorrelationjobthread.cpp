@@ -1553,7 +1553,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // NOW WE READ ALL FRAMES IN THE TIFF FILE INTO THE flot* ARRAY ALLOCATED BEFORE
+    // NOW WE READ ALL FRAMES IN THE TIFF FILE INTO THE float* ARRAY ALLOCATED BEFORE
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     firstFrames=(float*)qfCalloc(frame_width*frame_height,sizeof(float));
     lastFrames=(float*)qfCalloc(frame_width*frame_height,sizeof(float));

@@ -310,7 +310,8 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int axis) {
                 //    sscanf(binstr.c_str(),"%*4i%1i%*3i", &isRefSet);
                     //isRefSet=0;
                 if(axes[axis].doRefMove==true) {
-                    if (round(getPosition(axis))!=0) {
+                    //if (round(getPosition(axis))!=0) { // Referencing check overwritten.
+                    if (false) {
                         log_text(tr(LOG_PREFIX "Reference Position apparently defined (nonzero initial position).(Undo by restarting Controller)\n"));
                     }
                     else {

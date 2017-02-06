@@ -151,29 +151,7 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCa
 
     //initalize fourier transform data array and other variables
 
-    ftsizex=image.width();
-    ftsizey=image.height();
-    ft_ix=(double*)malloc(ftsizex*sizeof(double));
-    ft_x=(double*)malloc(ftsizex*sizeof(double));
-    currentline_x=(double*)malloc(ftsizex*sizeof(double));
-    ft_x_tempstorage=(double*)malloc(ftsizex*sizeof(double));
-    ft_iy=(double*)malloc(ftsizey*sizeof(double));
-    ft_y=(double*)malloc(ftsizey*sizeof(double));
-    currentline_y=(double*)malloc(ftsizey*sizeof(double));
-    ft_y_tempstorage=(double*)malloc(ftsizey*sizeof(double));
-
-    for (unsigned int i=0; i<ftsizex; i++) {
-        ft_ix[i]=i;
-        ft_x[i]=0;
-        currentline_x[i]=0;
-        ft_x_tempstorage[i]=0;
-    }
-    for (unsigned int i=0; i<ftsizey; i++) {
-        ft_iy[i]=i;
-        ft_y[i]=0;
-        currentline_y[i]=0;
-        ft_y_tempstorage[i]=0;
-    }
+    FtMemoryRealloc();
 
     imageFourierTransformCalculating=false;
     transformerxy.setSize(ftsizex);
@@ -440,18 +418,18 @@ void QFESPIMB040CameraView::createMainWidgets() {
     QHBoxLayout* fthbl=new QHBoxLayout();
     vbl->addLayout(fthbl);
     fthbl->setContentsMargins(0,0,0,0);
-    chkFourierTransform=new QCheckBox(tr("fourier transform"), w);
+    chkFourierTransform=new QCheckBox(tr("Sharpness Fourier Transform"), w);
     fthbl->addWidget(chkFourierTransform);
+    chkFourierTransform->setChecked(false);
     fthbl->addStretch();
-    labelSharpness_x=new QLabel(tr("x-Sharpness: %1").arg(sharpness_x));
-    labelSharpness_x->setStyleSheet("font-weight:bold; font-size: 20px");
+    labelSharpness_x=new QLabel(tr("x-Sharpness: Inactive"));
+    labelSharpness_x->setStyleSheet("font-weight:bold; font-size: 16px");
     fthbl->addWidget(labelSharpness_x);
     fthbl->addStretch();
-    labelSharpness_y=new QLabel(tr("y-Sharpness: %1").arg(sharpness_y));
-    labelSharpness_y->setStyleSheet("font-weight:bold; font-size: 20px");
+    labelSharpness_y=new QLabel(tr("y-Sharpness: Inactive"));
+    labelSharpness_y->setStyleSheet("font-weight:bold; font-size: 16px");
     fthbl->addWidget(labelSharpness_y);
     fthbl->addStretch();
-    connect(chkFourierTransform, SIGNAL(toggled(bool)), this, SLOT(ftMemoryRealloc()));
 
 
     pltFourierTransform=new JKQTFastPlotter(w);
@@ -1345,7 +1323,7 @@ void QFESPIMB040CameraView::redrawFrameRecalc(bool forceHisto) {
     displayImageStatistics(chkImageStatisticsHistogram->isChecked(), forceHisto);
     //qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   displayImageStatistics = "<<tim.elapsed()<<" ms";
     //tim.start();
-    displayFourierTransform(chkFourierTransform->isChecked());
+    displayFourierTransform();
     //qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   displayFourierTransform = "<<tim.elapsed()<<" ms";
     //tim.start();
     redrawFrame();
@@ -2704,18 +2682,23 @@ void QFESPIMB040CameraView::clearGraph() {
 }
 
 
-void QFESPIMB040CameraView::displayFourierTransform(bool withFourierTransform) {
+void QFESPIMB040CameraView::displayFourierTransform() {
     if (!ft_x || !ft_y) return;
+    if (chkFourierTransform->isChecked()==false) return;
     if (image.width()!=ftsizex || image.height()!=ftsizey || !((ftsizex & (~ftsizex + 1)) == ftsizex) || !((ftsizey & (~ftsizey + 1)) == ftsizey)) {
-        if(ftMemoryRealloc()==true) {
-            chkFourierTransform->setChecked(false);
-            chkFourierTransform->setCheckable(true);
-            return;
-        }
+        // image size has changed or image size is not 2^n
+        FtMemoryRealloc();
+
+        plteFourierTransformRangeX->set_xmin(0);
+        plteFourierTransformRangeX->set_xmax((double)ftsizex/2-2);
+        pltFourierTransform->set_xTickDistance((ftsizex/2-2)/20);
+        pltFourierTransform->setXRange(-1, ftsizex/2-2, false);
+
+        if(CheckFourierSize()) return;
     }
 
     // CALCULATE FOURIER TRANSFORM OF TRANSFORMED IMAGE AND DRAW IF ACTIVATED
-    if (!imageFourierTransformCalculating && withFourierTransform) {
+    if (!imageFourierTransformCalculating) {
 
         // Calculate Fourier Transform
 
@@ -2838,17 +2821,7 @@ void QFESPIMB040CameraView::calcLineFourierTransform(double *linefouriertransfor
     linesharpness+=sharpness_temp;
 }
 
-bool QFESPIMB040CameraView::ftMemoryRealloc() {
-
-
-    if(transformerxy.setSize(image.width()) == QFourierTransformer::InvalidSize) {
-        labelSharpness_x->setText("x: Invalid Size for FFT");
-        return true;
-    }
-    if(transformerxy.setSize(image.height()) == QFourierTransformer::InvalidSize) {
-        labelSharpness_y->setText("y: Invalid Size for FFT");
-        return true;
-    }
+void QFESPIMB040CameraView::FtMemoryRealloc() {
 
     ftsizex=image.width();
     ftsizey=image.height();
@@ -2875,14 +2848,29 @@ bool QFESPIMB040CameraView::ftMemoryRealloc() {
         currentline_y[i]=0;
         ft_y_tempstorage[i]=0;
     }
+}
 
-    plteFourierTransformRangeX->set_xmin(0);
-    plteFourierTransformRangeX->set_xmax((double)ftsizex/2-2);
-    pltFourierTransform->set_xTickDistance((ftsizex/2-2)/20);
-    pltFourierTransform->setXRange(-1, ftsizex/2-2, false);
+void QFESPIMB040CameraView::setFourierTransform(bool state) {
+    chkFourierTransform->setChecked(state);
+    chkFourierTransform->setCheckable(true);
+    if (state==false) {
+        labelSharpness_x->setText("x: Inactive");
+        labelSharpness_y->setText("y: Inactive");
+    }
+}
 
+bool QFESPIMB040CameraView::CheckFourierSize() {
 
+    if(transformerxy.setSize(image.width()) == QFourierTransformer::InvalidSize) {
+        setFourierTransform(false);
+        labelSharpness_x->setText("x: Invalid Size for FFT. Should be 2^n.");
+        return true;
+    }
+    if(transformerxy.setSize(image.height()) == QFourierTransformer::InvalidSize) {
+        setFourierTransform(false);
+        labelSharpness_y->setText("y: Invalid Size for FFT. Should be 2^n.");
+        return true;
+    }
     return false;
-
 
 }

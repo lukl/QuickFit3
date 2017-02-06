@@ -643,7 +643,7 @@ protected:
         QLabel* labelSharpness_y;
 
         /** \brief calculate and display image Fourier Transform */
-        void displayFourierTransform(bool withFourierTransform);
+        void displayFourierTransform();
 
         /*! \brief calculate the fourier transform in x and y direction and project on axis (x and y must be same length) */
         void calcXYLineFourierTransform(double* ft_x=NULL, double* ft_y=NULL, double* imglinex=NULL, double* imgliney=NULL);
@@ -680,9 +680,10 @@ protected:
         //QElapsedTimer ftlabelUpdateTime;
         bool imageFourierTransformCalculating;
         QFourierTransformer transformerxy;
-protected slots:
-        bool ftMemoryRealloc();
-
+        void FtMemoryRealloc();
+        bool CheckFourierSize();
+public:
+        void setFourierTransform(bool state);
 
 };
 
