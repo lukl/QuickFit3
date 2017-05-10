@@ -323,6 +323,27 @@ class JKImage {
 
         }
 
+        /** \brief copy the given normalized line to a new array and possibly load an increasing array of values in lineX */
+        template <class t>
+        inline void copyNormLine(uint32_t y, t* line, t* lineX=NULL) {
+            double average;
+            average=0;
+            for(register uint32_t i=0; i< iheight*iwidth; i++) {
+                average+=d[i];
+            }
+            average=average/(double)(iheight*iwidth);
+            if (lineX) {
+                for (register uint32_t i=0; i< iwidth; i++) {
+                    line[i] = d[y*iwidth+i]/average;
+                    lineX[i] = i;
+                }
+            } else {
+                for (register uint32_t i=0; i< iwidth; i++) {
+                    line[i] = d[y*iwidth+i]/average;
+                }
+            }
+
+        }
         /** \brief copy the given column to a new array and possibly load an increasing array of values in lineX */
         template <class t>
         inline void copyColumn(uint32_t x, t* line, t* lineX=NULL) const {
@@ -339,6 +360,27 @@ class JKImage {
 
         }
 
+        /** \brief copy the given normalized column to a new array and possibly load an increasing array of values in lineX */
+        template <class t>
+        inline void copyNormColumn(uint32_t x, t* line, t* lineX=NULL) const {
+            double average;
+            average=0;
+            for(register uint32_t i=0; i< iheight*iwidth; i++) {
+                average+=d[i];
+            }
+            average=average/(double)(iheight*iwidth);
+            if (lineX) {
+                for (register uint32_t i=0; i< iheight; i++) {
+                    line[i] = d[i*iwidth+x]/average;
+                    lineX[i] = i;
+                }
+            } else {
+                for (register uint32_t i=0; i< iheight; i++) {
+                    line[i] = d[i*iwidth+x]/average;
+                }
+            }
+
+        }
 
         /** \brief copy the given line to a new array and possibly load an increasing array of values in lineX, reverses the pixel order */
         template <class t>
@@ -483,7 +525,7 @@ class JKImage {
 
 
 
-        /** \brief copy a sum over all linse to a new array and possibly load an increasing array of values in lineX */
+        /** \brief copy a sum over all lines to a new array and possibly load an increasing array of values in lineX */
         template <class t>
         inline void copyLineAverage(t* line, t* lineX=NULL) const {
             if (!line) return;

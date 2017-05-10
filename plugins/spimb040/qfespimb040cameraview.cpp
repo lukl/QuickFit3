@@ -2716,8 +2716,8 @@ void QFESPIMB040CameraView::displayFourierTransform() {
             }
 
             for (uint i=0; i<ftsizex; i++) {
-                image.copyLine(i, currentline_x);
-                image.copyColumn(i, currentline_y);
+                image.copyNormLine(i, currentline_x);
+                image.copyNormColumn(i, currentline_y);
                 calcXYLineFourierTransform(ft_x, ft_y, currentline_x, currentline_y);
             }
         }
@@ -2725,13 +2725,13 @@ void QFESPIMB040CameraView::displayFourierTransform() {
 
             for (uint i=0; i<ftsizex; i++) { ft_x[i]=0; }
             for (uint i=0; i<ftsizey; i++) {
-                image.copyLine(i, currentline_x);
+                image.copyNormLine(i, currentline_x);
                 calcLineFourierTransform(ft_x, currentline_x, ftsizex, sharpness_x);
             }
 
             for (uint i=0; i<ftsizey; i++) { ft_y[i]=0; }
             for (uint i=0; i<ftsizex; i++) {
-                image.copyColumn(i, currentline_y);
+                image.copyNormColumn(i, currentline_y);
                 calcLineFourierTransform(ft_y, currentline_y,ftsizey, sharpness_y);
             }
         }
@@ -2787,8 +2787,8 @@ void QFESPIMB040CameraView::calcXYLineFourierTransform(double *ft_x, double *ft_
             ft_x[i]+=qSqrt(qPow(ft_x_tempstorage[i],2)+qPow(ft_x_tempstorage[ftsizex/2+i],2));
             ft_y[i]+=qSqrt(qPow(ft_y_tempstorage[i],2)+qPow(ft_y_tempstorage[ftsizex/2+i],2));
             if (i>threshold_frequency_min && i<threshold_frequency_max) {
-                if (ft_x_tempstorage[0]>0) sharpness_x+=qSqrt(qPow(ft_x_tempstorage[i],2)+qPow(ft_x_tempstorage[ftsizex/2+i],2))/ft_x_tempstorage[0];
-                if (ft_y_tempstorage[0]>0) sharpness_y+=qSqrt(qPow(ft_y_tempstorage[i],2)+qPow(ft_y_tempstorage[ftsizex/2+i],2))/ft_y_tempstorage[0];
+                if (ft_x_tempstorage[0]>0) sharpness_x+=qSqrt(qPow(ft_x_tempstorage[i],2)+qPow(ft_x_tempstorage[ftsizex/2+i],2));
+                if (ft_y_tempstorage[0]>0) sharpness_y+=qSqrt(qPow(ft_y_tempstorage[i],2)+qPow(ft_y_tempstorage[ftsizex/2+i],2));
             }
         }
 }
@@ -2815,7 +2815,7 @@ void QFESPIMB040CameraView::calcLineFourierTransform(double *linefouriertransfor
 
         linefouriertransform[i]+=qSqrt(qPow(lineft_tempstorage[i],2)+qPow(lineft_tempstorage[length/2+i],2));
         if (lineft_tempstorage[0]>0 && i>threshold_frequency_min && i<threshold_frequency_max)
-            sharpness_temp+=qSqrt(qPow(lineft_tempstorage[i],2)+qPow(lineft_tempstorage[length/2+i],2))/lineft_tempstorage[0];
+            sharpness_temp+=qSqrt(qPow(lineft_tempstorage[i],2)+qPow(lineft_tempstorage[length/2+i],2));
 
     }
     linesharpness+=sharpness_temp;
