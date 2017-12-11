@@ -256,9 +256,6 @@ void QFExtensionCoboltLaser::setLightSourcePower(unsigned int lightSource, unsig
     if (!com || !serial) return ;
     QMutex* mutex=ports.getMutex(sources[lightSource].port);
     QMutexLocker locker(mutex);
-    if (sources[lightSource].type==cltMLD6) {
-        serial->sendCommand(QString("cp "));
-    }
 
     if (sources[lightSource].line_enabled) {
         serial->sendCommand(QString("p %1").arg(power*sources[lightSource].powerFactor_ParamToSend,0,'f'));
