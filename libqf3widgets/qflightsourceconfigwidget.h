@@ -150,6 +150,9 @@ class QFWIDLIB_EXPORT QFLightSourceConfigWidget : public QFrame {
         /** \brief tool button to configure a LightSource */
         QToolButton* btnConfigure;
 
+        /** \brief tool button to configure a LightSource */
+        QToolButton* btnExternalModulation;
+
         QSpacerItem* stretch;
 
         /** \brief action to connect to a LightSource */
@@ -157,6 +160,9 @@ class QFWIDLIB_EXPORT QFLightSourceConfigWidget : public QFrame {
 
         /** \brief action to configure to a LightSource */
         QAction* actConfigure;
+
+        /** \brief action to switch on ExternalModulation */
+        QAction* actExternalMod;
 
         QTimer* timUpdate;
 
@@ -198,6 +204,7 @@ class QFWIDLIB_EXPORT QFLightSourceConfigWidget : public QFrame {
         void lineEnabledToggled(bool enabled);
         void linesChanged(QTime time, QList<bool> lineenabled, QList<double> setValues, QList<double> measuredValues, QStringList powerUnits, QStringList lineNames, QList<bool> widgetsEnabled);
         void setPowerEditingFinished();
+        void toggleexternalmod();
 
         
 };

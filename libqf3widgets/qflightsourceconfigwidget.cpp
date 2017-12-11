@@ -166,6 +166,8 @@ void QFLightSourceConfigWidget::createWidgets() {
     widgetLayout->addWidget(btnConnect,0,1);
     btnConfigure=new QToolButton(this);
     widgetLayout->addWidget(btnConfigure,0,2);
+    btnExternalModulation=new QToolButton(this);
+    widgetLayout->addWidget(btnExternalModulation,0,3);
 
     linesLayoutWidget=new QWidget(this);
     linesLayout=new QGridLayout();
@@ -201,6 +203,11 @@ void QFLightSourceConfigWidget::createActions() {
     actConfigure=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/configure_lightsource.png"), tr("Configure filter changer ..."), this);
     connect(actConfigure, SIGNAL(triggered()), this, SLOT(configure()));
     btnConfigure->setDefaultAction(actConfigure);
+
+    actExternalMod=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/configure_lightsource.png"), tr("Set external modulation ..."), this);
+    actExternalMod->setCheckable(true);
+    connect(actExternalMod, SIGNAL(toggled()), this, SLOT(toggleexternalmod()));
+    btnExternalModulation->setDefaultAction(actExternalMod);
 
 }
 
@@ -322,6 +329,7 @@ void QFLightSourceConfigWidget::updateStates() {
     }
     bool en=(LightSource!=NULL) && (LightSourceID>=0);
     if (actConfigure->isEnabled()!=en) actConfigure->setEnabled(en);
+    if (actExternalMod->isEnabled()!=en) actExternalMod->setEnabled(en);
     if (!actConnect->isEnabled()) actConnect->setEnabled(true);//(LightSource!=NULL) && (LightSourceID>=0));
     if (cmbLightSource->isEnabled()!=!conn) cmbLightSource->setEnabled(!conn);
 }
@@ -387,6 +395,15 @@ void QFLightSourceConfigWidget::configure() {
     QFExtensionLightSource* LightSource=getLightSource();
     int LightSourceID=getLightSourceID();
     if (LightSource) LightSource->showLightSourceSettingsDialog(LightSourceID, this);
+    updateLSLinesWidgets();
+    updateStates();
+}
+
+void QFLightSourceConfigWidget::toggleexternalmod() {
+    QFExtensionLightSource* LightSource=getLightSource();
+    int LightSourceID=getLightSourceID();
+    bool extmod=actExternalMod->isChecked();
+    if (LightSource) LightSource->setExternalModulation(LightSourceID, this);
     updateLSLinesWidgets();
     updateStates();
 }

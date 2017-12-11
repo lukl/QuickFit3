@@ -88,6 +88,9 @@ class QFExtensionLightSource {
         /** \brief return the currently selected light source measured power */
         virtual double getLightSourceCurrentMeasuredPower(unsigned int lightSource, unsigned int wavelengthLine) =0;
 
+        /** \brief set the laser to external modulation if possible */
+        virtual void setExternalModulation(unsigned int lightSource, QWidget* parent=NULL) =0;
+
         /** \brief en-/disable the wavelength line in the given light source */
         virtual void setLightSourceLineEnabled(unsigned int lightSource, unsigned int wavelengthLine, bool enabled) =0;
 
@@ -112,7 +115,7 @@ class QFExtensionLightSource {
             \param[in] lightSource the light source for which to display the dialog
             \param[in] parent parent widget for the returned QWidget
          */
-         virtual void showLightSourceSettingsDialog(unsigned int lightSource, QWidget* parent=NULL)=0;
+         virtual void showLightSourceSettingsDialog(unsigned int lightSource, QWidget* parent=NULL) =0;
 };
 
 
