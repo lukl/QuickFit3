@@ -205,8 +205,7 @@ void QFLightSourceConfigWidget::createActions() {
     btnConfigure->setDefaultAction(actConfigure);
 
     actExternalMod=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/configure_lightsource.png"), tr("Set external modulation ..."), this);
-    actExternalMod->setCheckable(true);
-    connect(actExternalMod, SIGNAL(toggled()), this, SLOT(toggleexternalmod()));
+    connect(actExternalMod, SIGNAL(triggered()), this, SLOT(toggleexternalmod()));
     btnExternalModulation->setDefaultAction(actExternalMod);
 
 }

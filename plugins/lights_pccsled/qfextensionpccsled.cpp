@@ -363,7 +363,9 @@ void QFExtensionPCCSLED::showShutterSettingsDialog(unsigned int shutter, QWidget
     showLightSourceSettingsDialog(shutter, parent);
 }
 
+void setExternalModulation(unsigned int lightSource, QWidget* parent) {
 
+}
 
 
 

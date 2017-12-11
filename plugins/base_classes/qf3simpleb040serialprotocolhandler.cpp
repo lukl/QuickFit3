@@ -29,7 +29,7 @@ QF3SimpleB040SerialProtocolHandler::QF3SimpleB040SerialProtocolHandler(QFSerialC
     this->log=NULL;
     this->LOG_PREFIX="";
     this->name=name;
-    addToCommand="\n";
+    addToCommand="\n"; // "\x0D" "\x00a" Line Feed, Carriage Return
 }
 
 void QF3SimpleB040SerialProtocolHandler::setLogging(QFPluginLogService* log, QString LOG_PREFIX) {
