@@ -91,8 +91,8 @@ class QFExtensionTestFilterChanger : public QObject, public QFExtensionBase, pub
         virtual unsigned int getFilterChangerCount()  ;
         /** \copydoc QFExtensionFilterChanger::filterChangerConnect() */
         virtual void filterChangerConnect(unsigned int filterChanger);
-        /** \copydoc QFExtensionFilterChanger::filterChangerDisonnect() */
-        virtual void filterChangerDisonnect(unsigned int filterChanger);
+        /** \copydoc QFExtensionFilterChanger::filterChangerDisconnect() */
+        virtual void filterChangerDisconnect(unsigned int filterChanger);
         /** \copydoc QFExtensionFilterChanger::setFilterChangerLogging() */
         virtual void setFilterChangerLogging(QFPluginLogService* logService);
 

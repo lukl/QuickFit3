@@ -197,10 +197,13 @@ void QFExtensionTMCLFilterChanger::filterChangerConnect(unsigned int filterChang
     }
 }
 
-void QFExtensionTMCLFilterChanger::filterChangerDisonnect(unsigned int filterChanger) {
+void QFExtensionTMCLFilterChanger::filterChangerDisconnect(unsigned int filterChanger) {
     if (filterChanger>=getFilterChangerCount()) return;
     QFSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
+    QF3TMCLProtocolHandler* tmcl=wheels[filterChanger].tmcl;
     if (!com) return;
+    bool ok=true;
+    TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 7, 0, wheels[filterChanger].motor), tr("error setting standby current upon disconnecting"));
     com->close();
     wheels[filterChanger].actRealign->setEnabled(true);
 
@@ -345,7 +348,6 @@ bool QFExtensionTMCLFilterChanger::TMCLRealignFW(int filterChanger) {
 
     log_text(tr("  - port: %1   speed: %4   id: %2   axis: %3\n").arg(com->get_port().c_str()).arg(wheels[filterChanger].id).arg(wheels[filterChanger].motor).arg(com->get_baudrate()));
     log_text(tr("  - firmware version: %1\n").arg(tmcl->getFirmwareVersion(wheels[filterChanger].id, wheels[filterChanger].motor)));
-    int32_t value=0;
     log_text(tr("  - resetting position\n"));
     TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 1, 0, wheels[filterChanger].motor), tr("error resetting position\n"));
     log_text(tr("  - set fast referencing speed to %1\n").arg(wheels[filterChanger].fastRFSSpeed));
@@ -362,6 +364,8 @@ bool QFExtensionTMCLFilterChanger::TMCLRealignFW(int filterChanger) {
     TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 6, wheels[filterChanger].maximumCurrent, wheels[filterChanger].motor), tr("error setting maximum current"));
     log_text(tr("  - set acceleration with ramps\n"));
     TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 15, 0, wheels[filterChanger].motor), tr("error setting acceleration with ramps"));
+    log_text(tr("  - set microstep mode to 3 (16 microsteps/step)\n"));
+    TMCL_TESTOK(tmcl->setAxisParameter(wheels[filterChanger].id, 140, 3, wheels[filterChanger].motor), tr("error setting microstep mode"));
 
     // move about a third rotation and wait until movement finished
     com->clearBuffer();
@@ -429,7 +433,7 @@ void QFExtensionTMCLFilterChanger::readGlobalSettings(QSettings &inifile, const 
 
     if (getFilterChangerCount()>0) {
         for (int i=0; i<(int64_t)getFilterChangerCount(); i++) {
-            if (isFilterChangerConnected(i)) filterChangerDisonnect(i);
+            if (isFilterChangerConnected(i)) filterChangerDisconnect(i);
         }
     }
 
@@ -458,7 +462,7 @@ void QFExtensionTMCLFilterChanger::readGlobalSettings(QSettings &inifile, const 
 
         QString motor=inifile.value(prefix+"filterwheel"+QString::number(i+1)+"/motor", "none").toString().toLower();
         s.motorName=motor;
-        if (motor=="pd-108-28" || motor=="pd1-108-28" || motor=="pd3-108-28" || motor=="pdx-108-28") {
+        if (motor=="pd-108-28" || motor=="pd1-108-28" || motor=="pd3-108-28" || motor=="pdx-108-28"|| motor=="pd3-108-28-SE") {
             s.steps_per_revolution=200*16;
         }
         s.infoMessage="";
