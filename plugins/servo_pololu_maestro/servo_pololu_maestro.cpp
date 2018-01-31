@@ -352,7 +352,7 @@ void QFExtensionServoPololuMaestro::filterChangerConnect(unsigned int filterChan
 
 }
 
-void QFExtensionServoPololuMaestro::filterChangerDisonnect(unsigned int filterChanger)
+void QFExtensionServoPololuMaestro::filterChangerDisconnect(unsigned int filterChanger)
 {
     if (filterChanger>=getFilterChangerCount()) return;
     QFSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);

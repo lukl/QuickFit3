@@ -360,11 +360,11 @@ void QFFilterChangerConfigWidget::disConnect() {
                 gotConnection=true;
             } else {
                 actConnect->setChecked(false);
-                FilterChanger->filterChangerDisonnect(FilterChangerID);
+                FilterChanger->filterChangerDisconnect(FilterChangerID);
                 m_log->log_error("error connecting to FilterChanger driver ...\n");
             }
         } else {
-            FilterChanger->filterChangerDisonnect(FilterChangerID);
+            FilterChanger->filterChangerDisconnect(FilterChangerID);
             m_log->log_text("disconnected from FilterChanger driver ...\n");
         }
     } else {

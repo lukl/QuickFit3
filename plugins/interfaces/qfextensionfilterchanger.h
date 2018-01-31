@@ -46,7 +46,7 @@ class QFExtensionFilterChanger {
         /** \brief connect to a filter wheel controller/driver/.... */
         virtual void filterChangerConnect(unsigned int filterChanger)=0;
         /** \brief disconnect from a filter wheel controller/driver/.... */
-        virtual void filterChangerDisonnect(unsigned int filterChanger)=0;
+        virtual void filterChangerDisconnect(unsigned int filterChanger)=0;
         /** \brief set QFPluginLogServices to use (or \c NULL) for message/error logging */
         virtual void setFilterChangerLogging(QFPluginLogService* logService)=0;
 

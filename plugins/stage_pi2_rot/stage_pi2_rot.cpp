@@ -308,7 +308,7 @@ void QFExtensionLinearStagePI2Rot::connectDevice(unsigned int axis) {
             serial->sendCommand("SPA "+inttostr(axis+1)+" 0xb "+inttostr(axes[axis].acceleration));
             serial->sendCommand("SPA "+inttostr(axis+1)+" 0xc "+inttostr(axes[axis].acceleration));
 
-            log_text(tr(LOG_PREFIX "Controller setup. P-Term: %1, I-Term: %2, D-Term: %3, I-Limit: %4\n").arg(serial->queryCommand("SPA? "+inttostr(axis+1)+" 0x1").c_str()).arg(serial->queryCommand("SPA? "+inttostr(axis+1)+" 0x2").c_str()).arg(serial->queryCommand("SPA? "+inttostr(axis+1)+" 0x3").c_str()).arg(serial->queryCommand("SPA? "+inttostr(axis+1)+" 0x4").c_str()));
+            log_text(tr(LOG_PREFIX "Controller setup: P-Term: %1I-Term: %2D-Term: %3I-Limit: %4").arg(serial->queryCommand("SPA? "+inttostr(axis+1)+" 0x1").substr(2).c_str()).arg(serial->queryCommand("SPA? "+inttostr(axis+1)+" 0x2").substr(2).c_str()).arg(serial->queryCommand("SPA? "+inttostr(axis+1)+" 0x3").substr(2).c_str()).arg(serial->queryCommand("SPA? "+inttostr(axis+1)+" 0x4").c_str()));
 
             serial->sendCommand("SVO "+inttostr(axis+1)+" 1");
             if(serial->queryCommand("SVO? "+inttostr(axis+1))!=inttostr(axis+1)+"=1\n") {

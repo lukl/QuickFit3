@@ -120,7 +120,7 @@ void QFExtensionTestFilterChanger::filterChangerConnect(unsigned int filterChang
     if (filterChanger<=1) connected[filterChanger]=true;
 }
 
-void QFExtensionTestFilterChanger::filterChangerDisonnect(unsigned int filterChanger) {
+void QFExtensionTestFilterChanger::filterChangerDisconnect(unsigned int filterChanger) {
     if (filterChanger<=1) connected[filterChanger]=false;
 }
 
