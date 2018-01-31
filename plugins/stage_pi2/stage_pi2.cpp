@@ -293,15 +293,16 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int axis) {
         com->open();
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[axis].ID);
-            //serial->selectAxis(axes[axis].ID);
-            serial->queryCommand("VE");
+            log_text(tr(LOG_PREFIX "Controller Version: %1\n").arg(serial->queryCommand("VE").c_str()));
+            log_text(tr(LOG_PREFIX "Firmware version: %1\n").arg(serial->queryCommand("CS").c_str()));
             serial->sendCommand("DP"+inttostr(axes[axis].PTerm));
-            serial->queryCommand("GP");
             serial->sendCommand("DI"+inttostr(axes[axis].iTerm));
             serial->sendCommand("DD"+inttostr(axes[axis].DTerm));
             serial->sendCommand("DL"+inttostr(axes[axis].iLimit));
             serial->sendCommand("SA"+inttostr(axes[axis].acceleration));
-            serial->sendCommand("MN");
+            log_text(tr(LOG_PREFIX "Controller setup. P-Term: %1, I-Term: %2, D-Term: %3, I-Limit: %4, Conrol mode: %5\n").arg(serial->queryCommand("GP").c_str()).arg(serial->queryCommand("GI").c_str()).arg(serial->queryCommand("GD").c_str()).arg(serial->queryCommand("GL").c_str()).arg(serial->queryCommand("FM?").c_str()));
+                        serial->queryCommand("GP"); //
+            serial->sendCommand("MN"); // Motor ON
             if (!com->hasErrorOccured()) {
                 //int isRefSet=0;
                 //char block1[2];
@@ -381,11 +382,12 @@ void QFExtensionLinearStagePI2::disconnectDevice(unsigned int axis) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
-//        if (com->isConnectionOpen()) {
+        if (com->isConnectionOpen()) {
 //            serial->selectAxis(axes[axis].ID);
-//            serial->sendCommand("JF");
+//            serial->sendCommand("MF"); // Switch off motor
+//            serial->sendCommand("JF"); // Switch off joystick
 //            axes[axis].joystickEnabled=false;
-//        }
+        }
         com->close();
         axes[axis].state=QFExtensionLinearStage::Disconnected;
     }

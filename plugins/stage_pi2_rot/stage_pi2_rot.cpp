@@ -94,8 +94,6 @@ void QFExtensionLinearStagePI2Rot::initExtension() {
             d.ms=inifile.value(axisname+"/ms", defaultAD.ms).toDouble();
 
 
-
-            d.velocity=defaultAD.initVelocity;
             d.joystickEnabled=false;
             d.state=QFExtensionLinearStage::Disconnected;
             d.name=axisname;
@@ -301,13 +299,17 @@ void QFExtensionLinearStagePI2Rot::connectDevice(unsigned int axis) {
             if(serial->queryCommand("CSV?").c_str()!=std::string("2.0\n")) {
                 log_warning(tr(LOG_PREFIX "Potentially incompatible Controller GCS Syntax version: %1Plugin written for 2.0\n").arg(serial->queryCommand("CSV?").c_str()));
             }
-//            serial->sendCommand("DP"+inttostr(axes[axis].PTerm)); // Old native 2 char commands
-//            serial->queryCommand("GP");
-//            serial->sendCommand("DI"+inttostr(axes[axis].iTerm));
-//            serial->sendCommand("DD"+inttostr(axes[axis].DTerm));
-//            serial->sendCommand("DL"+inttostr(axes[axis].iLimit));
-//            serial->sendCommand("SA"+inttostr(axes[axis].acceleration));
-//            serial->sendCommand("MN");
+
+            serial->sendCommand("SPA "+inttostr(axis+1)+" 0x1 "+inttostr(axes[axis].PTerm));
+            serial->sendCommand("SPA "+inttostr(axis+1)+" 0x2 "+inttostr(axes[axis].iTerm));
+            serial->sendCommand("SPA "+inttostr(axis+1)+" 0x3 "+inttostr(axes[axis].DTerm));
+            serial->sendCommand("SPA "+inttostr(axis+1)+" 0x4 "+inttostr(axes[axis].iLimit));
+            serial->sendCommand("SPA "+inttostr(axis+1)+" 0x49 "+inttostr(axes[axis].initVelocity));
+            serial->sendCommand("SPA "+inttostr(axis+1)+" 0xb "+inttostr(axes[axis].acceleration));
+            serial->sendCommand("SPA "+inttostr(axis+1)+" 0xc "+inttostr(axes[axis].acceleration));
+
+            log_text(tr(LOG_PREFIX "Controller setup. P-Term: %1, I-Term: %2, D-Term: %3, I-Limit: %4\n").arg(serial->queryCommand("SPA? "+inttostr(axis+1)+" 0x1").c_str()).arg(serial->queryCommand("SPA? "+inttostr(axis+1)+" 0x2").c_str()).arg(serial->queryCommand("SPA? "+inttostr(axis+1)+" 0x3").c_str()).arg(serial->queryCommand("SPA? "+inttostr(axis+1)+" 0x4").c_str()));
+
             serial->sendCommand("SVO "+inttostr(axis+1)+" 1");
             if(serial->queryCommand("SVO? "+inttostr(axis+1))!=inttostr(axis+1)+"=1\n") {
                 log_error(tr(LOG_PREFIX "Switching on servo failed.\n"));
@@ -354,7 +356,6 @@ void QFExtensionLinearStagePI2Rot::connectDevice(unsigned int axis) {
             else {
                 log_text(tr("Reference movement upon startup disabled.\n"));
             }
-            axes[axis].velocity=axes[axis].initVelocity;
             axes[axis].joystickEnabled=false;
 
             if (com->hasErrorOccured()) {

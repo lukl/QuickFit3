@@ -165,19 +165,19 @@ class QFExtensionLinearStagePI2Rot : public QObject, public QFExtensionBase, pub
 
         struct AxisDescription {
             AxisDescription() {
-                PTerm=150;
-                iTerm=45;
-                DTerm=300;
+                PTerm=1000;
+                iTerm=500;
+                DTerm=2000;
                 iLimit=2000;
-                acceleration=1000000;
-                maxVelocity=2000;
-                initVelocity=1000;
+                acceleration=100;
+                maxVelocity=3.99999;
+                initVelocity=3;
                 lengthFactor=1; //2.57e-5;
                 velocityFactor=1; //2.57e-5;
                 accelerationFactor=1; //2.57e-5;
                 maxCoord=0;
                 minCoord=0;
-                backlashCorr=1;
+                backlashCorr=0.1;
                 ms=0.1;
                 doRefMove=false;
             }
@@ -196,7 +196,6 @@ class QFExtensionLinearStagePI2Rot : public QObject, public QFExtensionBase, pub
              /** \brief indicates whether the joystick is enabled or not */
              bool joystickEnabled;
 
-             double velocity;
 
              QString name;
              QString label;
