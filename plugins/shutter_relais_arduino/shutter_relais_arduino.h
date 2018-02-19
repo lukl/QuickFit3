@@ -123,6 +123,8 @@ class QFExtensionShutterShuterArduino : public QObject, public QFExtensionBase, 
         virtual bool isShutterOpen(unsigned int shutter) ;
         /** \copydoc QFExtensionShutter::setShutterState() */
         virtual void setShutterState(unsigned int shutter, bool opened);
+        /** \copydoc QFExtensionShutter::setShutterAlex() */
+        virtual void setShutterAlex(unsigned int shutter, bool AlexOnOff);
         /** \copydoc QFExtensionShutter::isLastShutterActionFinished() */
         virtual bool isLastShutterActionFinished(unsigned int shutter);
         /** \copydoc QFExtensionShutter::getShutterDescription() */

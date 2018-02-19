@@ -62,7 +62,7 @@
         <file alias="get_current_pos_around.png">icons/get_current_pos_around.png</file>
         <file alias="shutter_closed.png">icons/shutter_closed.png</file>
         <file alias="shutter_opened.png">icons/shutter_open.png</file>
-        <file alias="connect_shutter.png">icons/connect_shutter.png</file>
+        <file alias="shutter_alex.png">icons/connect_shutter.png</file>
         <file alias="disconnect_shutter.png">icons/disconnect_shutter.png</file>
         <file alias="lightpath.png">icons/lightpath.png</file>
         <file alias="lightpath_delete.png">icons/lightpath_delete.png</file>
@@ -113,5 +113,7 @@
         <file alias="move_relleft.png">icons/move_relleft.png</file>
         <file alias="move_CSright.png">icons/move_CSright.png</file>
         <file alias="move_CSleft.png">icons/move_CSleft.png</file>
+        <file alias="icons/shutter_alex.png">icons/shutter_alex.png</file>
+        <file alias="icons/external_modulation.png">icons/external_modulation.png</file>
     </qresource>
 </RCC>

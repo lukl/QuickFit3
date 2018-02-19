@@ -106,10 +106,11 @@
         <file alias="stage_joystick.png">icons/joystick.png</file>
         <file alias="stage_nojoystick.png">icons/nojoystick.png</file>
         <file alias="plugin.png">icons/plugin.png</file>
+        <file alias="shutter_alex.png">icons/shutter_alex.png</file>
+        <file alias="external_modulation.png">icons/external_modulation.png</file>
     </qresource>
     <qresource prefix="/lib/qt">
-         <file alias="dblbtn_down.png">images/btn_down.png</file>
-         <file alias="dblbtn_up.png">images/btn_up.png</file>
-     </qresource>
-
+        <file alias="dblbtn_down.png">images/btn_down.png</file>
+        <file alias="dblbtn_up.png">images/btn_up.png</file>
+    </qresource>
 </RCC>

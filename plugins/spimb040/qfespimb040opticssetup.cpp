@@ -987,6 +987,13 @@ bool QFESPIMB040OpticsSetup::setMainIlluminationShutter(bool opened, bool blocki
     return true;
 }
 
+bool QFESPIMB040OpticsSetup::setAlex(bool AlexOnOff, bool blocking) {
+    if (!isMainIlluminationShutterAvailable()) return false;
+
+    ui->shutterMainIllumination->setAlex(AlexOnOff);
+    return true;
+}
+
 
 void QFESPIMB040OpticsSetup::setSpecialShutter(int shutter, bool opened, bool blocking)
 {

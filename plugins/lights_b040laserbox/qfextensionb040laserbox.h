@@ -121,7 +121,7 @@ class QFExtensionB040LaserBox : public QObject, public QFExtensionBase, public Q
         /*! \copydoc QFExtensionLightSource::showLightSourceSettingsDialog() */
         virtual void showLightSourceSettingsDialog(unsigned int lightSource, QWidget* parent=NULL);
         /** \brief set the laser to external modulation if possible */
-        virtual void setExternalModulation(unsigned int lightSource, QWidget* parent=NULL);
+        virtual void setExternalModulation(unsigned int lightSource, bool OnOff, QWidget* parent=NULL);
 
     protected:
         /** \copydoc QFExtensionBase::projectChanged() */

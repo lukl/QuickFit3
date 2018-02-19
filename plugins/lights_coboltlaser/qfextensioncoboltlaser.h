@@ -122,7 +122,7 @@ class QFExtensionCoboltLaser : public QObject, public QFExtensionBase, public QF
         /*! \copydoc QFExtensionLightSource::showLightSourceSettingsDialog() */
         virtual void showLightSourceSettingsDialog(unsigned int lightSource, QWidget* parent=NULL);
         /** \brief set the laser to external modulation if possible */
-        virtual void setExternalModulation(unsigned int lightSource, QWidget* parent=NULL);
+        virtual void setExternalModulation(unsigned int lightSource, bool OnOff, QWidget* parent=NULL);
 
         /////////////////////////////////////////////////////////////////////////////
         // QFExtensionMeasurementAndControlDevice routines

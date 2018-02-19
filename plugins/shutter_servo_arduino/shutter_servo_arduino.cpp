@@ -193,6 +193,24 @@ void QFExtensionShutterServoArduino::setShutterState(unsigned int shutter, bool 
     }
 }
 
+void QFExtensionShutterServoArduino::setShutterAlex(unsigned int shutter, bool AlexOnOff) {
+    if (shutter>=getShutterCount()) return;
+    QFSerialConnection* com=ports.getCOMPort(shutters[shutter].port);
+    if (!com) return ;
+    QMutex* mutex=ports.getMutex(shutters[shutter].port);
+    QMutexLocker locker(mutex);
+    if (!com->isConnectionOpen()) return ;
+    shutters[shutter].serial->sendCommand(QString("A")+QString::number(AlexOnOff));
+    shutters[shutter].lastAction=QTime::currentTime();
+
+    QTime t=QTime::currentTime();
+    QTime t2;
+    t.start();
+    while (t.elapsed()<20) {
+        t2.start();
+    }
+}
+
 bool QFExtensionShutterServoArduino::isLastShutterActionFinished(unsigned int shutter) {
     if (shutter>=getShutterCount()) return true;
     return shutters[shutter].lastAction.elapsed()>shutters[shutter].shutter_operation_duration;

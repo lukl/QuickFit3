@@ -208,6 +208,8 @@ class QFESPIMB040OpticsSetup : public QFESPIMB040OpticsSetupBase {
         bool isMainIlluminationShutterAvailable();
         /** \brief get main illumination shutter state */
         bool getMainIlluminationShutter();
+        /** \brief Set alternating laser excitation state (ALEX) */
+        bool setAlex(bool AlexOnOff, bool blocking);
 
         /** \brief return a description of the laser configuration */
         QString getLaserConfig();

@@ -122,7 +122,7 @@ class QFExtensionPCCSLED : public QObject, public QFExtensionBase, public QFExte
         /*! \copydoc QFExtensionLightSource::showLightSourceSettingsDialog() */
         virtual void showLightSourceSettingsDialog(unsigned int lightSource, QWidget* parent=NULL);
         /** \copydoc set the laser to external modulation if possible */
-        virtual void setExternalModulation(unsigned int lightSource, QWidget* parent=NULL);
+        virtual void setExternalModulation(unsigned int lightSource, bool OnOff, QWidget* parent=NULL);
 
 
 
@@ -148,6 +148,8 @@ class QFExtensionPCCSLED : public QObject, public QFExtensionBase, public QFExte
         virtual bool isShutterOpen(unsigned int shutter) ;
         /** \brief open or close the given shutter, use isLastShutterActionFinished() to check whether the instruction has been executed */
         virtual void setShutterState(unsigned int shutter, bool opened);
+        /** \copydoc QFExtensionShutter::setShutterAlex() */
+        virtual void setShutterAlex(unsigned int shutter, bool AlexOnOff);
         /** \brief return \c true if the last command, sent to the given shutter was executet, i.e. the shutter has settled to its new position
          *
          *  \note Use this to check, whether the shutter has been closed/opened after a call to setShutterState(), not isShutterOpen(), as the second
