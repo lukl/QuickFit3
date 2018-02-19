@@ -130,8 +130,12 @@ void QFExtensionShutterServoArduino::shutterConnect(unsigned int shutter) {
         while (t.elapsed()<CONNECTION_DELAY_MS)  {
             QApplication::processEvents();
         }
-        shutters[shutter].infoMessage=shutters[shutter].serial->queryCommand("?");
-        //qDebug()<<"infoMessage '"<<infoMessage<<"'";
+        shutters[shutter].infoMessage=shutters[shutter].serial->queryCommand("I");
+        while (t.elapsed()<CONNECTION_DELAY_MS)  {
+            QApplication::processEvents();
+        }
+        shutters[shutter].infoMessage=shutters[shutter].serial->queryCommand("I");
+        //qDebug()<<"infoMessage '"<<shutters[shutter].infoMessage<<"'";
         if (!(shutters[shutter].infoMessage.toLower().contains("servo controller") && shutters[shutter].infoMessage.toLower().contains("jan krieger"))) {
             com->close();
             log_error(tr("%1 Could not connect to Servo Shutter Driver [port=%1  baud=%2]!!!\n").arg(com->get_port().c_str()).arg(com->get_baudrate()));
