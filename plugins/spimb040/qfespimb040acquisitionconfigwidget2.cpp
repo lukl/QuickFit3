@@ -124,6 +124,7 @@ QFESPIMB040AcquisitionConfigWidget2::~QFESPIMB040AcquisitionConfigWidget2()
 void QFESPIMB040AcquisitionConfigWidget2::loadSettings(QSettings& settings, QString prefix) {
     ui->chkOverview->setChecked(settings.value(prefix+"overview", true).toBool());
     ui->chkCloseMainShutter->setChecked(settings.value(prefix+"chkCloseMainShutter", false).toBool());
+    ui->chkAlex->setChecked(settings.value(prefix+"chkAlex", false).toBool());
     ui->chkBackground->setChecked(settings.value(prefix+"background", true).toBool());
     ui->spinBackgroundFrames1->setValue(settings.value(prefix+"background_frames1", 1000).toInt());
     ui->spinBackgroundFrames2->setValue(settings.value(prefix+"background_frames2", 1000).toInt());
@@ -189,6 +190,7 @@ void QFESPIMB040AcquisitionConfigWidget2::storeSettings(QSettings& settings, QSt
 
     settings.setValue(prefix+"overview", ui->chkOverview->isChecked());
     settings.setValue(prefix+"chkCloseMainShutter", ui->chkCloseMainShutter->isChecked());
+    settings.setValue(prefix+"chkAlex", ui->chkAlex->isChecked());
     settings.setValue(prefix+"background", ui->chkBackground->isChecked());
     settings.setValue(prefix+"background_frames1", ui->spinBackgroundFrames1->value());
     settings.setValue(prefix+"background_frames2", ui->spinBackgroundFrames2->value());
@@ -969,6 +971,16 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
             opticsSetup->setMainIlluminationShutter(false, false);
         }
 
+        //////////////////////////////////////////////////////////////////////////////////////
+        // switch off alex if activated
+        //////////////////////////////////////////////////////////////////////////////////////
+
+            if (opticsSetup->isMainIlluminationShutterAvailable()) {
+                log->log_text(tr("Switch Alex off before measurement"));
+                opticsSetup->setAlex(false, false);
+
+        }
+
 
         progress.setLabelText(tr("setting up acquisition %1/%2 ...").arg(repeatCnt+1).arg(repeats()));
         ok=true;
@@ -1261,6 +1273,18 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         }
 
         //////////////////////////////////////////////////////////////////////////////////////
+        // switch on alex if activated
+        //////////////////////////////////////////////////////////////////////////////////////
+
+        if(ui->chkAlex->isChecked()) {
+            if (opticsSetup->isMainIlluminationShutterAvailable()) {
+                log->log_text(tr("Switch Alex on"));
+                opticsSetup->setAlex(true, false);
+                //opticsSetup->getLaser()
+            }
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////
         // acquire image series
         //////////////////////////////////////////////////////////////////////////////////////
         progress.nextItem();
@@ -1281,6 +1305,18 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         } else {
             log->log_text(tr("  - acquired image series!\n"));
         }
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // switch off alex after acquisition
+        //////////////////////////////////////////////////////////////////////////////////////
+
+        if(ui->chkBackground->isChecked()) {
+            if (opticsSetup->isMainIlluminationShutterAvailable()) {
+                log->log_text(tr("Switch Alex on"));
+                opticsSetup->setAlex(false, false);
+            }
+        }
+
 
 
         //////////////////////////////////////////////////////////////////////////////////////

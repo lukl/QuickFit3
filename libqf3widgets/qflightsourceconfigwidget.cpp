@@ -204,8 +204,9 @@ void QFLightSourceConfigWidget::createActions() {
     connect(actConfigure, SIGNAL(triggered()), this, SLOT(configure()));
     btnConfigure->setDefaultAction(actConfigure);
 
-    actExternalMod=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/configure_lightsource.png"), tr("Set external modulation ..."), this);
-    connect(actExternalMod, SIGNAL(triggered()), this, SLOT(toggleexternalmod()));
+    actExternalMod=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/external_modulation.png"), tr("Set external modulation ..."), this);
+    actExternalMod->setCheckable(true);
+    connect(actExternalMod, SIGNAL(toggled(bool)), this, SLOT(toggleexternalmod(bool extmod)));
     btnExternalModulation->setDefaultAction(actExternalMod);
 
 }
@@ -398,11 +399,11 @@ void QFLightSourceConfigWidget::configure() {
     updateStates();
 }
 
-void QFLightSourceConfigWidget::toggleexternalmod() {
+void QFLightSourceConfigWidget::toggleexternalmod(bool extmod) {
     QFExtensionLightSource* LightSource=getLightSource();
     int LightSourceID=getLightSourceID();
-    bool extmod=actExternalMod->isChecked();
-    if (LightSource) LightSource->setExternalModulation(LightSourceID, this);
+    //bool extmod=actExternalMod->isChecked();
+    if (LightSource) LightSource->setExternalModulation(LightSourceID, extmod, this);
     updateLSLinesWidgets();
     updateStates();
 }

@@ -364,7 +364,7 @@ void QFExtensionPCCSLED::showShutterSettingsDialog(unsigned int shutter, QWidget
 }
 
 /** \brief set the laser to external modulation if possible */
-void QFExtensionPCCSLED::setExternalModulation(unsigned int lightSource, QWidget* parent) {
+void QFExtensionPCCSLED::setExternalModulation(unsigned int lightSource, bool OnOff, QWidget* parent) {
 
 }
 

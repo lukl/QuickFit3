@@ -39,6 +39,7 @@ QFShutterConfigWidget::QFShutterConfigWidget(QWidget* parent):
     shutterStateUpdateInterval=351;
     iconOpened=QPixmap(":/libqf3widgets/shutter_open.png");
     iconClosed=QPixmap(":/libqf3widgets/shutter_closed.png");
+    iconAlex=QPixmap(":/libqf3widgets/shutter_alex.png");
 
     m_thread=new QFShutterConfigWidgetThread(this);
     connect(m_thread, SIGNAL(stateChanged(bool)), this, SLOT(shutterStateChanged(bool)));
@@ -143,6 +144,8 @@ void QFShutterConfigWidget::createWidgets() {
     widgetLayout->addWidget(btnConnect,0,2);
     btnConfigure=new QToolButton(this);
     widgetLayout->addWidget(btnConfigure,0,3);
+    btnAlexOnOff=new QToolButton(this);
+    widgetLayout->addWidget(btnAlexOnOff,0,4);
     QWidget* w=new QWidget(this);
     w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     widgetLayout->addWidget(w,0,4);
@@ -170,6 +173,10 @@ void QFShutterConfigWidget::createActions() {
     connect(actState, SIGNAL(toggled(bool)), this, SLOT(shutterActionClicked(bool)));
     btnState->setDefaultAction(actState);
 
+    actAlexOnOff=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/shutter_alex.png"), tr("Switch On/Off Alternating laser excitation ..."), this);
+    actAlexOnOff->setCheckable(true);
+    connect(actAlexOnOff, SIGNAL(toggled(bool)), this, SLOT(shutterActionAlexClicked(bool)));
+    btnAlexOnOff->setDefaultAction(actAlexOnOff);
 }
 
 void QFShutterConfigWidget::updateStates() {
@@ -195,6 +202,7 @@ void QFShutterConfigWidget::updateStates() {
     }
     actConfigure->setEnabled(shutter!=NULL && shutterID>=0);
     actConnect->setEnabled(shutter!=NULL && shutterID>=0);
+    actAlexOnOff->setEnabled(shutter!=NULL && shutterID>=0);
     cmbShutter->setEnabled(!conn);
     actState->setEnabled(conn && shutter!=NULL && (!moving));
 
@@ -341,6 +349,10 @@ void QFShutterConfigWidget::setShutter(bool opened) {
     actState->setChecked(opened);
 }
 
+void QFShutterConfigWidget::setAlex(bool AlexOnOff) {
+    actAlexOnOff->setChecked(AlexOnOff);
+}
+
 void QFShutterConfigWidget::toggleShutter() {
     actState->setChecked(!actState->isChecked());
 }
@@ -361,6 +373,27 @@ void QFShutterConfigWidget::shutterActionClicked(bool opened) {
     if (shutter) {
         //qDebug()<<"set shutter state opened="<<opened;
         shutter->setShutterState(shutterID, opened);
+        if (!locked) {
+            moving=true;
+            actState->setEnabled(false);
+            QTime started=QTime::currentTime();
+            while (!shutter->isLastShutterActionFinished(shutterID) && (started.elapsed()<10000)) {
+                //qDebug()<<started.elapsed();
+                QApplication::processEvents();
+            }
+            moving=false;
+        }
+    }
+}
+
+void QFShutterConfigWidget::shutterActionAlexClicked(bool AlexOnOff) {
+    QFExtensionShutter* shutter;
+    int shutterID;
+    shutter=getShutter();
+    shutterID=getShutterID();
+    if (shutter) {
+        //qDebug()<<"set shutter state opened="<<opened;
+        shutter->setShutterAlex(shutterID, AlexOnOff);
         if (!locked) {
             moving=true;
             actState->setEnabled(false);

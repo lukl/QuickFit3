@@ -204,7 +204,7 @@ class QFWIDLIB_EXPORT QFLightSourceConfigWidget : public QFrame {
         void lineEnabledToggled(bool enabled);
         void linesChanged(QTime time, QList<bool> lineenabled, QList<double> setValues, QList<double> measuredValues, QStringList powerUnits, QStringList lineNames, QList<bool> widgetsEnabled);
         void setPowerEditingFinished();
-        void toggleexternalmod();
+        void toggleexternalmod(bool extmod);
 
         
 };

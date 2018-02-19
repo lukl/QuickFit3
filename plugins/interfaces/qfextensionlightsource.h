@@ -89,7 +89,7 @@ class QFExtensionLightSource {
         virtual double getLightSourceCurrentMeasuredPower(unsigned int lightSource, unsigned int wavelengthLine) =0;
 
         /** \brief set the laser to external modulation if possible */
-        virtual void setExternalModulation(unsigned int lightSource, QWidget* parent=NULL) =0;
+        virtual void setExternalModulation(unsigned int lightSource, bool OnOff, QWidget* parent=NULL) =0;
 
         /** \brief en-/disable the wavelength line in the given light source */
         virtual void setLightSourceLineEnabled(unsigned int lightSource, unsigned int wavelengthLine, bool enabled) =0;

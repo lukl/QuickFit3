@@ -243,6 +243,9 @@ class QFESPIMB040OpticsSetupBase: public QWidget {
         virtual bool isMainIlluminationShutterAvailable()=0;
         /** \brief get main illumination shutter state */
         virtual bool getMainIlluminationShutter()=0;
+        /** \brief Set alternating laser excitation state (ALEX) */
+        virtual bool setAlex(bool AlexOnOff, bool blocking)=0;
+
 
         /** \brief return a description of the laser configuration */
         virtual QString getLaserConfig()=0;

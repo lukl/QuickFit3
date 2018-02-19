@@ -124,6 +124,9 @@ class QFWIDLIB_EXPORT QFShutterConfigWidget : public QWidget {
         /** \brief tool button to configure a shutter */
         QToolButton* btnConfigure;
 
+        /** \brief tool button to configure a shutter */
+        QToolButton* btnAlexOnOff;
+
         /** \brief button to display/change the shutter state */
         QToolButton* btnState;
 
@@ -133,6 +136,7 @@ class QFWIDLIB_EXPORT QFShutterConfigWidget : public QWidget {
         /** \brief action to configure to a shutter */
         QAction* actConfigure;
         QAction* actState;
+        QAction* actAlexOnOff;
 
         QTimer* timUpdate;
 
@@ -156,6 +160,7 @@ class QFWIDLIB_EXPORT QFShutterConfigWidget : public QWidget {
 
         QPixmap iconOpened;
         QPixmap iconClosed;
+        QPixmap iconAlex;
 
         bool moving;
 
@@ -169,6 +174,7 @@ class QFWIDLIB_EXPORT QFShutterConfigWidget : public QWidget {
 
     public slots:
         void setShutter(bool shutterOpened);
+        void setAlex(bool shutterAlexOnOff);
 
         void toggleShutter();
         void shutterOff();
@@ -183,6 +189,7 @@ class QFWIDLIB_EXPORT QFShutterConfigWidget : public QWidget {
     public slots:
         void shutterActionClicked(bool shutterOpened);
         void shutterStateChanged(bool state);
+        void shutterActionAlexClicked(bool AlexOnOff);
 };
 
 #endif // QFSHUTTERCONFIGWIDGET_H

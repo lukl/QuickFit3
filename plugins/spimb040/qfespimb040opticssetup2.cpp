@@ -1744,6 +1744,46 @@ bool QFESPIMB040OpticsSetup2::setMainIlluminationShutter(bool opened, bool block
 }
 
 
+/** \brief Switch Laser alternation (ALEX) on or off */
+bool QFESPIMB040OpticsSetup2::setAlex(bool alexOnOff, bool blocking) {
+    if (!isMainIlluminationShutterAvailable()) return false;
+    if (getLaserCount()==0) return false;
+
+    waitForMainShutter.clear();
+    for (int i=0; i<shutterMain.size(); i++) {
+            shutterMain[i].shutter->setAlex(alexOnOff);
+            waitForMainShutter.insert(i);
+    }
+
+    for (int i=0; i<laserIndex.size(); i++) {
+        getLaser(i)->setExternalModulation(0, true);
+    }
+
+    if (blocking) {
+        QTime t;
+        t.start();
+        bool ok=false;
+        while (!ok && t.elapsed()<10000) {
+            ok=true;
+            for (int i=0; i<shutterMain.size(); i++) {
+                    shutterMain[i].shutter->setAlex(alexOnOff);
+                    waitForMainShutter.insert(i);
+            }
+        }
+
+
+            QApplication::processEvents();
+
+
+        if (t.elapsed()>=10000) {
+            m_log->log_error("main shutter timed out after 10s!\n");
+            return false;
+        }
+        return true;
+    }
+    return true;
+}
+
 void QFESPIMB040OpticsSetup2::setSpecialShutter(int shutter, bool opened, bool blocking)
 {
     if (shutter==QFESPIMB040OpticsSetup2::ShutterMain) {

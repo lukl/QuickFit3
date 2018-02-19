@@ -61,8 +61,9 @@ class QFExtensionShutter {
         virtual bool isShutterOpen(unsigned int shutter) =0;
         /** \brief open or close the given shutter, use isLastShutterActionFinished() to check whether the instruction has been executed */
         virtual void setShutterState(unsigned int shutter, bool opened)=0;
-        /** \brief return \c true if the last command, sent to the given shutter was executet, i.e. the shutter has settled to its new position
-         *
+        /** \brief return \c true if the last command, sent to the given shutter was executed, i.e. the shutter has settled to its new position */
+        virtual void setShutterAlex(unsigned int shutter, bool AlexOnOff)=0;
+        /** \brief set Alternation of lasers (Alex) on or off
          *  \note Use this to check, whether the shutter has been closed/opened after a call to setShutterState(), not isShutterOpen(), as the second
          *        one might not be defined (and return a wrong value) during the shutter movement!
          */

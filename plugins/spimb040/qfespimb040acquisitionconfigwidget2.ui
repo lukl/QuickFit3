@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1158</width>
-    <height>824</height>
+    <width>1314</width>
+    <height>886</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -204,7 +204,7 @@ p, li { white-space: pre-wrap; }
         <item>
          <widget class="QLabel" name="labPreview2_6">
           <property name="text">
-           <string>Previe&amp;w Settings 6:</string>
+           <string>Preview Settings &amp;6:</string>
           </property>
           <property name="buddy">
            <cstring>cmbPreviewSettings2_1</cstring>
@@ -239,7 +239,7 @@ p, li { white-space: pre-wrap; }
       <item row="1" column="0">
        <widget class="QLabel" name="labPreview2">
         <property name="text">
-         <string>Previe&amp;w Settings 1:</string>
+         <string>Preview Settings &amp;1:</string>
         </property>
         <property name="buddy">
          <cstring>cmbPreviewSettings2_1</cstring>
@@ -259,7 +259,7 @@ p, li { white-space: pre-wrap; }
       <item row="2" column="0">
        <widget class="QLabel" name="labPreview2_2">
         <property name="text">
-         <string>Previe&amp;w Settings 2:</string>
+         <string>Preview Settings &amp;2:</string>
         </property>
         <property name="buddy">
          <cstring>cmbPreviewSettings2_1</cstring>
@@ -302,7 +302,7 @@ p, li { white-space: pre-wrap; }
       <item row="3" column="0">
        <widget class="QLabel" name="labPreview2_3">
         <property name="text">
-         <string>Previe&amp;w Settings 3:</string>
+         <string>Preview Settings &amp;3:</string>
         </property>
         <property name="buddy">
          <cstring>cmbPreviewSettings2_1</cstring>
@@ -390,7 +390,7 @@ p, li { white-space: pre-wrap; }
         <item>
          <widget class="QLabel" name="labPreview2_5">
           <property name="text">
-           <string>Previe&amp;w Settings 5:</string>
+           <string>Preview Settings &amp;5:</string>
           </property>
           <property name="buddy">
            <cstring>cmbPreviewSettings2_1</cstring>
@@ -435,7 +435,7 @@ p, li { white-space: pre-wrap; }
       <item row="4" column="0">
        <widget class="QLabel" name="labPreview2_4">
         <property name="text">
-         <string>Previe&amp;w Settings 4:</string>
+         <string>Preview Settings &amp;4:</string>
         </property>
         <property name="buddy">
          <cstring>cmbPreviewSettings2_1</cstring>
@@ -742,6 +742,13 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
+         <widget class="QCheckBox" name="chkAlex">
+          <property name="text">
+           <string>Alternate lasers (ALEX)</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_22">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -905,7 +912,7 @@ p, li { white-space: pre-wrap; }
       <item row="1" column="0">
        <widget class="QLabel" name="labPreview1">
         <property name="text">
-         <string>&amp;Preview Settings 1:</string>
+         <string>Pre&amp;view Settings 1:</string>
         </property>
         <property name="buddy">
          <cstring>cmbPreviewSettings1_1</cstring>
@@ -915,7 +922,7 @@ p, li { white-space: pre-wrap; }
       <item row="3" column="0">
        <widget class="QLabel" name="labPreview1_3">
         <property name="text">
-         <string>&amp;Preview Settings 3:</string>
+         <string>Prev&amp;iew Settings 3:</string>
         </property>
         <property name="buddy">
          <cstring>cmbPreviewSettings1_1</cstring>
@@ -1043,7 +1050,7 @@ p, li { white-space: pre-wrap; }
         <item>
          <widget class="QLabel" name="labPreview1_6">
           <property name="text">
-           <string>&amp;Preview Settings 6:</string>
+           <string>Preview Setti&amp;ngs 6:</string>
           </property>
           <property name="buddy">
            <cstring>cmbPreviewSettings1_1</cstring>
