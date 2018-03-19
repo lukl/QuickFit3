@@ -110,7 +110,7 @@ void QFSerialConnection::win32_error(std::string where) {
 
 
 QFSerialConnection::QFSerialConnection(std::string port, unsigned int baudrate, QFSCdatabits databits, QFSCparity parity, QFSCstopbits stopbits, QFSChandshaking handshaking) {
-    logToFile=false;
+    logToFile=true;
     log=NULL;
     if (logToFile && log==NULL) log=fopen("rs232.log", "w");
     //if  (!log) //std::cout<<"error opening log file\n";
