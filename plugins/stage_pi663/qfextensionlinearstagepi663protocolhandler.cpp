@@ -66,7 +66,12 @@ bool QFExtensionLinearStagePI663ProtocolHandler::checkComConnected()
 
 void QFExtensionLinearStagePI663ProtocolHandler::sendCommand(std::string command)
 {
-    com->write(command+"\x0D");
+    com->write(command+"\x00a");
+}
+
+void QFExtensionLinearStagePI663ProtocolHandler::sendCommandSingleChar(std::string command)
+{
+    com->write(command);
 }
 
 std::string QFExtensionLinearStagePI663ProtocolHandler::queryCommand(std::string command)
@@ -74,12 +79,12 @@ std::string QFExtensionLinearStagePI663ProtocolHandler::queryCommand(std::string
     std::string res="";
     //std::cout<<"\n\ncommand (stage "<<currentID<<"): '"<<command<<"'";
     com->clearBuffer();
-    if (com->write(command+"\x0D")) {
-        res=com->readUntil(3);
+    if (com->write(command+"\x00a")) {
+        res=com->readUntil(10);
         //std::cout<<" ... reading ... ";
     }
     //std::cout<<"   direct_result: '"<<toprintablestr(res)<<"' ";
-    if (res.size()>=3) res=res.erase(res.size()-3, 3);
+    if (res.size()>=1) res=res.erase(res.size()-1, 1);
     //std::cout<<"   returned_result: '"<<toprintablestr(res)<<"'\n\n";
     return res;
 }
@@ -90,11 +95,11 @@ std::string QFExtensionLinearStagePI663ProtocolHandler::queryCommandSingleChar(s
     //std::cout<<"\n\ncommand (stage "<<currentID<<"): '"<<command<<"'";
     com->clearBuffer();
     if (com->write(command)) {
-        res=com->readUntil(3);
+        res=com->readUntil(10);
         //std::cout<<" ... reading ... ";
     }
     //std::cout<<"   direct_result: '"<<toprintablestr(res)<<"' ";
-    if (res.size()>=3) res=res.erase(res.size()-3, 3);
+    //if (res.size()>=3) res=res.erase(res.size()-3, 3);
     //std::cout<<"   returned_result: '"<<toprintablestr(res)<<"'\n\n";
     return res;
 }

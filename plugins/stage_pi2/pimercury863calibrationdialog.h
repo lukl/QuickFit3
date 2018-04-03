@@ -72,6 +72,8 @@ class PIMercury863CalibrationDialog : public QFDialog {
         bool accepted;
 
         int axis;
+        uint baud_timeout=ceil(12*((double)1000/9600)); // Minimal baudrate;
+        uint ms=500; // Transfer timeout
 
     private:
 };

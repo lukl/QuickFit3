@@ -35,7 +35,7 @@
 
     This protocol is used by most of the hardware devices developed for the SPIM in group B040. It has only few rules:
       -# There are commands without and with return value.
-      -# senCommand() transmits the given command (+ a line feed \c 0x0A character). This function  returns immediatly and does not wait for an answer
+      -# sendCommand() transmits the given command (+ a line feed \c 0x0A character). This function  returns immediatly and does not wait for an answer
       -# queryCommand() queries information from the device by first transmitting the query (including a trailing line feed \c 0x0A character) and
          then waiting for an answer which has to be finished by two consecutive line feed \c 0x0A characters (end of message sequence). The function
          also returns after a timeout (this error is reported by hasErrorOccured() afterwards) with possibly a fraction of the query answer, received so far.
@@ -55,6 +55,7 @@ class QFExtensionLinearStagePI663ProtocolHandler {
 //        void selectAxis(QChar ID); // Native Command Set ONLY, not required for Control via GCS. Controller ID is controlled via Controller ID Prefix.
         /** \brief send a command to the Mercury controller (this automatically adds a command terminating character (carriage return) */
         void sendCommand(std::string command);
+        void sendCommandSingleChar(std::string command);
 
         /** \brief send a command to the Mercury controller (this automatically adds a command terminating character (carriage return)
          *         and returns the result (the standard finishing sequence CR LF ETX will be cut from the string) */

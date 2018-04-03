@@ -101,7 +101,7 @@ void QFExtensionLinearStagePI663::initExtension() {
         }
     }
 
-    actCalibrateJoysticks=new QFActionWithNoMenuRole(QIcon(":/stage_pi/pi_joystick.png"), tr("calibrate PI stage joysticks, v2"), this);
+    actCalibrateJoysticks=new QFActionWithNoMenuRole(QIcon(":/stage_pi/pi_joystick.png"), tr("Calibrate PI Mercury C-663 stage joysticks"), this);
     connect(actCalibrateJoysticks, SIGNAL(triggered()), this, SLOT(calibrateJoysticks()));
     if (services) {
         QMenu* m=services->getMenu("extensions");
@@ -287,16 +287,18 @@ void QFExtensionLinearStagePI663::connectDevice(unsigned int axis) {
         if (com->isConnectionOpen()) {
 
             std::string error=serial->queryCommand(std::string("ERR?")); // Clear Errors
-            if (true) log_text(tr(LOG_PREFIX "Last Error: %1 (see Manual p. 162 for details)").arg(error.c_str()));
+            if (error!="0") log_text(tr(LOG_PREFIX "Last Occured Error: %1 (see Manual p. 162 for details)\n").arg(error.c_str()));
+
+            log_text(tr(LOG_PREFIX "Mercury C-663 Motor Controller (use with caution)\n"));
+            log_text(tr(LOG_PREFIX "Controller Version: %1\n").arg(serial->queryCommand("VER?").c_str()));
+            log_text(tr(LOG_PREFIX "Device Identification: %1\n").arg(serial->queryCommand("*IDN?").c_str()));
+            log_warning(tr(LOG_PREFIX "WARNING: GCS Controller, Daisy Chain not implemented, so only one controller via USB supported\n"));
+
+            serial->sendCommand("ACC "+ axes[axis].ID.toStdString() + " " + inttostr(axes[axis].acceleration/axes[axis].accelerationFactor));
+            serial->sendCommand("DEC "+ axes[axis].ID.toStdString() + " " + inttostr(axes[axis].deceleration/axes[axis].accelerationFactor));
+
             error=serial->queryCommand(std::string("ERR?"));
-
-            log_text(tr(LOG_PREFIX "Mercury C-663 Motor Controller - Quick'n'Dirty Implementation (use with caution)"));
-            log_text(tr(LOG_PREFIX "Controller Version: %1").arg(serial->queryCommand("VER?").c_str()));
-            log_text(tr(LOG_PREFIX "Device Identification: %1").arg(serial->queryCommand("*IDN?").c_str()));
-            log_text(tr(LOG_PREFIX "WARNING: GCS Controller, Daisy Chain not implemented, so only one controller via USB supported"));
-
-            serial->sendCommand("ACC"+inttostr(axes[axis].acceleration));
-            serial->sendCommand("DEC"+inttostr(axes[axis].acceleration));
+            if (error!="0") log_text(tr(LOG_PREFIX "Last Error: %1 (see Manual p. 162 for details)\n").arg(error.c_str()));
 
             serial->sendCommand("JAX 1 " + axes[axis].ID.toStdString() + " 1"); // Attribute joystick on controller to control of corresponding controller axis. See C-663 Manual for details.
 
@@ -305,32 +307,42 @@ void QFExtensionLinearStagePI663::connectDevice(unsigned int axis) {
 
             serial->sendCommand("SVO " + axes[axis].ID.toStdString() + " 1"); // Motor ON
 
+            error=serial->queryCommand(std::string("ERR?"));
+            if (error!="0") log_text(tr(LOG_PREFIX "Last Error: %1 (see Manual p. 162 for details)\n").arg(error.c_str()));
+
             if (!com->hasErrorOccured()) {
                 if (axes[axis].doRefMove==true) {
                     int isRefSet;
-                    if(sscanf(serial->queryCommand("FRF? "+axes[axis].ID.toStdString()).c_str(), "%*i=%i\n", &isRefSet)) {
+                    std::string frf_response;
+                    if(sscanf(serial->queryCommand("FRF? "+axes[axis].ID.toStdString()).c_str(), "%*i=%i", &isRefSet)) {
                         if(isRefSet==true) {
                             log_text(tr(LOG_PREFIX "Reference Position is defined.(Undo by restarting Controller)\n"));
                         }
                         else {
-                            log_text(tr(LOG_PREFIX "Reference Position not defined, Referencing activated. Referencing, returning to inital position..."));
-                            serial->sendCommand("FED "+ axes[axis].ID.toStdString() +" 2 0"); // Find edge switch position
-                            while("0\x00a"!=serial->queryCommand("\x005")) QThread::msleep(axes[axis].ms);
+                            log_text(tr(LOG_PREFIX "Reference Position not defined, Referencing activated. Referencing, returning to inital position...\n"));
+                            std::string ref_pos_string=serial->queryCommand(std::string("SPA? " + axes[axis].ID.toStdString() + " 0x16")); // Position at Reference Switch
+                            float reference_switch_pos=8;
+                            sscanf(ref_pos_string.c_str(), "%*1s %*i=%f", &reference_switch_pos);
+                            serial->sendCommand("RON "+ axes[axis].ID.toStdString() +" 0"); // Deactivate referencing requirement for axis
+                            serial->sendCommand("POS "+axes[axis].ID.toStdString()+" 0");
+                            serial->sendCommand("FED "+ axes[axis].ID.toStdString() +" 3 0"); // Find reference switch position (1 negative limit, 2 pos limit, 3 reference switch)
+                            while("0\x00a"!=serial->queryCommandSingleChar("\x005")) QThread::msleep(axes[axis].ms); // (\x00a is the same character as \n or [LF])
                             double RelativeInitialPosition=-getPosition(axis);
-                            serial->sendCommand("DFH "+axes[axis].ID.toStdString());
-                            serial->sendCommand("MOV "+axes[axis].ID.toStdString()+" "+floattostr(RelativeInitialPosition,4,true));
-                            while("0\x00a"!=serial->queryCommand("\x005")) QThread::msleep(axes[axis].ms);
+                            serial->sendCommand("POS "+axes[axis].ID.toStdString()+" "+ floattostr(reference_switch_pos,6,true));
+                            serial->sendCommand("MVR "+axes[axis].ID.toStdString()+" "+floattostr((double)RelativeInitialPosition/axes[axis].lengthFactor,6,true));
+                            while("0\x00a"!=serial->queryCommandSingleChar("\x005")) QThread::msleep(axes[axis].ms);
                             log_text(tr("Done.\n"));
                         }
                     }
                     else {
-                        log_error(tr(LOG_PREFIX "Invalid result string from FRF? command (Getting Reference Result) [expected <axis>=<bool>] from axis %1").arg(inttostr(axis).c_str()));
-                        log_error(tr(LOG_PREFIX "Result of FRF? command was %1").arg(serial->queryCommand("FRF? " + axes[axis].ID.toStdString() ).c_str() ));
+                        log_error(tr(LOG_PREFIX "Invalid result string from FRF? command (Getting Reference Result) [expected <axis>=<bool>] from axis %1\n").arg(inttostr(axis).c_str()));
+                        log_error( tr(LOG_PREFIX "Result of FRF? command was %1").arg(frf_response.c_str()) );
                     }
                 }
             }
 
             axes[axis].velocity=axes[axis].initVelocity;
+            serial->sendCommand("VEL " + axes[axis].ID.toStdString() + " " + floattostr(((double)axes[axis].velocity/axes[axis].velocityFactor), 6));
             axes[axis].joystickEnabled=false;
 
             if (com->hasErrorOccured()) {
@@ -352,6 +364,8 @@ void QFExtensionLinearStagePI663::disconnectDevice(unsigned int axis) {
         QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI663ProtocolHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen()) {
+            std::string error=serial->queryCommand(std::string("ERR?"));
+            if (error!="0") log_text(tr(LOG_PREFIX "Last Error: %1 (see Manual p. 162 for details)\n").arg(error.c_str()));
             serial->sendCommand("SVO " + axes[axis].ID.toStdString() + " 0"); // Motor OFF
             serial->sendCommand("JON 1 0"); // Switch off joystick
             axes[axis].joystickEnabled=false;
@@ -372,11 +386,12 @@ void QFExtensionLinearStagePI663::setJoystickActive(unsigned int axis, bool enab
         QFExtensionLinearStagePI663ProtocolHandler* serial=axes[axis].serial;
 
         if (enabled) {
-            serial->sendCommand("VEL " + axes[axis].ID.toStdString() + inttostr((long)round(setVelocity/axes[axis].velocityFactor)));
-            serial->sendCommand("JON 1 1"); // Switch ON joystick
-            axes[axis].joystickEnabled=true;
+            //serial->sendCommand("VEL " + axes[axis].ID.toStdString() + " " + floattostr(((double)setVelocity/axes[axis].velocityFactor), 6));
+            //serial->sendCommand("JON 1 1"); // Switch ON joystick
+            //axes[axis].joystickEnabled=true;
         } else {
-            serial->sendCommand("JON 1 0"); // Switch OFF joystick
+            while("\x030\x00a"!=serial->queryCommandSingleChar("\x005")) {QThread::msleep(axes[axis].ms);}
+            //serial->sendCommand("JON 1 0"); // Switch OFF joystick
             axes[axis].joystickEnabled=false;
         }
     }
@@ -395,7 +410,7 @@ void QFExtensionLinearStagePI663::stop(unsigned int axis) { // Stop abruptly, er
         QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI663ProtocolHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen()) {
-            serial->sendCommand("\x024");
+            serial->sendCommandSingleChar("\x024");
         }
     }
 }
@@ -406,13 +421,24 @@ double QFExtensionLinearStagePI663::getSpeed(unsigned int axis) {
         QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI663ProtocolHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen()) {
-            std::string r=serial->queryCommand("VEL? "+ axes[axis].ID.toStdString());
-            double v=0;
             if (!com->hasErrorOccured()) {
-                if (sscanf(r.c_str(), "%*i=%lf", &v)) {
-                    return v*axes[axis].velocityFactor;
+                int isMoving=0;
+                std::string reply=serial->queryCommandSingleChar("\x005");
+                if (sscanf(reply.c_str(), "%i\n", &isMoving)) {
+                    if (isMoving!=0) {
+                        std::string reply=serial->queryCommand(std::string("VEL? ") + axes[axis].ID.toStdString());
+                        replace_reply_punctuation(&reply);
+                        double vel=0;
+                        if(sscanf(reply.c_str(), "%*i=%lf", &vel)) {
+                            return vel*axes[axis].velocityFactor;
+                        }
+                        else {
+                           log_error(tr(LOG_PREFIX " invalid result string from VEL? after ASCII #5 command [expected <axis>=<speed>] from axis %1. String was '%2'.\n").arg(axis).arg(toprintablestr(reply).c_str()));
+                        }
+                    }
+                    else return (double)isMoving;
                 } else {
-                    log_error(tr(LOG_PREFIX " invalid result string from VEL? command [expected <axis id>=<number>] from axis %1. String was '%2'.\n").arg(axis).arg(toprintablestr(r).c_str()));
+                    log_error(tr(LOG_PREFIX " invalid result string from ASCII #5 command (Request Motion Status) [expected <bool>] from axis %1. String was '%2'.\n").arg(axis).arg(toprintablestr(reply).c_str()));
                 }
             }
         }
@@ -427,13 +453,14 @@ double QFExtensionLinearStagePI663::getPosition(unsigned int axis) {
         QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI663ProtocolHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen()) {
-            std::string r=serial->queryCommand("POS? "+ axes[axis].ID.toStdString());
-            double v=0;
+            std::string reply=serial->queryCommand("POS? "+ axes[axis].ID.toStdString());
+            replace_reply_punctuation(&reply);
+            double pos=0;
             if (!com->hasErrorOccured()) {
-                if (sscanf(r.c_str(), "%*i=%lf", &v)) {
-                    return v*axes[axis].lengthFactor;
+                if (sscanf(reply.c_str(), "%*i=%lf", &pos)) {
+                    return pos*axes[axis].lengthFactor;
                 } else {
-                    log_error(tr(LOG_PREFIX " invalid result string from POS? command [expected <axis id>=<number>] from axis %1. String was '%2'.\n").arg(axis).arg(toprintablestr(r).c_str()));
+                    log_error(tr(LOG_PREFIX " invalid result string from POS? command [expected <axis id>=<number>] from axis %1. String was '%2'.\n").arg(axis).arg(toprintablestr(reply).c_str()));
                 }
             }
         }    }
@@ -448,26 +475,30 @@ void QFExtensionLinearStagePI663::move(unsigned int axis, double newPosition) {
         QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI663ProtocolHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen() && (axes[axis].state==QFExtensionLinearStage::Ready) && (!axes[axis].joystickEnabled)) {
-            long xx=(long)round(newPosition/axes[axis].lengthFactor);
+            double xx=newPosition/axes[axis].lengthFactor;
             if ( (axes[axis].maxCoord !=0  && newPosition>axes[axis].maxCoord) || (axes[axis].minCoord !=0 && newPosition<axes[axis].minCoord) ) {
                 log_warning(tr(LOG_PREFIX " error on axis %1: Move attempt with position exceeding limits").arg(axis));
             }
             else {
                 if (!com->hasErrorOccured()) {
                     double currentPosition=getPosition(axis);
-                    serial->sendCommand("SV"+inttostr((long)round(axes[axis].velocity/axes[axis].velocityFactor)));
+                    serial->sendCommand("VEL " + axes[axis].ID.toStdString() + " " + floattostr((axes[axis].velocity/axes[axis].velocityFactor), 6));
+                    axes[axis].state=QFExtensionLinearStage::Moving;
                     if(currentPosition<newPosition) {
-                        serial->sendCommand("MOV " + axes[axis].ID.toStdString() + " "  + inttostr((long)round(xx+(axes[axis].backlashCorr/axes[axis].lengthFactor)))); // Always approach from same side, default 50 microns correction
-                        axes[axis].state=QFExtensionLinearStage::Moving;
-                        while("\x030"!=serial->queryCommandSingleChar("\x005")) {QThread::msleep(axes[axis].ms);}
-                        serial->sendCommand("MOV " + axes[axis].ID.toStdString() + " " + inttostr(xx));
+
+                        serial->sendCommand("MOV " + axes[axis].ID.toStdString() + " "  + floattostr(xx+(axes[axis].backlashCorr/axes[axis].lengthFactor),6)); // Always approach from same side to evade backlash
+                        while("\x030\x00a"!=serial->queryCommandSingleChar("\x005")) {QThread::msleep(axes[axis].ms);}
+                        serial->sendCommand("MOV " + axes[axis].ID.toStdString() + " " + floattostr(xx,6));
+
                     }
                     else if (currentPosition>newPosition) {
-                        serial->sendCommand("MOV " + axes[axis].ID.toStdString() + " " + inttostr(xx));
-                        axes[axis].state=QFExtensionLinearStage::Moving;
+
+                        serial->sendCommand("MOV " + axes[axis].ID.toStdString() + " " + floattostr(xx,6));
+
                     }
-                    while("\x030"!=serial->queryCommandSingleChar("\x005")) {QThread::msleep(axes[axis].ms);}
-                    axes[axis].state=QFExtensionLinearStage::Ready;
+                    else if (currentPosition==newPosition) log_text(tr(LOG_PREFIX "Stage already in Position.\n"));
+                    //while("\x030\x00a"!=serial->queryCommandSingleChar("\x005")) {QThread::msleep(axes[axis].ms);}
+                    //axes[axis].state=QFExtensionLinearStage::Ready;
                 }
             }
         }
@@ -486,7 +517,7 @@ QFExtensionLinearStage::AxisState QFExtensionLinearStagePI663::getAxisState(unsi
         std::string failedaxes="";
         if (com->isConnectionOpen()) {
 
-            std::string reply=serial->queryCommand(std::string("\x004"));
+            std::string reply=serial->queryCommandSingleChar(std::string("\x004"));
             std::string binstat=hextobin(reply.substr(2,4));
 
             int BZERO=0, B1=0, B2=0, B3=0, B4=0, B5=0, B6=0, B7=0, B8=0, B9=0, B10=0, B11=0, B12=0, B13=0, B14=0, B15=0;
@@ -496,10 +527,8 @@ QFExtensionLinearStage::AxisState QFExtensionLinearStagePI663::getAxisState(unsi
                     //std::cout<<"\n\n"<<std::string(1, (char)('x'+i-1))<<": "<<r<<"\n\n";
                     if (B8!=0) {
                         log_error(tr(LOG_PREFIX " error on axis %1: Error flag (Bit #8) is set\n").arg(axis));
-                        axes[axis].state=QFExtensionLinearStage::Error;
                         std::string error=serial->queryCommand(std::string("ERR?"));
-                        error.erase(std::remove(error.begin(), error.end(), '\n'), error.end());
-                        log_error(tr(LOG_PREFIX " error on axis %1: Error code: %2\n").arg(axis).arg(toprintablestr(error).c_str()));
+                        log_error(tr(LOG_PREFIX " error on axis %1: Error code: %2\n").arg(axis).arg(error.c_str()));
                         if (error==inttostr(0)) {
                             log_error(tr(LOG_PREFIX " error on axis %1: Controller says: No error. Therefore Software Error\n").arg(axis));
                             axes[axis].state=QFExtensionLinearStage::Error;
@@ -558,7 +587,7 @@ QFExtensionLinearStage::AxisState QFExtensionLinearStagePI663::getAxisState(unsi
                             log_error(tr(LOG_PREFIX " error on axis %1: Referencing failed\n").arg(axis));
                             axes[axis].state=QFExtensionLinearStage::Error;
                         } else {
-                            log_error(tr(LOG_PREFIX " error on axis %1: Error Code unknown. See C-863 User Manual for further codes\n").arg(axis));
+                            log_error(tr(LOG_PREFIX " error on axis %1: Error Code unknown. See C-663 User Manual for further codes\n").arg(axis));
                             axes[axis].state=QFExtensionLinearStage::Error;
                         }
                     }
@@ -629,112 +658,12 @@ void QFExtensionLinearStagePI663::log_error(QString message) {
 }
 
 
-//std::string QFExtensionLinearStagePI663::twocharblockstrtobinstr(std::string twocharblock) {
-//    char charone=0, chartwo=0;
-//    sscanf(twocharblock.c_str(), "%c%c", &charone, &chartwo);
-//    std::string binary="";
-//    switch(charone) {
-//        case '0':
-//            binary+="0000";
-//            break;
-//        case '1':
-//            binary+="0001";
-//            break;
-//        case '2':
-//            binary+="0010";
-//            break;
-//        case '3':
-//            binary+="0011";
-//            break;
-//        case '4':
-//            binary+="0100";
-//            break;
-//        case '5':
-//            binary+="0101";
-//            break;
-//        case '6':
-//            binary+="0110";
-//            break;
-//        case '7':
-//            binary+="0111";
-//            break;
-//        case '8':
-//            binary+="1000";
-//            break;
-//        case '9':
-//            binary+="1001";
-//            break;
-//        case 'A':
-//            binary+="1010";
-//            break;
-//        case 'B':
-//            binary+="1011";
-//            break;
-//        case 'C':
-//            binary+="1100";
-//            break;
-//        case 'D':
-//            binary+="1101";
-//            break;
-//        case 'E':
-//            binary+="1110";
-//            break;
-//        case 'F':
-//            binary+="1111";
-//            break;
-//    }
-//    switch(chartwo) {
-//        case '0':
-//            binary+="0000";
-//            break;
-//        case '1':
-//            binary+="0001";
-//            break;
-//        case '2':
-//            binary+="0010";
-//            break;
-//        case '3':
-//            binary+="0011";
-//            break;
-//        case '4':
-//            binary+="0100";
-//            break;
-//        case '5':
-//            binary+="0101";
-//            break;
-//        case '6':
-//            binary+="0110";
-//            break;
-//        case '7':
-//            binary+="0111";
-//            break;
-//        case '8':
-//            binary+="1000";
-//            break;
-//        case '9':
-//            binary+="1001";
-//            break;
-//        case 'A':
-//            binary+="1010";
-//            break;
-//        case 'B':
-//            binary+="1011";
-//            break;
-//        case 'C':
-//            binary+="1100";
-//            break;
-//        case 'D':
-//            binary+="1101";
-//            break;
-//        case 'E':
-//            binary+="1110";
-//            break;
-//        case 'F':
-//            binary+="1111";
-//            break;
-//    }
-//    return(binary);
-//}
+void QFExtensionLinearStagePI663::replace_reply_punctuation (std::string *s) {
+    QChar npunct=QLocale::system().decimalPoint();
+    if(npunct.toLatin1()!='.') {
+        std::replace((*s).begin(),(*s).end(), '.', npunct.toLatin1());
+    }
+}
 
 
 Q_EXPORT_PLUGIN2(stage_pi663, QFExtensionLinearStagePI663)

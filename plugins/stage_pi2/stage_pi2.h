@@ -163,21 +163,22 @@ class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public
 
         struct AxisDescription {
             AxisDescription() {
-                PTerm=150;
-                iTerm=45;
-                DTerm=300;
+                PTerm=140;
+                iTerm=180;
+                DTerm=120;
                 iLimit=2000;
                 acceleration=1000000;
                 maxVelocity=2000;
-                initVelocity=1000;
-                lengthFactor=6.9e-3;
-                velocityFactor=6.9e-3;
-                accelerationFactor=6.9e-3;
+                initVelocity=800;
+                lengthFactor=6.866455e-3;
+                velocityFactor=6.866455e-3;
+                accelerationFactor=6.866455e-3;
                 maxCoord=0;
                 minCoord=0;
-                backlashCorr=0.5;
+                backlashCorr=3;
                 ms=1;
                 doRefMove=false;
+                nF_Edge=80;
             }
 
             /** \brief ID of the Mercury C-863 controller for the axis
@@ -206,6 +207,8 @@ class QFExtensionLinearStagePI2 : public QObject, public QFExtensionBase, public
              unsigned int DTerm;
              /** \brief settings of i-Limit */
              unsigned int iLimit;
+             /** \brief settings of Notch Filter Edge */
+             unsigned int nF_Edge;
              /** \brief settings of acceleration */
              double acceleration;
              /** \brief the initial velocity of all axes */

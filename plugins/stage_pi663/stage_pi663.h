@@ -34,7 +34,7 @@
 #include "pimercury663calibrationdialog.h"
 
 /*!
-    \defgroup qf3ext_StagePI663 QFExtensionLinearStage implementation for PI mercury stages
+    \defgroup qf3ext_StagePI663 QFExtensionLinearStage implementation for PI mercury C-663 stages
     \ingroup qf3extensionplugins
 */
 
@@ -67,7 +67,7 @@ class QFExtensionLinearStagePI663 : public QObject, public QFExtensionBase, publ
         /** \copydoc QFExtension::getAuthor() */
         virtual QString getAuthor() const  { return tr("Lukas Lau"); };
         /** \copydoc QFExtension::getCopyright() */
-        virtual QString getCopyright() const  { return tr("(c) 2018 by Jan Krieger, Lukas Lau"); };
+        virtual QString getCopyright() const  { return tr("(c) 2018 by Lukas Lau, Jan Krieger"); };
         /** \copydoc QFExtension::getWeblink() */
         virtual QString getWeblink() const  { return tr(""); };
         /** \copydoc QFExtension::getIconFilename() */
@@ -165,13 +165,13 @@ class QFExtensionLinearStagePI663 : public QObject, public QFExtensionBase, publ
             AxisDescription() {
                 maxCoord=0;
                 minCoord=0;
-                acceleration=26310;
-                deceleration=26310;
-                maxVelocity=26315;
-                initVelocity=13150;
-                lengthFactor=3.8e-2;
-                velocityFactor=3.8e-2;
-                accelerationFactor=3.8e-2;
+                acceleration=9900;
+                deceleration=9900;
+                maxVelocity=9999;
+                initVelocity=1000;
+                lengthFactor=1000;
+                velocityFactor=1000;
+                accelerationFactor=1000;
                 doRefMove=false;
                 ms=100;
                 ControllerID=1;
@@ -230,6 +230,7 @@ class QFExtensionLinearStagePI663 : public QObject, public QFExtensionBase, publ
 
         QVector<AxisDescription> axes;
 
+        void replace_reply_punctuation(std::string *s);
 
         /** \brief This function is specific to the old C-863 controller and converts a "TS"-query answer two char block to binary
          *  (see also corresponding Manual "Native Commands MS176E Release 1.1.0", p. 80ff) */

@@ -92,7 +92,7 @@ void QFExtensionLinearStagePI2::initExtension() {
             d.minCoord=inifile.value(axisname+"/mincoord", defaultAD.minCoord).toDouble();
             d.backlashCorr=inifile.value(axisname+"/backlashcorr", defaultAD.backlashCorr).toDouble();
             d.backlashCorr=inifile.value(axisname+"/ms", defaultAD.ms).toDouble();
-
+            d.nF_Edge=inifile.value(axisname+"/notchFilterEdge", defaultAD.nF_Edge).toDouble();
 
 
             d.velocity=defaultAD.initVelocity;
@@ -104,7 +104,7 @@ void QFExtensionLinearStagePI2::initExtension() {
         }
     }
 
-    actCalibrateJoysticks=new QFActionWithNoMenuRole(QIcon(":/stage_pi/pi_joystick.png"), tr("calibrate PI stage joysticks, v2"), this);
+    actCalibrateJoysticks=new QFActionWithNoMenuRole(QIcon(":/stage_pi/pi_joystick.png"), tr("Calibrate PI Mercury C-863.10 stage joysticks (xyz, Ver. 2)"), this);
     connect(actCalibrateJoysticks, SIGNAL(triggered()), this, SLOT(calibrateJoysticks()));
     if (services) {
         QMenu* m=services->getMenu("extensions");
@@ -137,6 +137,7 @@ void QFExtensionLinearStagePI2::deinit() {
         inifile.setValue(axisname+"/mincoord", axes[axis].minCoord);
         inifile.setValue(axisname+"/backlashcorr", axes[axis].backlashCorr);
         inifile.setValue(axisname+"/ms", axes[axis].ms);
+        inifile.setValue(axisname+"/notchFilterEdge", axes[axis].nF_Edge);
     }
 }
 
@@ -267,7 +268,7 @@ void QFExtensionLinearStagePI2::calibrateJoysticks() {
             PIMercury863CalibrationDialog* dlg=new PIMercury863CalibrationDialog(NULL, this, axis);
             dlg->exec();
             delete dlg;
-            if (!wasConnected) disconnectDevice(axis);
+            disconnectDevice(axis);
         } else if (answer==QMessageBox::Cancel)  {
             break;
         }
@@ -299,9 +300,10 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int axis) {
             serial->sendCommand("DI"+inttostr(axes[axis].iTerm));
             serial->sendCommand("DD"+inttostr(axes[axis].DTerm));
             serial->sendCommand("DL"+inttostr(axes[axis].iLimit));
+            serial->sendCommand("FQ"+inttostr(axes[axis].nF_Edge));
             serial->sendCommand("SA"+inttostr(axes[axis].acceleration));
-            log_text(tr(LOG_PREFIX "Controller setup. P-Term: %1, I-Term: %2, D-Term: %3, I-Limit: %4, Conrol mode: %5\n").arg(serial->queryCommand("GP").c_str()).arg(serial->queryCommand("GI").c_str()).arg(serial->queryCommand("GD").c_str()).arg(serial->queryCommand("GL").c_str()).arg(serial->queryCommand("FM?").c_str()));
-                        serial->queryCommand("GP"); //
+            log_text(tr(LOG_PREFIX "Controller setup. P-Term: %1, I-Term: %2, D-Term: %3, I-Limit: %4, Notch Filter Edge: %5\n").arg(serial->queryCommand("GP").c_str()).arg(serial->queryCommand("GI").c_str()).arg(serial->queryCommand("GD").c_str()).arg(serial->queryCommand("GL").c_str()).arg(serial->queryCommand("FQ?").c_str()));
+            serial->sendCommand("JN"); // Joystick Off in any case.
             serial->sendCommand("MN"); // Motor ON
             if (!com->hasErrorOccured()) {
                 //int isRefSet=0;
@@ -347,7 +349,7 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int axis) {
 //                             }
                             //while("\x030"!=serial->queryCommandSingleChar("\x05c")) {QThread::msleep(axes[axis].ms);}
                             //serial->sendCommand("DH0");
-                            serial->sendCommand("SV"+inttostr((long)round(axes[axis].velocity/axes[axis].velocityFactor))+",MA"+inttostr(dist));
+                            serial->sendCommand("SV"+inttostr((long)round(axes[axis].initVelocity/axes[axis].velocityFactor))+",MA"+inttostr(dist));
                             while("\x030"!=serial->queryCommandSingleChar("\x05c")) {QThread::msleep(axes[axis].ms);}
                             log_text(tr("Done.\n"));
                     }
@@ -383,10 +385,10 @@ void QFExtensionLinearStagePI2::disconnectDevice(unsigned int axis) {
         QFSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen()) {
-//            serial->selectAxis(axes[axis].ID);
-//            serial->sendCommand("MF"); // Switch off motor
-//            serial->sendCommand("JF"); // Switch off joystick
-//            axes[axis].joystickEnabled=false;
+            serial->selectAxis(axes[axis].ID);
+            serial->sendCommand("MF"); // Switch off motor
+            serial->sendCommand("JF"); // Switch off joystick
+            axes[axis].joystickEnabled=false;
         }
         com->close();
         axes[axis].state=QFExtensionLinearStage::Disconnected;
@@ -405,6 +407,7 @@ void QFExtensionLinearStagePI2::setJoystickActive(unsigned int axis, bool enable
 
         if (enabled) {
             serial->selectAxis(axes[axis].ID);
+            if (maxVelocity>axes[axis].maxVelocity) maxVelocity=axes[axis].maxVelocity;
             serial->sendCommand("JN"+inttostr((long)round(maxVelocity/axes[axis].velocityFactor)));
             axes[axis].joystickEnabled=true;
         } else {
@@ -463,11 +466,11 @@ double QFExtensionLinearStagePI2::getPosition(unsigned int axis) {
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[axis].ID);
-            std::string r=serial->queryCommand("TP")+"\n";
-            double v=0;
+            std::string r=serial->queryCommand("TP");
+            double pos=0;
             if (!com->hasErrorOccured()) {
-                if (sscanf(r.c_str(), "P:%lf", &v)) {
-                    return v*axes[axis].lengthFactor;
+                if (sscanf(r.c_str(), "P:%lf", &pos)) {
+                    return pos*axes[axis].lengthFactor;
                 } else {
                     log_error(tr(LOG_PREFIX " invalid result string from TP command [expected P:<number>] from axis %1. String was '%2'.\n").arg(axis).arg(toprintablestr(r).c_str()));
                 }
@@ -491,18 +494,23 @@ void QFExtensionLinearStagePI2::move(unsigned int axis, double newPosition) {
             }
             else {
                 if (!com->hasErrorOccured()) {
-                    double currentPosition=getPosition(axis);
-                    if(currentPosition<newPosition) {
+                    double currentRealPosition=getPosition(axis);
+                    double currentPosition=currentRealPosition/axes[axis].lengthFactor;
+
+                    if (axes[axis].velocity>axes[axis].maxVelocity) axes[axis].velocity=axes[axis].maxVelocity;
+                    serial->sendCommand("SV"+inttostr((long)round(axes[axis].velocity/axes[axis].velocityFactor)));
+                    if(currentPosition<xx) {
                         serial->sendCommand("MA"+inttostr((long)round(xx+(axes[axis].backlashCorr/axes[axis].lengthFactor)))); // Always approach from same side, default 50 microns correction
                         axes[axis].state=QFExtensionLinearStage::Moving;
                         while("\x030"!=serial->queryCommandSingleChar("\x05c")) {QThread::msleep(axes[axis].ms);}
                         serial->sendCommand("MA"+inttostr(xx));
                     }
-                    else if (currentPosition>newPosition) {
-                        serial->sendCommand("SV"+inttostr((long)round(axes[axis].velocity/axes[axis].velocityFactor))+",MA"+inttostr(xx));
+                    else if (currentPosition>xx) {
+                        serial->sendCommand("MA"+inttostr(xx));
                         axes[axis].state=QFExtensionLinearStage::Moving;
                         while("\x030"!=serial->queryCommandSingleChar("\x05c")) {QThread::msleep(axes[axis].ms);}
                     }
+                    else if (currentPosition==xx) log_text(tr(LOG_PREFIX "Stage Already in position."));
                 }
                 //axes[axis].state=QFExtensionLinearStage::Moving;
             }

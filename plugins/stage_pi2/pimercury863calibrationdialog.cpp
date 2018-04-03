@@ -101,8 +101,7 @@ PIMercury863CalibrationDialog::PIMercury863CalibrationDialog(QWidget* parent, QF
     accepted=false;
     setWindowIcon(QIcon(":/stage_pi/pi_joystick.png"));
     setWindowTitle(tr("PI Mercury C863 joystick calibration, stage %1").arg(axis));
-
-    QTimer::singleShot(100, this, SLOT(getJoystickValues()));
+    QTimer::singleShot(ms, this, SLOT(getJoystickValues()));
 }
 
 PIMercury863CalibrationDialog::~PIMercury863CalibrationDialog()
@@ -117,16 +116,21 @@ void PIMercury863CalibrationDialog::resetCal() {
     std::cout<<"\n\ncalX[...]=\n";
     for (int i=0; i<256; i++) {
         serial->selectAxis(stage->axes[axis].ID);
-        serial->sendCommand("SI"+inttostr(i));
         int c=(int)round(1024.0*((double)i-127.0)/128.0);
-        serial->sendCommand("SJ"+inttostr(c));
+        //serial->sendCommand("SI"+inttostr(i));
+        //serial->sendCommand("SJ"+inttostr(c));
+        serial->sendCommand("SI"+inttostr(i)+",SJ"+inttostr(c));
         //std::cout<<"   "<<i<<":  "<<c<<std::endl;
+        ("SI"+inttostr(i)+",SJ"+inttostr(c)).length();
+        QThread::msleep(baud_timeout);
         calX[i]=i;
     }
+
     minX=-10000;
     maxX=-10000;
     zeroX=127;
-
+    QThread::msleep(ms);
+    com->clearBuffer();
 }
 
 void PIMercury863CalibrationDialog::acceptCal() {
@@ -137,11 +141,15 @@ void PIMercury863CalibrationDialog::acceptCal() {
     stage->log_text(tr("  cal[i]=\tvalue\n").arg(axis));
     for (int i=0; i<256; i++) {
         serial->selectAxis(stage->axes[axis].ID);
-        serial->sendCommand("SI"+inttostr(i));
-        serial->sendCommand("SJ"+inttostr(calX[i]));
+        //serial->sendCommand("SI"+inttostr(i));
+        //serial->sendCommand("SJ"+inttostr(calX[i]));
+        serial->sendCommand("SI"+inttostr(i)+",SJ"+inttostr(calX[i]));
+        QThread::msleep(baud_timeout);
         stage->log_text(tr("  %1\t%2\n").arg(i).arg(calX[i]));
         //qDebug()<<stage->queryCommand("SI?").c_str()<<stage->queryCommand("SJ?").c_str();
     }
+    QThread::msleep(ms);
+    com->clearBuffer();
     accept();
 }
 
@@ -182,7 +190,7 @@ void PIMercury863CalibrationDialog::calibrate() {
 
 
     zeroX=0;
-    QTimer::singleShot(10, this, SLOT(getJoystickValues()));
+    QTimer::singleShot(baud_timeout, this, SLOT(getJoystickValues()));
 }
 
 void PIMercury863CalibrationDialog::center() {
@@ -195,8 +203,9 @@ void PIMercury863CalibrationDialog::center() {
         //if (!stage->hasErrorOccured())
             sscanf(r.c_str(), "A5:%d", &zeroX);
     }
-    minX=-1;
-    maxX=-1;
+    QThread::msleep(baud_timeout);
+    minX=zeroX;
+    maxX=zeroX;
 
     //QTimer::singleShot(1, this, SLOT(getJoystickValues()));
 }
@@ -208,26 +217,28 @@ void PIMercury863CalibrationDialog::getJoystickValues() {
         std::string r;
         serial->selectAxis(stage->axes[axis].ID);
         r=serial->queryCommand("TA5")+"\n";
+        QThread::msleep(baud_timeout);
         //if (!serial->hasErrorOccured())
-            sscanf(r.c_str(), "A5:%d", &jx);
+            if(sscanf(r.c_str(), "A5:%d", &jx)) {
 
-        int jjx=jx;
-        if (jx<0) jx=0; if (jx>255) jx=255;
+                int jjx=jx;
+                if (jx<0) jx=0; if (jx>255) jx=255;
 
-        //std::cout<<"("<<jx<<", "<<jy<<", "<<jz<<")\n";
-        labX->setText(tr("%1  (%2)").arg(calX[jx]-zeroX).arg(jjx));
-        prgX->setValue(jx);
-        if (minX<=-10000) minX=maxX=calX[jx];
-        else {
-            if (calX[jx]<minX) minX=calX[jx];
-            if (calX[jx]>maxX) maxX=calX[jx];
-        }
-        labMinX->setText(tr("zero=%2 min=%1").arg(minX-zeroX).arg(zeroX));
-        labMaxX->setText(tr("max=%1").arg(maxX-zeroX));
+                //std::cout<<"("<<jx<<", "<<jy<<", "<<jz<<")\n";
+                labX->setText(tr("%1  (%2)").arg(calX[jx]-zeroX).arg(jjx));
+                prgX->setValue(jx);
+                if (minX<=-10000) minX=maxX=calX[jx];
+                else {
+                    if (calX[jx]<minX) minX=calX[jx];
+                    if (calX[jx]>maxX) maxX=calX[jx];
+                }
+                labMinX->setText(tr("zero=%2 min=%1").arg(minX-zeroX).arg(zeroX));
+                labMaxX->setText(tr("max=%1").arg(maxX-zeroX));
+            }
+            else labX->setText(tr("-illegit response-"));
     } else {
         labX->setText(tr("Not Connected"));
     }
 
-    if (!accepted) QTimer::singleShot(1, this, SLOT(getJoystickValues()));
+    if (!accepted) QTimer::singleShot(baud_timeout, this, SLOT(getJoystickValues()));
 }
-

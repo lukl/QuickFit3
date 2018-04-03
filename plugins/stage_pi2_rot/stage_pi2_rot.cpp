@@ -102,7 +102,7 @@ void QFExtensionLinearStagePI2Rot::initExtension() {
         }
     }
 
-    actCalibrateJoysticks=new QFActionWithNoMenuRole(QIcon(":/stage_pi/pi_joystick.png"), tr("calibrate PI stage joysticks, v2 Rot"), this);
+    actCalibrateJoysticks=new QFActionWithNoMenuRole(QIcon(":/stage_pi/pi_joystick.png"), tr("Calibrate PI Mercury C-863.11 stage joysticks (Rotation)"), this);
     connect(actCalibrateJoysticks, SIGNAL(triggered()), this, SLOT(calibrateJoysticks()));
     if (services) {
         QMenu* m=services->getMenu("extensions");
