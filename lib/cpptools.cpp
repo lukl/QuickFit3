@@ -1874,7 +1874,7 @@ double getHighResolutionTime() {
 
 std::string hextobin(std::string data){
     std::string binary = "";
-    for (int i = 0; i < data.length (); i++)
+    for (uint i = 0; i < data.length (); i++)
     {
         switch (data [i])
         {

@@ -688,7 +688,7 @@ p, li { white-space: pre-wrap; }
      <item row="1" column="1">
       <widget class="QFEnhancedTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="tab">
         <attribute name="title">
@@ -729,24 +729,6 @@ p, li { white-space: pre-wrap; }
           <widget class="QFMeasurementDeviceConfigWidget" name="widMD2" native="true"/>
          </item>
         </layout>
-       </widget>
-       <widget class="QWidget" name="tab_4">
-        <attribute name="title">
-         <string>Track CS</string>
-        </attribute>
-        <widget class="QFESPIMB040TrackCS" name="groupBox1" native="true">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>-1</x>
-           <y>-1</y>
-           <width>371</width>
-           <height>481</height>
-          </rect>
-         </property>
-        </widget>
        </widget>
       </widget>
      </item>
@@ -1781,12 +1763,6 @@ p, li { white-space: pre-wrap; }
    <header>qfmeasurementdeviceconfigwidget.h</header>
    <container>1</container>
   </customwidget>
-  <customwidget>
-   <class>QFESPIMB040TrackCS</class>
-   <extends>QWidget</extends>
-   <header>qfespimb040trackcs.h</header>
-   <container>1</container>
-  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>cmbLightpathConfig</tabstop>
@@ -2117,22 +2093,6 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>1064</x>
      <y>336</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>btnLockFiltersEtc</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>stageSetup</receiver>
-   <slot>setReadOnly(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1113</x>
-     <y>38</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>842</x>
-     <y>749</y>
     </hint>
    </hints>
   </connection>
@@ -2565,6 +2525,22 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>110</x>
      <y>313</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLockFiltersEtc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>stageSetup</receiver>
+   <slot>setReadOnly(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1113</x>
+     <y>38</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>842</x>
+     <y>749</y>
     </hint>
    </hints>
   </connection>
