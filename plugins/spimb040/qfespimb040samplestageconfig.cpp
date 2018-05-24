@@ -585,12 +585,12 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     spinInitialZLimit->setDecimals(3);
     spinInitialZLimit->setButtonSymbols(QAbstractSpinBox::NoButtons);
     spinInitialZLimit->setReadOnly(true);
-    spinInitialZLimit->setMinimum(-9999);
+    spinInitialZLimit->setMinimum(-99999);
     gl->addWidget(spinInitialZLimit, 1,1);
     spinCurrentZLimit=new QDoubleSpinBox(this);
     spinCurrentZLimit->setDecimals(3);
     spinCurrentZLimit->setButtonSymbols(QAbstractSpinBox::NoButtons);
-    spinCurrentZLimit->setMinimum(-9999);
+    spinCurrentZLimit->setMinimum(-99999);
     spinCurrentZLimit->setReadOnly(true);
     gl->addWidget(spinCurrentZLimit, 1,2);
     btnSetZStageLimit=new QPushButton("Set", this);

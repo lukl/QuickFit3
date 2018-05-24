@@ -640,7 +640,14 @@ void QFExtensionLinearStagePI663::setRefMoveActive(unsigned int axis, bool enabl
     axes[axis].doRefMove=enabled;
 }
 
+void QFExtensionLinearStagePI663::setSoftLimit(unsigned int axis, double limit) {
+    log_text("getSoftLimit not implemented in stage_pi663");
+}
 
+double QFExtensionLinearStagePI663::getSoftLimit(unsigned int axis) {
+    log_text("getSoftLimit not implemented in stage_pi663");
+    return(0);
+}
 
 void QFExtensionLinearStagePI663::log_text(QString message) {
 	if (logService) logService->log_text(message);
