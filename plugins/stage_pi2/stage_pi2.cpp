@@ -617,7 +617,35 @@ void QFExtensionLinearStagePI2::setRefMoveActive(unsigned int axis, bool enabled
     axes[axis].doRefMove=enabled;
 }
 
+void QFExtensionLinearStagePI2::setSoftLimit(unsigned int axis, double limit) {
+    if (((int64_t)axis<axes.size())) {
+        QMutexLocker locker(axes[axis].serial->getMutex());
+        QFSerialConnection* com=axes[axis].serial->getCOM();
+        QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
+        serial->selectAxis(axes[axis].ID);
+        serial->sendCommand("JL"+inttostr((long)round(limit/axes[axis].lengthFactor)));
+    }
+    return;
+}
 
+double QFExtensionLinearStagePI2::getSoftLimit(unsigned int axis) {
+    double limit=77;
+    if (((int64_t)axis<axes.size())) {
+        QMutexLocker locker(axes[axis].serial->getMutex());
+        QFSerialConnection* com=axes[axis].serial->getCOM();
+        QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
+        serial->selectAxis(axes[axis].ID);
+        std::string r=serial->queryCommand("JL?");
+        if (!com->hasErrorOccured()) {
+            if (sscanf(r.c_str(), "JL:%lf", &limit)) {
+                return (limit*axes[axis].lengthFactor);
+            } else {
+                log_error(tr(LOG_PREFIX " invalid result string from JL? command [expected JL:<number>] from axis %1. String was '%2'.\n").arg(axis).arg(toprintablestr(r).c_str()));
+            }
+        }
+    }
+    return limit;
+}
 
 void QFExtensionLinearStagePI2::log_text(QString message) {
 	if (logService) logService->log_text(message);

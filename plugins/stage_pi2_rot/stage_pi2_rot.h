@@ -120,6 +120,12 @@ class QFExtensionLinearStagePI2Rot : public QObject, public QFExtensionBase, pub
         /** \copydoc QFExtensionLinearStage::setRefMoveActive() */
         virtual void setRefMoveActive(unsigned int axis, bool enabled);
 
+        /** \copydoc QFExtensionLinearStage::setSoftLimit() */
+        virtual void setSoftLimit(unsigned int axis, double limit);
+
+        /** \copydoc QFExtensionLinearStage::getSoftLimit() */
+        virtual double getSoftLimit(unsigned int axis);
+
         /** \copydoc QFExtensionLinearStage::getAxisState() */
         virtual AxisState getAxisState(unsigned int axis);
 

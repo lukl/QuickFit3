@@ -376,6 +376,20 @@ class QFESPIMB040SampleStageConfig : public QGroupBox {
     protected slots:
         void TrackCSStepLeft();
         void TrackCSStepRight();
+
+        // Z Movement Limitation for stage
+    protected:
+
+        QPushButton* btnSetZStageLimit;
+        QPushButton* btnReleaseZStageLimit;
+        QDoubleSpinBox* spinInitialZLimit;
+        QDoubleSpinBox* spinCurrentZLimit;
+
+    protected slots:
+
+        void setZStageLimitToInitial();
+        void setZStageLimitToCurrent();
+
 };
 
 #endif // QFESPIMB040SAMPLESTAGECONFIG_H

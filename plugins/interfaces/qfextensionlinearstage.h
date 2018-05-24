@@ -125,9 +125,17 @@ class QFExtensionLinearStage {
          /** \brief return the current state of a given axis */
          virtual AxisState getAxisState(unsigned int axis)=0;
 
-        /** \brief sets reference movement at startup on/off */
+        /** \brief Sets reference movement at startup on/off */
 
         virtual void setRefMoveActive(unsigned int axis, bool enabled)=0;
+
+        /** \brief Sets the soft movement limitation of the stage */
+
+        virtual void setSoftLimit(unsigned int axis, double limit)=0;
+
+        /** \brief Gets the soft movement limitation of the stage */
+
+        virtual double getSoftLimit(unsigned int axis)=0;
 
          /** \brief emergency stop an axis */
          virtual void stop(unsigned int axis)=0;

@@ -572,6 +572,38 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     stagelayout->addRow(l, gl);
     //stagelayout->addRow(tr("<b>status:</b>"), gl);
 
+    // Z Limit for Det Obj Protection
+    l=new QLabel (tr("<b>Z-Stage Soft Limits:</b>"), this);
+    l->setStyleSheet("background-color: 	aliceblue;");
+    gl=new QGridLayout();
+    gl->addWidget(new QLabel(" ", this), 1, 0);
+    gl->addWidget(new QLabel("<b>Initial:</b>", this), 0, 1);
+    gl->addWidget(new QLabel("<b>Current:</b>", this), 0, 2);
+    gl->addWidget(new QLabel("<b>To z position </b>", this), 0, 3);
+    gl->addWidget(new QLabel("<b> To initial</b>", this), 0, 4);
+    spinInitialZLimit=new QDoubleSpinBox(this);
+    spinInitialZLimit->setDecimals(3);
+    spinInitialZLimit->setButtonSymbols(QAbstractSpinBox::NoButtons);
+    spinInitialZLimit->setReadOnly(true);
+    spinInitialZLimit->setMinimum(-9999);
+    gl->addWidget(spinInitialZLimit, 1,1);
+    spinCurrentZLimit=new QDoubleSpinBox(this);
+    spinCurrentZLimit->setDecimals(3);
+    spinCurrentZLimit->setButtonSymbols(QAbstractSpinBox::NoButtons);
+    spinCurrentZLimit->setMinimum(-9999);
+    spinCurrentZLimit->setReadOnly(true);
+    gl->addWidget(spinCurrentZLimit, 1,2);
+    btnSetZStageLimit=new QPushButton("Set", this);
+    btnReleaseZStageLimit=new QPushButton("Release", this);
+    connect(btnSetZStageLimit, SIGNAL(clicked()), this, SLOT(setZStageLimitToCurrent()));
+    connect(btnReleaseZStageLimit, SIGNAL(clicked()), this, SLOT(setZStageLimitToInitial()));
+    gl->addWidget(btnSetZStageLimit, 1, 3);
+    gl->addWidget(btnReleaseZStageLimit, 1, 4);
+    gl->setColumnStretch(0,10);
+    gl->setContentsMargins(0,0,0,0);
+    gl->setHorizontalSpacing(1);
+    gl->setVerticalSpacing(1);
+    stagelayout->addRow(l, gl);
 
     // Track Coverslip
     l=new QLabel (tr("<b>Track CS:</b>"), this);
@@ -870,6 +902,9 @@ void QFESPIMB040SampleStageConfig::disConnectZ() {
         if (conn) {
             stage->setLogging(m_log);
             stage->connectDevice(axis);
+            double limit=88;
+            limit=stage->getSoftLimit(axis);
+            spinInitialZLimit->setValue(limit);
             if (stage->isConnected(axis) && (stage->getAxisState(axis)==QFExtensionLinearStage::Ready)) {
                 m_log->log_text("connected to z-axis stage driver ...\n");
             } else {
@@ -878,6 +913,7 @@ void QFESPIMB040SampleStageConfig::disConnectZ() {
                 m_log->log_error("error connecting to z-axis stage driver ...\n");
             }
         } else {
+            setZStageLimitToInitial();
             stage->disconnectDevice(axis);
             m_log->log_text("disconnected from z-axis stage driver ...\n");
         }
@@ -1665,6 +1701,39 @@ void QFESPIMB040SampleStageConfig::updateRefMove() {
     updateStates();
 
 }
+
+
+void QFESPIMB040SampleStageConfig::setZStageLimitToInitial() {
+
+    QFExtensionLinearStage* stage;
+    int axis;
+    double limit = spinInitialZLimit->value();
+    double checked_limit=99;
+    stage=getZStage();
+    axis=getZStageAxis();
+    if (stage) {
+        stage->setSoftLimit(axis, limit);
+        checked_limit=stage->getSoftLimit(axis);
+    }
+    spinCurrentZLimit->setValue(checked_limit);
+}
+
+void QFESPIMB040SampleStageConfig::setZStageLimitToCurrent() {
+
+    QFExtensionLinearStage* stage;
+    int axis;
+    double limit = spinInitialZLimit->value();
+    double checked_limit=99;
+    stage=getZStage();
+    axis=getZStageAxis();
+    if (stage) {
+        limit=stage->getPosition(axis);
+        stage->setSoftLimit(axis, limit);
+        checked_limit=stage->getSoftLimit(axis);
+    }
+    spinCurrentZLimit->setValue(checked_limit);
+}
+
 
 void QFESPIMB040SampleStageConfig::threadStarted() {
     //labThread->setText(tr("thread started ..."));
