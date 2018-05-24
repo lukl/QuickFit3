@@ -585,12 +585,12 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     spinInitialZLimit->setDecimals(3);
     spinInitialZLimit->setButtonSymbols(QAbstractSpinBox::NoButtons);
     spinInitialZLimit->setReadOnly(true);
-    spinInitialZLimit->setMinimum(-9999);
+    spinInitialZLimit->setMinimum(-99999);
     gl->addWidget(spinInitialZLimit, 1,1);
     spinCurrentZLimit=new QDoubleSpinBox(this);
     spinCurrentZLimit->setDecimals(3);
     spinCurrentZLimit->setButtonSymbols(QAbstractSpinBox::NoButtons);
-    spinCurrentZLimit->setMinimum(-9999);
+    spinCurrentZLimit->setMinimum(-99999);
     spinCurrentZLimit->setReadOnly(true);
     gl->addWidget(spinCurrentZLimit, 1,2);
     btnSetZStageLimit=new QPushButton("Set", this);
@@ -687,7 +687,7 @@ void QFESPIMB040SampleStageConfig::createActions() {
 void QFESPIMB040SampleStageConfig::updateStates() {
     QFExtensionLinearStage* stage;
     int axis;
-    bool conn;
+    bool conn=false;
     bool xyzconn=false;
 
     bool anyconn=false;
@@ -905,6 +905,7 @@ void QFESPIMB040SampleStageConfig::disConnectZ() {
             double limit=88;
             limit=stage->getSoftLimit(axis);
             spinInitialZLimit->setValue(limit);
+            spinCurrentZLimit->setValue(limit);
             if (stage->isConnected(axis) && (stage->getAxisState(axis)==QFExtensionLinearStage::Ready)) {
                 m_log->log_text("connected to z-axis stage driver ...\n");
             } else {
@@ -913,7 +914,7 @@ void QFESPIMB040SampleStageConfig::disConnectZ() {
                 m_log->log_error("error connecting to z-axis stage driver ...\n");
             }
         } else {
-            setZStageLimitToInitial();
+            if (round(stage->getSoftLimit(axis))!=round(spinInitialZLimit->value())) setZStageLimitToInitial();
             stage->disconnectDevice(axis);
             m_log->log_text("disconnected from z-axis stage driver ...\n");
         }
@@ -1424,6 +1425,8 @@ void QFESPIMB040SampleStageConfig::connectStages() {
 
 void QFESPIMB040SampleStageConfig::disconnectStages() {
     bool updt=updatesEnabled(); setUpdatesEnabled(false);
+
+    if (cmbStageZ->currentExtensionLinearStage() && actConnectZ->isChecked()) setZStageLimitToInitial();
     if (cmbStageX->currentExtensionLinearStage() && actConnectX->isChecked()) {
         actConnectX->setChecked(true);
         actConnectX->trigger();

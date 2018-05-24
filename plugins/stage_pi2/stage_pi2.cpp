@@ -320,8 +320,8 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int axis) {
                     else {
                         log_text(tr(LOG_PREFIX "Reference Position not defined (Controller restarted?). Referencing, returning to inital position..."));
                         serial->sendCommand("DH");
-                        if (axis==2) serial->sendCommand("FE0");// Find Origin, z-dir: positive, negative else
-                        else serial->sendCommand("FE1");
+                        if (axis==1) serial->sendCommand("FE1");// Find Origin, z-dir: positive, negative else
+                        else serial->sendCommand("FE0");
 //                        int findingReference=1;
 //                        char block4[2];
 //                        while(findingReference) {
@@ -386,7 +386,7 @@ void QFExtensionLinearStagePI2::disconnectDevice(unsigned int axis) {
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
         if (com->isConnectionOpen()) {
             serial->selectAxis(axes[axis].ID);
-            serial->sendCommand("MF"); // Switch off motor
+            //serial->sendCommand("MF"); // Switch off motor
             serial->sendCommand("JF"); // Switch off joystick
             axes[axis].joystickEnabled=false;
         }

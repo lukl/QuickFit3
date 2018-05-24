@@ -659,6 +659,15 @@ void QFExtensionLinearStagePI2Rot::setRefMoveActive(unsigned int axis, bool enab
     axes[axis].doRefMove=enabled;
 }
 
+void QFExtensionLinearStagePI2Rot::setSoftLimit(unsigned int axis, double limit) {
+    log_text("getSoftLimit not implemented in stage_pi2_rot");
+}
+
+double QFExtensionLinearStagePI2Rot::getSoftLimit(unsigned int axis) {
+    log_text("getSoftLimit not implemented in stage_pi2_rot");
+    return(0);
+}
+
 
 void QFExtensionLinearStagePI2Rot::log_text(QString message) {
 	if (logService) logService->log_text(message);
