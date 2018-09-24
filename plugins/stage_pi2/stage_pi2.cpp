@@ -91,7 +91,7 @@ void QFExtensionLinearStagePI2::initExtension() {
             d.maxCoord=inifile.value(axisname+"/maxcoord", defaultAD.maxCoord).toDouble();
             d.minCoord=inifile.value(axisname+"/mincoord", defaultAD.minCoord).toDouble();
             d.backlashCorr=inifile.value(axisname+"/backlashcorr", defaultAD.backlashCorr).toDouble();
-            d.backlashCorr=inifile.value(axisname+"/ms", defaultAD.ms).toDouble();
+            d.ms=inifile.value(axisname+"/ms", defaultAD.ms).toDouble();
             d.nF_Edge=inifile.value(axisname+"/notchFilterEdge", defaultAD.nF_Edge).toDouble();
 
 
@@ -336,7 +336,7 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int axis) {
                             serial->sendCommand("DH0");
 //                            if (!com->hasErrorOccured()) {
 //                                    if(dist>0) {
-//                                        serial->sendCommand("MA"+inttostr((long)round(dist+(axes[axis].backlashCorr/axes[axis].lengthFactor)))); // Always approach from same side, default 50 microns correction
+//                                        serial->sendCommand("MA"+inttostr((long)round(dist+(axes[axis].backlashCorr/axes[axis].lengthFactor)))); // Always approach from same side
 //                                        //axes[axis].state=QFExtensionLinearStage::Moving;
 //                                        while("\x030"!=serial->queryCommandSingleChar("\x05c")) {QThread::msleep(axes[axis].ms);}
 //                                        serial->sendCommand("MA"+inttostr(dist));
@@ -500,10 +500,13 @@ void QFExtensionLinearStagePI2::move(unsigned int axis, double newPosition) {
                     if (axes[axis].velocity>axes[axis].maxVelocity) axes[axis].velocity=axes[axis].maxVelocity;
                     serial->sendCommand("SV"+inttostr((long)round(axes[axis].velocity/axes[axis].velocityFactor)));
                     if(currentPosition<xx) {
-                        serial->sendCommand("MA"+inttostr((long)round(xx+(axes[axis].backlashCorr/axes[axis].lengthFactor)))); // Always approach from same side, default 50 microns correction
-                        axes[axis].state=QFExtensionLinearStage::Moving;
-                        while("\x030"!=serial->queryCommandSingleChar("\x05c")) {QThread::msleep(axes[axis].ms);}
+                        if(axes[axis].backlashCorr!=0) {
+                            serial->sendCommand("MA"+inttostr((long)round(xx+(axes[axis].backlashCorr/axes[axis].lengthFactor)))); // Always approach from same side
+                            axes[axis].state=QFExtensionLinearStage::Moving;
+                            while("\x030"!=serial->queryCommandSingleChar("\x05c")) {QThread::msleep(axes[axis].ms);}
+                        }
                         serial->sendCommand("MA"+inttostr(xx));
+                        axes[axis].state=QFExtensionLinearStage::Moving;
                     }
                     else if (currentPosition>xx) {
                         serial->sendCommand("MA"+inttostr(xx));
