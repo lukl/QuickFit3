@@ -983,9 +983,9 @@ void QFRDRImageStackPlugin::wizLSAnalysisImgPreviewOnValidate(QWizardPage *page,
 
         if (wizLSAnalysisedtStepSize) {
             if (info.properties.contains("DELTAZ")) {
-                wizLSAnalysisedtStepSize->setValue(info.properties["DELTAZ"].toDouble());
+                wizLSAnalysisedtStepSize->setValue(qFabs(info.properties["DELTAZ"].toDouble()));
             } else if (info.properties.contains("STEPSIZE")) {
-                wizLSAnalysisedtStepSize->setValue(info.properties["STEPSIZE"].toDouble());
+                wizLSAnalysisedtStepSize->setValue(qFabs(info.properties["STEPSIZE"].toDouble()));
             }
         }
         if (wizLSAnalysiscmbFitDir && image && width>0 && height>0)  {
