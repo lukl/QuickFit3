@@ -1281,6 +1281,9 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                 log->log_text(tr("Switch Alex on"));
                 opticsSetup->setAlex(true, false);
                 //opticsSetup->getLaser()
+                QTime t;
+                t.start();
+                while(t.elapsed()<10) QApplication::processEvents();
             }
         }
 
