@@ -1508,6 +1508,15 @@ bool QFRDRImagingFCSData::isFCCS() const
     return fccs;
 }
 
+bool QFRDRImagingFCSData::isAlex() const
+{
+    if (tau && (tau[0]!=getFrameTime()) )
+        return true;
+    else
+        return false;
+}
+
+
 bool QFRDRImagingFCSData::isDCCF() const
 {
     bool fccs=getRole().toLower().startsWith("dccf");

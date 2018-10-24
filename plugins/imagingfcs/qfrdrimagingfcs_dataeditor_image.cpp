@@ -4190,6 +4190,15 @@ void QFRDRImagingFCSImageEditor::replotData() {
 
 
         size_t c_tau=ds->addColumn(m->getCorrelationT(), m->getCorrelationN(), "tau");
+        double* tau_acfs=duplicateArray(m->getCorrelationT(), m->getCorrelationN());
+        if (m->isAlex()) {
+            for(int i=1; i < m->getCorrelationN() ; i++) {
+                tau_acfs[i]-=(double)tau_acfs[0]/3;
+            }
+            tau_acfs[0]-=(double)tau_acfs[0]/3;
+        }
+        size_t c_tau_acfs=ds->addColumn(tau_acfs, m->getCorrelationN(), "tau_acfs");
+
 
         //////////////////////////////////////////////////////////////////////////////////
         // Plot average + error markers
@@ -4300,12 +4309,12 @@ void QFRDRImagingFCSImageEditor::replotData() {
 
 
             if (selected.size()==1) {
-                if (acf0) plotRun(acf0, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF0, &dataCorrACF0, &dataCorrErrACF0, QColor("green"), tr("ACF0"));
-                if (acf1) plotRun(acf1, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF1, &dataCorrACF1, &dataCorrErrACF1, QColor("red"), tr("ACF1"));
+                if (acf0) plotRun(acf0, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau_acfs, &dataTauACF0, &dataCorrACF0, &dataCorrErrACF0, QColor("green"), tr("ACF0"));
+                if (acf1) plotRun(acf1, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau_acfs, &dataTauACF1, &dataCorrACF1, &dataCorrErrACF1, QColor("red"), tr("ACF1"));
                 plotRun(fccs, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau, &dataTauCCF, &dataCorrCCF, &dataCorrErrCCF, QColor("blue"), tr("CCF"));
             } else {
-                if (acf0) plotRunsAvg(acf0, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF0, &dataCorrACF0, &dataCorrErrACF0, QColor("green"), tr("ACF0"));
-                if (acf1) plotRunsAvg(acf1, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF1, &dataCorrACF1, &dataCorrErrACF1, QColor("red"), tr("ACF1"));
+                if (acf0) plotRunsAvg(acf0, selected, true, plotter, plotterResid, tabFitvals, c_tau_acfs, &dataTauACF0, &dataCorrACF0, &dataCorrErrACF0, QColor("green"), tr("ACF0"));
+                if (acf1) plotRunsAvg(acf1, selected, true, plotter, plotterResid, tabFitvals, c_tau_acfs, &dataTauACF1, &dataCorrACF1, &dataCorrErrACF1, QColor("red"), tr("ACF1"));
                 plotRunsAvg(fccs, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauCCF, &dataCorrCCF, &dataCorrErrCCF, QColor("blue"), tr("CCF"));
 
             }

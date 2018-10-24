@@ -1473,6 +1473,11 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_series(float* image_series, 
     for (uint32_t i=0; i<ccf_N; i++) {
         ccf_tau[i]=(double)ccf_t[i]*job.frameTime;
     }
+    if(job.isAlex && ( (shiftX!=0) || (shiftY!=0) ))
+        for (uint32_t i=0; i<ccf_N; i++) {
+            ccf_tau[i]+=(double)job.frameTime/2;
+        }
+
     qfFree(ccf_t);
 
 

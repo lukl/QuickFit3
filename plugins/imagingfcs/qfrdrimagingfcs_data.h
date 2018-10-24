@@ -146,6 +146,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         void setDualViewMode(DualViewMode mode);
         bool isFCCS() const;
         bool isDCCF() const;
+        bool isAlex() const;
         int getDCCFDeltaX() const;
         int getDCCFDeltaY() const;
         bool isACF() const;

@@ -175,6 +175,7 @@ struct IMFCSJob {
     double cameraPixelHeight;
 
     int dualViewMode;
+    bool isAlex; // is Stack with alternated lasers
     bool addFCCSSeparately;
     bool addNandB;
 

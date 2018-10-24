@@ -511,6 +511,7 @@ void QFRDRImagingFCSCorrelationDialog::on_cmbDualView_currentIndexChanged(int in
         ui->labDualView->setVisible(false);
         //ui->chkCrop->setEnabled(true);
         ui->chk2cFCCS->setEnabled(false);
+        ui->chkAlex->setEnabled(false);
         ui->chkNondefaultShift->setEnabled(false);
         ui->widNondefaultShift->setEnabled(false);
         ui->chkSeparateColorChannels->setEnabled(false);
@@ -524,6 +525,7 @@ void QFRDRImagingFCSCorrelationDialog::on_cmbDualView_currentIndexChanged(int in
         //ui->chkCrop->setChecked(false);
         //ui->chkCrop->setEnabled(false);
         ui->chk2cFCCS->setEnabled(true);
+        ui->chkAlex->setEnabled(true);
         ui->chkNondefaultShift->setEnabled(true);
         ui->widNondefaultShift->setEnabled(ui->chkNondefaultShift->isChecked());
 
@@ -892,12 +894,14 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob(int biningForFCCS) {
                 job.DCCFDeltaY << 0;
                 job.DCCFrole<<QString("FCCS");
                 job.distanceCCF=true;
+                job.isAlex=ui->chkAlex->isChecked();
                 //qDebug()<<"added DV_H FCCS";
             } else if (ui->cmbDualView->currentIndex()==2) {
                 job.DCCFDeltaX << 0;
                 job.DCCFDeltaY << image_height/2/biningForFCCS;
                 job.DCCFrole<<QString("FCCS");
                 job.distanceCCF=true;
+                job.isAlex=ui->chkAlex->isChecked();
                 //qDebug()<<"added DV_V FCCS";
             }
         }
