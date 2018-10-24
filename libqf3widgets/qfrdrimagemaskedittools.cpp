@@ -104,8 +104,8 @@ QFRDRImageMaskEditTools::QFRDRImageMaskEditTools(QWidget *parentWidget, const QS
 
     cmbMode=new QComboBox(parentWidget);
     cmbMode->setVisible(false);
-    cmbMode->addItem(tr("edit mask"));
     cmbMode->addItem(tr("edit selection"));
+    cmbMode->addItem(tr("edit mask"));
     connect(cmbMode, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbModeChanged(int)));
     actMode=new QWidgetAction(parentWidget);
     actMode->setDefaultWidget(cmbMode);
