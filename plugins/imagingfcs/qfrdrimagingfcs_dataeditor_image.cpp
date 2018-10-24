@@ -4193,9 +4193,9 @@ void QFRDRImagingFCSImageEditor::replotData() {
         double* tau_acfs=duplicateArray(m->getCorrelationT(), m->getCorrelationN());
         if (m->isAlex()) {
             for(int i=1; i < m->getCorrelationN() ; i++) {
-                tau_acfs[i]-=(double)tau_acfs[0]/3;
+                tau_acfs[i]-= (double)0.5 * m->getFrameTime();
             }
-            tau_acfs[0]-=(double)tau_acfs[0]/3;
+            tau_acfs[0]-=(double)0.5 * m->getFrameTime();
         }
         size_t c_tau_acfs=ds->addColumn(tau_acfs, m->getCorrelationN(), "tau_acfs");
 
