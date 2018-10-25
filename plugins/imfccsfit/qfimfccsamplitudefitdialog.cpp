@@ -119,7 +119,7 @@ QFRawDataRecord *QFImFCCSAmplitudeFitDialog::getCCF() const
     return ui->cmbCCF->currentRDR();
 }
 
-bool QFImFCCSAmplitudeFitDialog::calculateRelCCF(QFRawDataRecord *acf0, QFRawDataRecord *acf1, QFRawDataRecord *ccf, double **rel_out0, double **rel_error_out0, double **rel_out1, double **rel_error_out1, int &w, int &h, bool showErrorMessage) const
+bool QFImFCCSAmplitudeFitDialog::calculateRelCCF(QFRawDataRecord *acf0, QFRawDataRecord *acf1, QFRawDataRecord *ccf, double **rel_out0, double **rel_error_out0, double **rel_out1, double **rel_error_out1, double **rel_out_min, double **rel_error_out_min, int &w, int &h, bool showErrorMessage) const
 {
 
     int avgCount=ui->spinAvg->value();
@@ -209,6 +209,8 @@ bool QFImFCCSAmplitudeFitDialog::calculateRelCCF(QFRawDataRecord *acf0, QFRawDat
                 double* rel0_error=(double*)qfMalloc(w*h*sizeof(double));
                 double* rel1=(double*)qfMalloc(w*h*sizeof(double));
                 double* rel1_error=(double*)qfMalloc(w*h*sizeof(double));
+                double* relmin=(double*)qfMalloc(w*h*sizeof(double));
+                double* relmin_error=(double*)qfMalloc(w*h*sizeof(double));
                 uint64_t idxA0=0;
                 uint64_t idxA1=0;
                 uint64_t idxC=0;
@@ -281,6 +283,18 @@ bool QFImFCCSAmplitudeFitDialog::calculateRelCCF(QFRawDataRecord *acf0, QFRawDat
                     if (acf1S && ccfS) rel1_error[i]=sqrt(qfSqr(eA1*D/qfSqr(A1)) + qfSqr(eD/A1));
                     if (!QFFloatIsOK(rel1_error[i])) rel1_error[i]=0;
 
+                    if (A1 < A0) {
+                        relmin[i]=D/A1;
+                        relmin_error[i]=0;
+                        if (acf1S && ccfS) relmin_error[i]=sqrt(qfSqr(eA1*D/qfSqr(A1)) + qfSqr(eD/A1));
+                    }
+                    else {
+                        relmin[i]=D/A0;
+                        relmin_error[i]=0;
+                        if (acf0S && ccfS) relmin_error[i]=sqrt(qfSqr(eA0*D/qfSqr(A0)) + qfSqr(eD/A0));
+                    }
+                    if (!QFFloatIsOK(relmin_error[i])) relmin_error[i]=0;
+
                     if (source==0) {
                         idxA0=idxA0+acf0N;
                         idxA1=idxA1+acf1N;
@@ -300,6 +314,11 @@ bool QFImFCCSAmplitudeFitDialog::calculateRelCCF(QFRawDataRecord *acf0, QFRawDat
                 else if (rel1) qfFree(rel1);
                 if (rel_error_out1) *rel_error_out1=rel1_error;
                 else if (rel1_error) qfFree(rel1_error);
+
+                if (rel_out_min) *rel_out_min=relmin;
+                else if (relmin) qfFree(relmin);
+                if (rel_error_out_min) *rel_error_out_min=relmin_error;
+                else if (relmin_error) qfFree(relmin_error);
 
                 QApplication::restoreOverrideCursor();
                 return true;
@@ -418,9 +437,11 @@ void QFImFCCSAmplitudeFitDialog::replotImages()
     double* rel0_error=NULL;
     double* rel1=NULL;
     double* rel1_error=NULL;
+    double* rel_min=NULL;
+    double* rel_min_error=NULL;
     int w=0, h=0;
     ui->labError->setText("");
-    if (calculateRelCCF(ui->cmbACF0->currentRDR(), ui->cmbACF1->currentRDR(), ui->cmbCCF->currentRDR(), &rel0, &rel0_error, &rel1, &rel1_error, w, h, false)) {
+    if (calculateRelCCF(ui->cmbACF0->currentRDR(), ui->cmbACF1->currentRDR(), ui->cmbCCF->currentRDR(), &rel0, &rel0_error, &rel1, &rel1_error, &rel_min, &rel_min_error, w, h, false)) {
 
         /*for (int i=0; i<2; i++) {
             QFPlotter* pltData=ui->pltData0;
@@ -483,11 +504,13 @@ void QFImFCCSAmplitudeFitDialog::addResult()
     double* rel0_error;
     double* rel1;
     double* rel1_error;
+    double* rel_min;
+    double* rel_min_error;
     int w=0, h=0;
     QFRawDataRecord* acf0=getACF0();
     QFRawDataRecord* acf1=getACF1();
     QFRawDataRecord* ccf=getCCF();
-    if (acf0&&acf1&&ccf&&calculateRelCCF(acf0, acf1, ccf, &rel0, &rel0_error, &rel1, &rel1_error, w, h, true)) {
+    if (acf0&&acf1&&ccf&&calculateRelCCF(acf0, acf1, ccf, &rel0, &rel0_error, &rel1, &rel1_error, &rel_min, &rel_min_error, w, h, true)) {
 
         for (int i=0; i<2; i++) {
             QFRawDataRecord* acf=acf0;
