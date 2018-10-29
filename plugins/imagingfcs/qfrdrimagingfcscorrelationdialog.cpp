@@ -25,8 +25,10 @@
 #include<QtGlobal>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets>
+#include <QRegularExpression>
 #else
 #include <QtGui>
+#include <QRegExp>
 #endif
 
 
@@ -164,6 +166,7 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     setEditControlsEnabled(false);
     ui->btnLoadNoCount->setEnabled(false);
     ui->btnSelectImageFileNoCount->setEnabled(false);
+    ui->btnNextCell->setEnabled(false);
     on_cmbDualView_currentIndexChanged(ui->cmbDualView->currentIndex());
     QTimer::singleShot(UPDATE_TIMEOUT, this, SLOT(updateProgress()));
 
@@ -643,6 +646,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnLoad_clicked() {
         setEditControlsEnabled(true);
         ui->btnLoadNoCount->setEnabled(true);
         ui->btnSelectImageFileNoCount->setEnabled(true);
+        ui->btnNextCell->setEnabled(true);
         if (channels>1) {
 
         }
@@ -651,6 +655,35 @@ void QFRDRImagingFCSCorrelationDialog::on_btnLoad_clicked() {
         QMessageBox::critical(this, tr("imFCS Correlator"), tr("The file '%1' does not exist.\nPlease select an existing file!").arg(filename));
     }
     writeSettings();
+}
+
+void QFRDRImagingFCSCorrelationDialog::on_btnNextCell_clicked() {
+    QString fileName=ui->edtImageFile->text();
+    QString OldfileName=fileName;
+
+    // Some Pattern magic finding "_c[0-9][0-9]__"
+
+    #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        QRegularExpression re("_c([0-9][0-9])__");
+        int cellno = re.match(fileName).captured(1).toInt();
+        //QString OldCellName = re.match(filename).captured(0);
+    #else
+        QRegExp re("_c([0-9][0-9])__");
+        int cellno = re.match(fileName).cap(1).toInt();
+    #endif
+
+    cellno++;
+    QString NextCellNoStr = QString("_c%1__").arg(cellno, 2, 10, QChar('0'));
+    fileName.replace(re, NextCellNoStr);
+
+    if (!fileName.isEmpty() && (OldfileName!=fileName)) {
+        lastImagefileDir=QFileInfo(fileName).dir().absolutePath();
+        ui->cmbFileformat->setCurrentIndex(imageFilters.indexOf(lastImagefileFilter));
+        ui->edtImageFile->setText(fileName);
+        ui->edtImageFile->setFocus(Qt::MouseFocusReason);
+        on_btnLoad_clicked();
+        writeSettings();
+    }
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_btnLoadNoCount_clicked()

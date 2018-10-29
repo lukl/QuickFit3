@@ -49,6 +49,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QToolButton" name="btnNextCell">
+          <property name="text">
+           <string>next cell</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QToolButton" name="btnSelectImageFile">
           <property name="toolTip">
            <string>select an image series file to correlate</string>
@@ -82,7 +89,7 @@
            <string>select an image series file to correlate</string>
           </property>
           <property name="text">
-           <string>don't count</string>
+           <string>w/o count</string>
           </property>
           <property name="icon">
            <iconset resource="qfrdrimagingfcs.qrc">
@@ -99,7 +106,7 @@
            <string>read metadata from the given image series file</string>
           </property>
           <property name="text">
-           <string>don't count</string>
+           <string>w/o count</string>
           </property>
           <property name="icon">
            <iconset resource="qfrdrimagingfcs.qrc">
@@ -346,7 +353,7 @@
              <item row="2" column="0">
               <widget class="QLabel" name="label_21">
                <property name="text">
-                <string>&amp;output:</string>
+                <string>o&amp;utput:</string>
                </property>
                <property name="buddy">
                 <cstring>edtPrefix</cstring>
@@ -1139,7 +1146,7 @@ p, li { white-space: pre-wrap; }
                <item>
                 <widget class="QLabel" name="label_31">
                  <property name="text">
-                  <string>&amp;background image:</string>
+                  <string>back&amp;ground image:</string>
                  </property>
                  <property name="buddy">
                   <cstring>edtBackgroundFile</cstring>
