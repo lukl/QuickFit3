@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1102</width>
+    <width>1280</width>
     <height>868</height>
    </rect>
   </property>
@@ -23,7 +23,7 @@
   <property name="modal">
    <bool>false</bool>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0">
    <item>
     <widget class="QGroupBox" name="groupBox_3">
      <property name="sizePolicy">
@@ -38,20 +38,13 @@
      <property name="flat">
       <bool>false</bool>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,1,0">
+     <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,1,1,0,0,0">
       <item row="0" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,0,0">
         <item>
          <widget class="QLineEdit" name="edtImageFile">
           <property name="placeholderText">
            <string>enter filename here</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QToolButton" name="btnNextCell">
-          <property name="text">
-           <string>next cell</string>
           </property>
          </widget>
         </item>
@@ -66,20 +59,6 @@
           <property name="icon">
            <iconset resource="qfrdrimagingfcs.qrc">
             <normaloff>:/imaging_fcs/fileopen.png</normaloff>:/imaging_fcs/fileopen.png</iconset>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QToolButton" name="btnLoad">
-          <property name="toolTip">
-           <string>read metadata from the given image series file</string>
-          </property>
-          <property name="text">
-           <string>...</string>
-          </property>
-          <property name="icon">
-           <iconset resource="qfrdrimagingfcs.qrc">
-            <normaloff>:/imaging_fcs/use_file.png</normaloff>:/imaging_fcs/use_file.png</iconset>
           </property>
          </widget>
         </item>
@@ -101,6 +80,20 @@
          </widget>
         </item>
         <item>
+         <widget class="QToolButton" name="btnLoad">
+          <property name="toolTip">
+           <string>read metadata from the given image series file</string>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="qfrdrimagingfcs.qrc">
+            <normaloff>:/imaging_fcs/use_file.png</normaloff>:/imaging_fcs/use_file.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QToolButton" name="btnLoadNoCount">
           <property name="toolTip">
            <string>read metadata from the given image series file</string>
@@ -117,26 +110,9 @@
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QToolButton" name="btnSimulate">
-          <property name="toolTip">
-           <string>read metadata from the given image series file</string>
-          </property>
-          <property name="text">
-           <string>simulate</string>
-          </property>
-          <property name="icon">
-           <iconset resource="qfrdrimagingfcs.qrc">
-            <normaloff>:/imaging_fcs/qfrdrimagingfcs_simulate.png</normaloff>:/imaging_fcs/qfrdrimagingfcs_simulate.png</iconset>
-          </property>
-          <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonTextBesideIcon</enum>
-          </property>
-         </widget>
-        </item>
        </layout>
       </item>
-      <item row="1" column="1">
+      <item row="4" column="1">
        <widget class="QScrollArea" name="scrollAreaParams">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
@@ -2102,7 +2078,7 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="4" column="0">
        <widget class="QLabel" name="labDetails">
         <property name="text">
          <string>&lt;b&gt;Details:&lt;/b&gt;</string>
@@ -2112,7 +2088,7 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="5" column="1">
        <widget class="QWidget" name="widAddJob" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <property name="spacing">
@@ -2227,6 +2203,57 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </widget>
+      </item>
+      <item row="1" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_23" stretch="0,0,0,0">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetFixedSize</enum>
+        </property>
+        <item>
+         <spacer name="horizontalSpacer_19">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnNextCell">
+          <property name="text">
+           <string>next cell</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnAddCellsAndJobs">
+          <property name="text">
+           <string>add all cells and jobs</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnSimulate">
+          <property name="toolTip">
+           <string>read metadata from the given image series file</string>
+          </property>
+          <property name="text">
+           <string>simulate</string>
+          </property>
+          <property name="icon">
+           <iconset resource="qfrdrimagingfcs.qrc">
+            <normaloff>:/imaging_fcs/qfrdrimagingfcs_simulate.png</normaloff>:/imaging_fcs/qfrdrimagingfcs_simulate.png</iconset>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextBesideIcon</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
@@ -2356,8 +2383,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>1056</width>
-           <height>98</height>
+           <width>1234</width>
+           <height>191</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -2469,8 +2496,6 @@ p, li { white-space: pre-wrap; }
  </customwidgets>
  <tabstops>
   <tabstop>edtImageFile</tabstop>
-  <tabstop>btnSelectImageFile</tabstop>
-  <tabstop>btnLoad</tabstop>
   <tabstop>btnDataExplorer</tabstop>
   <tabstop>edtPrefix</tabstop>
   <tabstop>edtPostfix</tabstop>

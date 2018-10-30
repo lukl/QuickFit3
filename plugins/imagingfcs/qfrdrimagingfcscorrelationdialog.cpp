@@ -167,6 +167,7 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     ui->btnLoadNoCount->setEnabled(false);
     ui->btnSelectImageFileNoCount->setEnabled(false);
     ui->btnNextCell->setEnabled(false);
+    ui->btnAddCellsAndJobs->setEnabled(false);
     on_cmbDualView_currentIndexChanged(ui->cmbDualView->currentIndex());
     QTimer::singleShot(UPDATE_TIMEOUT, this, SLOT(updateProgress()));
 
@@ -647,6 +648,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnLoad_clicked() {
         ui->btnLoadNoCount->setEnabled(true);
         ui->btnSelectImageFileNoCount->setEnabled(true);
         ui->btnNextCell->setEnabled(true);
+        ui->btnAddCellsAndJobs->setEnabled(true);
         if (channels>1) {
 
         }
@@ -683,6 +685,51 @@ void QFRDRImagingFCSCorrelationDialog::on_btnNextCell_clicked() {
         ui->edtImageFile->setFocus(Qt::MouseFocusReason);
         on_btnLoad_clicked();
         writeSettings();
+    }
+}
+
+void QFRDRImagingFCSCorrelationDialog::on_btnAddCellsAndJobs_clicked() {
+
+    QString fileName=ui->edtImageFile->text();
+    QString OldfileName=fileName;
+
+    // Add first cell
+    if (QFile::exists(fileName)) {
+        on_btnLoad_clicked();
+        writeSettings();
+        on_btnAddJob_clicked();
+    }
+
+    // Some Pattern magic finding "_c[0-9][0-9]__"
+
+    #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        QRegularExpression re("_c([0-9][0-9])__");
+        int cellno = re.match(fileName).captured(1).toInt();
+        //QString OldCellName = re.match(filename).captured(0);
+    #else
+        QRegExp re("_c([0-9][0-9])__");
+        int cellno = re.match(fileName).cap(1).toInt();
+    #endif
+
+    // Add All other cells
+    while (cellno<100) {
+
+        OldfileName=fileName;
+        cellno++;
+        QString NextCellNoStr = QString("_c%1__").arg(cellno, 2, 10, QChar('0'));
+        fileName.replace(re, NextCellNoStr);
+
+        if (!fileName.isEmpty() && (OldfileName!=fileName)) {
+            lastImagefileDir=QFileInfo(fileName).dir().absolutePath();
+            ui->cmbFileformat->setCurrentIndex(imageFilters.indexOf(lastImagefileFilter));
+            ui->edtImageFile->setText(fileName);
+            ui->edtImageFile->setFocus(Qt::MouseFocusReason);
+            if (QFile::exists(fileName)) {
+                on_btnLoad_clicked();
+                writeSettings();
+                on_btnAddJob_clicked();
+            }
+        }
     }
 }
 
