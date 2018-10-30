@@ -29,6 +29,9 @@
      <property name="sizeConstraint">
       <enum>QLayout::SetFixedSize</enum>
      </property>
+     <property name="rightMargin">
+      <number>9</number>
+     </property>
      <item>
       <widget class="QLabel" name="label_49">
        <property name="font">
@@ -98,19 +101,15 @@
       <property name="topMargin">
        <number>0</number>
       </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item row="0" column="1">
        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,0,0,0">
         <item>
          <widget class="QLineEdit" name="edtImageFile">
           <property name="placeholderText">
            <string>enter filename here</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QToolButton" name="btnNextCell">
-          <property name="text">
-           <string>next cell</string>
           </property>
          </widget>
         </item>
@@ -129,6 +128,27 @@
          </widget>
         </item>
         <item>
+         <widget class="QToolButton" name="btnLoad">
+          <property name="toolTip">
+           <string>read metadata from the given image series file</string>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="qfrdrimagingfcs.qrc">
+            <normaloff>:/imaging_fcs/use_file.png</normaloff>:/imaging_fcs/use_file.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnNextCell">
+          <property name="text">
+           <string>next cell</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QToolButton" name="btnSelectImageFileNoCount">
           <property name="toolTip">
            <string>select an image series file to correlate</string>
@@ -142,20 +162,6 @@
           </property>
           <property name="toolButtonStyle">
            <enum>Qt::ToolButtonTextBesideIcon</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QToolButton" name="btnLoad">
-          <property name="toolTip">
-           <string>read metadata from the given image series file</string>
-          </property>
-          <property name="text">
-           <string>...</string>
-          </property>
-          <property name="icon">
-           <iconset resource="qfrdrimagingfcs.qrc">
-            <normaloff>:/imaging_fcs/use_file.png</normaloff>:/imaging_fcs/use_file.png</iconset>
           </property>
          </widget>
         </item>
@@ -198,7 +204,7 @@
         <widget class="QWidget" name="scrollAreaWidgetContents">
          <property name="geometry">
           <rect>
-           <x>-365</x>
+           <x>0</x>
            <y>0</y>
            <width>1494</width>
            <height>662</height>
@@ -2185,7 +2191,7 @@ p, li { white-space: pre-wrap; }
             <string>read all cells with settings above and add jobs</string>
            </property>
            <property name="text">
-            <string>&amp;add all cells and jobs</string>
+            <string>add all cells and jobs</string>
            </property>
            <property name="icon">
             <iconset resource="qfrdrimagingfcs.qrc">
@@ -2320,6 +2326,9 @@ p, li { white-space: pre-wrap; }
       <property name="spacing">
        <number>2</number>
       </property>
+      <property name="topMargin">
+       <number>3</number>
+      </property>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
@@ -2425,7 +2434,7 @@ p, li { white-space: pre-wrap; }
            <x>0</x>
            <y>0</y>
            <width>1234</width>
-           <height>200</height>
+           <height>215</height>
           </rect>
          </property>
          <property name="sizePolicy">

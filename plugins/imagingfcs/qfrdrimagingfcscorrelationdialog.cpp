@@ -696,6 +696,9 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddCellsAndJobs_clicked() {
 
     // Add first cell
     if (QFile::exists(fileName)) {
+        lastImagefileDir=QFileInfo(fileName).dir().absolutePath();
+        ui->cmbFileformat->setCurrentIndex(imageFilters.indexOf(lastImagefileFilter));
+        ui->edtImageFile->setFocus(Qt::MouseFocusReason);
         on_btnLoad_clicked();
         writeSettings();
         on_btnAddJob_clicked();
@@ -724,7 +727,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddCellsAndJobs_clicked() {
             lastImagefileDir=QFileInfo(fileName).dir().absolutePath();
             ui->cmbFileformat->setCurrentIndex(imageFilters.indexOf(lastImagefileFilter));
             ui->edtImageFile->setText(fileName);
-            ui->edtImageFile->setFocus(Qt::MouseFocusReason);
+            //ui->edtImageFile->setFocus(Qt::MouseFocusReason);
             if (QFile::exists(fileName)) {
                 on_btnLoad_clicked();
                 writeSettings();
@@ -884,11 +887,13 @@ void QFRDRImagingFCSCorrelationDialog::updateProgress() {
         bool allDone=(jobs.size()>0);
         for (int i=0; i<jobs.size(); i++) {
             if (jobs[i].progress) {
-                max=max+jobs[i].progress->getRangeMax()-jobs[i].progress->getRangeMin();
-                p=p+jobs[i].progress->getProgress();
+                //max+=jobs[i].progress->getRangeMax()-jobs[i].progress->getRangeMin();
+                max+=100;
+                p+=round(100*(double)jobs[i].progress->getProgress()/((double)(jobs[i].progress->getRangeMax()-jobs[i].progress->getRangeMin())));
                 allDone=allDone&&jobs[i].progress->isDone();
             }
         }
+        max+=100*waitingThreads();
         ui->progressBar->setRange(0,max);
         ui->progressBar->setValue(p);
 
