@@ -692,6 +692,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddCellsAndJobs_clicked() {
 
     QString fileName=ui->edtImageFile->text();
     QString OldfileName=fileName;
+    QString InitialFileName=fileName;
 
     // Add first cell
     if (QFile::exists(fileName)) {
@@ -712,7 +713,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddCellsAndJobs_clicked() {
     #endif
 
     // Add All other cells
-    while (cellno<100) {
+    while (cellno<99) {
 
         OldfileName=fileName;
         cellno++;
@@ -731,6 +732,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddCellsAndJobs_clicked() {
             }
         }
     }
+    ui->edtImageFile->setText(InitialFileName);
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_btnLoadNoCount_clicked()
