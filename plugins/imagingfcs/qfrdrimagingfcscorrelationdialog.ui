@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>1280</width>
-    <height>868</height>
+    <height>900</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_23" stretch="0,0,0">
      <property name="sizeConstraint">
-      <enum>QLayout::SetFixedSize</enum>
+      <enum>QLayout::SetDefaultConstraint</enum>
      </property>
      <property name="rightMargin">
       <number>9</number>
@@ -83,10 +83,22 @@
    <item>
     <widget class="QGroupBox" name="groupBox_3">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
+       <verstretch>1</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>500</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>850</height>
+      </size>
      </property>
      <property name="title">
       <string/>
@@ -97,7 +109,7 @@
      <property name="checkable">
       <bool>false</bool>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,1,1,0,0,0">
+     <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0,0,0">
       <property name="topMargin">
        <number>0</number>
       </property>
@@ -187,10 +199,16 @@
       <item row="4" column="1">
        <widget class="QScrollArea" name="scrollAreaParams">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
         </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -2307,11 +2325,20 @@ p, li { white-space: pre-wrap; }
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>250</height>
+      </size>
      </property>
      <property name="title">
       <string> Progress: </string>
@@ -2408,7 +2435,7 @@ p, li { white-space: pre-wrap; }
       <item>
        <widget class="QScrollArea" name="scrollArea">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+         <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -2416,7 +2443,7 @@ p, li { white-space: pre-wrap; }
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>100</height>
+          <height>60</height>
          </size>
         </property>
         <property name="horizontalScrollBarPolicy">
@@ -2434,7 +2461,7 @@ p, li { white-space: pre-wrap; }
            <x>0</x>
            <y>0</y>
            <width>1234</width>
-           <height>215</height>
+           <height>188</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -2488,6 +2515,9 @@ p, li { white-space: pre-wrap; }
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
      <item>
       <widget class="QPushButton" name="btnHelp">
        <property name="text">
