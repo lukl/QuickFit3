@@ -446,6 +446,8 @@ void QFESPIMB040OverviewAcquisitionConfigWidget::on_chkUse1_toggled(bool /*enabl
     ui->chkBackground->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->edtPrefix1->setEnabled(ui->chkUse1->isChecked());
     ui->widCam2Settings1->setEnabled(ui->chkUse1->isChecked());
+    ui->widCam2Settings1->setVisible(ui->chkUse1->isChecked());
+    ui->edtPrefix1->setVisible(ui->chkUse1->isChecked());
 
     updateBackgroundWidgets();
 }
@@ -456,6 +458,8 @@ void QFESPIMB040OverviewAcquisitionConfigWidget::on_chkUse2_toggled(bool /*enabl
     ui->chkBackground->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->edtPrefix2->setEnabled(ui->chkUse2->isChecked());
     ui->widCam2Settings2->setEnabled(ui->chkUse2->isChecked());
+    ui->widCam2Settings2->setVisible(ui->chkUse2->isChecked());
+    ui->edtPrefix2->setVisible(ui->chkUse2->isChecked());
 
     updateBackgroundWidgets();
 }
