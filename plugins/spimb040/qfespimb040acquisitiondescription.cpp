@@ -172,6 +172,12 @@ void QFESPIMB040AcquisitionDescription::nextCell()
     ui->spinCell->setValue(ui->spinCell->value()+1);
 }
 
+void QFESPIMB040AcquisitionDescription::firstCell()
+{
+    ui->edtComment->setText("");
+    ui->spinCell->setValue(1);
+}
+
 void QFESPIMB040AcquisitionDescription::on_btnClearAll_clicked() {
     ui->edtComment->setText("");
     ui->spinCell->setValue(1);
@@ -182,6 +188,11 @@ void QFESPIMB040AcquisitionDescription::on_btnClearAll_clicked() {
 void QFESPIMB040AcquisitionDescription::on_btnNextCell_clicked()
 {
     nextCell();
+}
+
+void QFESPIMB040AcquisitionDescription::on_btnFirstCell_clicked()
+{
+    firstCell();
 }
 
 void QFESPIMB040AcquisitionDescription::updateTime() {

@@ -65,9 +65,11 @@ class QFESPIMB040AcquisitionDescription : public QWidget, public QFESPIMB040File
     protected slots:
         void on_btnClearAll_clicked();
         void on_btnNextCell_clicked();
+        void on_btnFirstCell_clicked();
         void updateTime();
         void spinChanged();
         void updateReplaces();
+        void firstCell();
     private:
         Ui::QFESPIMB040AcquisitionDescription *ui;
         QFESPIMB040OpticsSetupBase *opticsSetup;
