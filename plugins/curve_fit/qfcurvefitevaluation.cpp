@@ -29,7 +29,7 @@ QFCurveFitEvaluation::QFCurveFitEvaluation(QFProject* parent):
     QFFitResultsByIndexEvaluation("", parent)
 {
 
-    m_weighting=EqualWeighting;
+    m_weighting=RunErrorWeighting;
     m_fitFunction="gen_line";
 
     if (m_fitAlgorithms.contains("fit_lmfit")) {

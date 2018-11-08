@@ -26,7 +26,7 @@
 
 QFCurveWeightingTools::QFCurveWeightingTools()
 {
-    m_weighting=QFCurveWeightingTools::EqualWeighting;
+    m_weighting=QFCurveWeightingTools::RunErrorWeighting;
 }
 
 QFCurveWeightingTools::~QFCurveWeightingTools()
@@ -345,8 +345,8 @@ QFCurveWeightingCombobox::QFCurveWeightingCombobox(QWidget *parent):
 {
     setEditable(false);
     clear();
-    addItem(tr("equal weights"));
     addItem(tr("per run error"));
+    addItem(tr("equal weights"));
     addItem(tr("running SD, 3"));
     addItem(tr("running SD, 5"));
     addItem(tr("running SD, 7"));

@@ -31,7 +31,7 @@ QFImFCSFitEvaluation::QFImFCSFitEvaluation(QFProject* parent):
 {
 
     matchFunctor=new QFImFCSMatchRDRFunctor();
-    m_weighting=EqualWeighting;
+    m_weighting=RunErrorWeighting;
     //mutexThreadedFit=new QMutex(QMutex::Recursive);
 
     if (m_fitFunctions.contains("fcs_spim_diffe2_newveff")) {

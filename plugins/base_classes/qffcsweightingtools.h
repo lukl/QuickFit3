@@ -37,9 +37,9 @@ class QFFCSWeightingTools
     public:
         /** \brief which data weighting should be applied */
         enum DataWeight {
-            EqualWeighting=0,
-            StdDevWeighting=1,
-            RunErrorWeighting=2,
+            RunErrorWeighting=0,
+            EqualWeighting=1,
+            StdDevWeighting=2,
             RunningStdDev3Weight=3,
             RunningStdDev5Weight=4,
             RunningStdDev7Weight=5,

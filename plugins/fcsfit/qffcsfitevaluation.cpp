@@ -29,7 +29,7 @@ QFFCSFitEvaluation::QFFCSFitEvaluation(QFProject* parent):
     QFFitResultsByIndexEvaluation("fcs_,dls_,fccs_", parent)
 {
 
-    m_weighting=EqualWeighting;
+    m_weighting=RunErrorWeighting;
 
     if (m_fitFunctions.contains("fcs_diff")) {
         m_fitFunction="fcs_diff";

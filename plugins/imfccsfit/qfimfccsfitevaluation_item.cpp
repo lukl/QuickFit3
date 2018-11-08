@@ -49,7 +49,7 @@ QFImFCCSFitEvaluationItem::QFImFCCSFitEvaluationItem(QFProject* parent):
     qRegisterMetaType<QList<QFRawDataRecord*> >("QList<QFRawDataRecord*>");
     getEvaluationResultIDUsesFitFunction=true;
     matchFunctor=new QFImFCCSMatchRDRFunctor();
-    m_weighting=EqualWeighting;
+    m_weighting=RunErrorWeighting;
     //m_currentIndex=-1;
     m_multiFitFunctions.clear();
     globalParamsChanged=true;

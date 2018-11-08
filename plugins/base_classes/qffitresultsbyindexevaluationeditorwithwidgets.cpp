@@ -89,11 +89,13 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     l->setBuddy(cmbAlgorithm);
     layAlgorithm->addWidget(l);
     cmbAlgorithm->setEditable(false);
+    cmbAlgorithm->setMaximumWidth(900);
+    layAlgorithm->addSpacing(32);
     layAlgorithm->addWidget(cmbAlgorithm);
-    btnConfigAlgorithm=createButtonAndActionShowText(actConfigAlgorithm, QIcon(":/lib/fit_config.png"), tr("&Configure Algorithm"), this);
+    btnConfigAlgorithm=createButtonAndActionShowText(actConfigAlgorithm, QIcon(":/lib/fit_config.png"), tr("&Configure Alg."), this);
     btnConfigAlgorithm->setMaximumWidth(250);
     layAlgorithm->addWidget(btnConfigAlgorithm);
-    btnAlgorithmHelp=createButtonAndActionShowText(actAlgorithmHelp, QIcon(":/lib/fit_help.png"), tr("Algorithm &Help"), this);
+    btnAlgorithmHelp=createButtonAndActionShowText(actAlgorithmHelp, QIcon(":/lib/fit_help.png"), tr("Alg. &Help"), this);
     btnAlgorithmHelp->setMaximumWidth(250);
     layAlgorithm->addWidget(btnAlgorithmHelp);
     layAlgorithm->addStretch();
@@ -111,6 +113,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     layModel=new QHBoxLayout();
     layModel->setContentsMargins(0,0,0,0);
     cmbModel=new QFFitFunctionComboBox(this);
+    cmbModel->setMaximumWidth(900);
     l=new QLabel(tr("Fit &Model:"), this);
     l->setBuddy(cmbModel);
     layModel->addWidget(l);

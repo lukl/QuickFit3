@@ -344,18 +344,20 @@ void QFImFCSFitEvaluationEditor::createWidgets() {
     cmbWeights->setMinimumWidth(150);
     QLabel* l=new QLabel(tr("&Weight Model: "), this);
     l->setBuddy(cmbWeights);
-    layAlgorithm->addSpacing(32);
-    layAlgorithm->addWidget(l);
-    layAlgorithm->addWidget(cmbWeights);
-    layAlgorithm->addStretch();
+    layAfterAlgorithm->addSpacing(32);
+    layAfterAlgorithm->addWidget(l);
+    layAfterAlgorithm->addWidget(cmbWeights);
+    //layAfterAlgorithm->addStretch();
 
     widFitErrorEstimate=new QFFitAlgorithmErrorEstimateModeWidget(this);
+    widFitErrorEstimate->setMaximumWidth(150);
+    widFitErrorEstimate->setMinimumWidth(150);
     l=new QLabel(tr("&Error Estimation: "), this);
     l->setBuddy(widFitErrorEstimate);
     layAfterAlgorithm->addSpacing(32);
     layAfterAlgorithm->addWidget(l);
     layAfterAlgorithm->addWidget(widFitErrorEstimate);
-    layAfterAlgorithm->addStretch();
+    layAfterAlgorithm->addStretch(1);
 
 
 

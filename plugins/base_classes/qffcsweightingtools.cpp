@@ -26,7 +26,7 @@
 
 QFFCSWeightingTools::QFFCSWeightingTools()
 {
-    m_weighting=QFFCSWeightingTools::EqualWeighting;
+    m_weighting=QFFCSWeightingTools::RunErrorWeighting;
 }
 
 QFFCSWeightingTools::~QFFCSWeightingTools()
@@ -366,9 +366,9 @@ QFFCSWeightingCombobox::QFFCSWeightingCombobox(QWidget *parent):
 {
     setEditable(false);
     clear();
+    addItem(tr("per run error"));
     addItem(tr("equal weights"));
     addItem(tr("standard deviation"));
-    addItem(tr("per run error"));
     addItem(tr("running SD, 3"));
     addItem(tr("running SD, 5"));
     addItem(tr("running SD, 7"));

@@ -38,8 +38,8 @@ class QFLIB_EXPORT QFCurveWeightingTools
     public:
         /** \brief which data weighting should be applied */
         enum DataWeight {
-            EqualWeighting=0,
-            RunErrorWeighting=1,
+            RunErrorWeighting=0,
+            EqualWeighting=1,
             RunningStdDev3Weight=2,
             RunningStdDev5Weight=3,
             RunningStdDev7Weight=4,
