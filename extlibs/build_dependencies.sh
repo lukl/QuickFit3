@@ -30,8 +30,22 @@ echo -e "=======================================================================
 "needed for QuickFit. All libraries will be built in static linking mode\n"\
 "and stay inside their subdirectory of this extlibs directory, so they\n"\
 "don't interfere with your system-libraries. The .pri-files in this di-\n"\
-"rectory include the libraries in a way that preferences these libraries \n"\
-"here!\n\nFirst we need to set some basics for the builds:"\
+"rectory include the libraries in a way that preferences these libraries.\n\n"\
+
+
+
+
+CURRENTDIR=${PWD}
+QT_INFO_LIBS=`qmake -query QT_INSTALL_LIBS`
+QT_INFO_BIN=`qmake -query QT_INSTALL_BINS`
+QT_INFO_PLUGINS=`qmake -query QT_INSTALL_PLUGINS`
+QT_INFO_INSTALLDIR=`qmake -query QT_INSTALL_PREFIX`
+QT_INFO_VERSION=`qmake -query QT_VERSION`
+echo -e "\n\nBuilding for\n    Qt version ${QT_INFO_VERSION}\n       in ${QT_INFO_INSTALLDIR}\n\n"
+
+
+echo -e "First we need to set some basics for the builds:"\
+
 
 read -p "How many parallel builds do you want to use in make (1/2/3...)? " -n 1  MAKE_PARALLEL_BUILDS
 echo -e  "\n"
@@ -70,18 +84,7 @@ fi
 
 
 
-CURRENTDIR=${PWD}
-QT_INFO_LIBS=`qmake -query QT_INSTALL_LIBS`
-QT_INFO_BIN=`qmake -query QT_INSTALL_BINS`
-QT_INFO_PLUGINS=`qmake -query QT_INSTALL_PLUGINS`
-QT_INFO_INSTALLDIR=`qmake -query QT_INSTALL_PREFIX`
-QT_INFO_VERSION=`qmake -query QT_VERSION`
-echo -e "\n\nbuilding for\n    Qt version ${QT_INFO_VERSION}\n       in ${QT_INFO_INSTALLDIR}\n\n"
 
-
-
-
-#PICFLAGS="-fPIC"
 echo "detecting compile system ... "
 ISMSYS=`uname -a`
 echo $ISMSYS
@@ -106,49 +109,6 @@ else
     echo -e "building in MSys environment on Windows! -fPIC required\n\n"
     PICFLAGS="-fPIC"
 fi
-
-
-
-
-qtOK=-5
-if [ $ISMSYS == "1" ] ; then
-	qtOK=-1
-	read -p "Do you want to copy 'Qt DLLs' (y/n)? " -n 1 INSTALL_ANSWER
-	echo -e  "\n"
-	if [ $INSTALL_ANSWER == "y" ] ; then
-		echo -e  "------------------------------------------------------------------------\n"\
-		"-- COPYING: Qt DLLs                                                   --\n"\
-		"------------------------------------------------------------------------\n\n"
-		
-		cp /mingw/bin/mingwm10.dll ../output/ &> /dev/null
-		cp /mingw/bin/libstdc++*.dll ../output/ &> /dev/null
-		cp /mingw/bin/libgcc*.dll ../output/ &> /dev/null
-		cp /mingw/bin/pthread*.dll ../output/ &> /dev/null
-		cp /mingw/bin/libpthread*.dll ../output/ &> / &> /dev/nullev/null
-		cp /mingw/bin/libwinpthread*.dll ../output/
-		
-		USEDQTMODULES="QtCore4 QtGui4 QtOpenGL4 QtScript4 QtScriptTools4 QtSvg4 QtXml4 QtNetwork4"
-		USEDQTMODULES5="Qt5Core Qt5Gui Qt5Network Qt5OpenGL Qt5Script Qt5ScriptTools Qt5PrintSupport Qt5Svg Qt5Xml Qt5Widgets Qt5WinExtras"
-		USEDQTPLUGINS= "${QT_INFO_PLUGINS}/*"
-		mkdir ../output/qtplugins
-		for f in $USEDQTMODULES $USEDQTMODULES5
-		do
-			cp "${QT_INFO_BIN}/${f}d.dll"  "../output/" &> /dev/null
-			cp "${QT_INFO_BIN}/${f}.dll"  "../output/" &> /dev/null
-		done
-		
-		cp -rf "${QT_INFO_BIN}/icu*.dll"  "../output/"
-		
-		for f in $USEDQTPLUGINS
-		do
-			cp -rf "${f}"  "../output/qtplugins/" &> /dev/null
-			cp -rf "${f}"  "../output/qtplugins/" &> /dev/null
-		done
-		qtOK=0
-	fi
-fi
-
-
 
 
 libnidaqmxOK=-5
@@ -216,6 +176,47 @@ if [ $ISMSYS == "1" ] ; then
 		else
 			libandorOK=-3
 		fi
+	fi
+fi
+
+
+
+
+qtOK=-5
+if [ $ISMSYS == "1" ] ; then
+	qtOK=-1
+	read -p "Do you want to copy 'Qt DLLs' (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+	if [ $INSTALL_ANSWER == "y" ] ; then
+		echo -e  "------------------------------------------------------------------------\n"\
+		"-- COPYING: Qt DLLs                                                   --\n"\
+		"------------------------------------------------------------------------\n\n"
+		
+		cp /mingw/bin/mingwm10.dll ../output/ &> /dev/null
+		cp /mingw/bin/libstdc++*.dll ../output/ &> /dev/null
+		cp /mingw/bin/libgcc*.dll ../output/ &> /dev/null
+		cp /mingw/bin/pthread*.dll ../output/ &> /dev/null
+		cp /mingw/bin/libpthread*.dll ../output/ &> / &> /dev/nullev/null
+		cp /mingw/bin/libwinpthread*.dll ../output/
+		
+		USEDQTMODULES="QtCore4 QtGui4 QtOpenGL4 QtScript4 QtScriptTools4 QtSvg4 QtXml4 QtNetwork4"
+		USEDQTMODULES5="Qt5Core Qt5Gui Qt5Network Qt5OpenGL Qt5Script Qt5ScriptTools Qt5PrintSupport Qt5Svg Qt5Xml Qt5Widgets Qt5WinExtras"
+		USEDQTPLUGINS= "${QT_INFO_PLUGINS}/*"
+		mkdir ../output/qtplugins
+		for f in $USEDQTMODULES $USEDQTMODULES5
+		do
+			cp "${QT_INFO_BIN}/${f}d.dll"  "../output/" &> /dev/null
+			cp "${QT_INFO_BIN}/${f}.dll"  "../output/" &> /dev/null
+		done
+		
+		cp -rf "${QT_INFO_BIN}/icu*.dll"  "../output/"
+		
+		for f in $USEDQTPLUGINS
+		do
+			cp -rf "${f}"  "../output/qtplugins/" &> /dev/null
+			cp -rf "${f}"  "../output/qtplugins/" &> /dev/null
+		done
+		qtOK=0
 	fi
 fi
 
@@ -1282,9 +1283,14 @@ echo -e  "\n--------------------------------------------------------------------
 "-- BUILD RESULTS                                                       --\n"\
 "------------------------------------------------------------------------\n\n"\
 
-print_result "Qt DLLs copy" $qtOK
+echo -e  "-- Windows only libraries                                              --\n"\
 print_result "libNIDAQmx" $libnidaqmxOK
 print_result "libAndor" $libandorOK
+
+echo -e  "-- Qt DLLS                                                             --\n"\
+print_result "Qt DLLs copy" $qtOK
+
+echo -e  "-- General Libraries                                                   --\n"\
 print_result "zlib" $zlibOK
 #print_result "lzma" $lzmaOK
 #print_result "lmfit" $lmfitOK
