@@ -26,7 +26,7 @@ Copyright (c) 2014
 #include "qfevalbeadscanpsf_item.h"
 #include "ui_qfevalbeadscanpsf_editor.h"
 #include "qmoretextobject.h"
-#include "cimg.h"
+#include "include_cimg.h"
 #include "qfrawdatarecordfactory.h"
 #include "qffitfunctionplottools.h"
 #include <QtGlobal>

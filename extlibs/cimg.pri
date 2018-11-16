@@ -23,7 +23,7 @@
 	INCLUDEPATH += $$PWD/cimg/
 	HEADERS += $$PWD/cimg/CImg.h
 	win32:LIBS+=-lgdi32
-	#PRECOMPILED_HEADER += cimg.h
+        #PRECOMPILED_HEADER += include_cimg.h
 }
 include (zlib.pri)
 #include (png.pri)
