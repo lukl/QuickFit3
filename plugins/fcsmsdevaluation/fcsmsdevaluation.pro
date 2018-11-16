@@ -31,7 +31,7 @@ include(../../qf3plugins.pri)
 DESTDIR = $$QFOUTPUT/plugins
 
 include(../../libquickfitwidgets.pri)
-include(../../extlibs/lmfit5.pri)
+include(../../extlibs/lmfit6.pri)
 include(../../extlibs/gsl.pri)
 
 # Input

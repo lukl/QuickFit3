@@ -28,7 +28,7 @@ DEPENDPATH += ./
 include(../../qf3plugins.pri)
 include(../../extlibs/zlib.pri)
 include(../../extlibs/tiff.pri)
-include(../../extlibs/lmfit5.pri)
+include(../../extlibs/lmfit6.pri)
 include(../../extlibsb040/tinytiff.pri)
 include(../../extlibsb040/yaidtools.pri)
 

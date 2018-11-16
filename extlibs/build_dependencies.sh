@@ -33,17 +33,15 @@ echo -e "=======================================================================
 "rectory include the libraries in a way that preferences these libraries \n"\
 "here!\n\nFirst we need to set some basics for the builds:"\
 
-read -p "Do you want to build keep the build directories (y/n)? " -n 1 KEEP_BUILD_DIR
+read -p "How many parallel builds do you want to use in make (1/2/3...)? " -n 1  MAKE_PARALLEL_BUILDS
 echo -e  "\n"
-read -p "How many parallel builds do you want to use in make (1/2/3/...)? " -n 1  MAKE_PARALLEL_BUILDS
+read -p "Do you want to build keep the build directories (y/n)? " -n 1 KEEP_BUILD_DIR
 echo -e  "\n"
 read -p "Do you want to use more agressive optimizations for the built libraries (y/n/M)? M: no optimizations, use on MacOSX) " -n 1  MAKE_AGRESSIVEOPTIMIZATIONS
 echo -e  "\n"
 read -p "Do you want to optimize libraries for your local machine? (y/n)? " -n 1  MAKE_COMPILEFORLOCAL
 echo -e  "\n"
 read -p "Do you want to use OpenMP? (y/n)? " -n 1  MAKE_USEOPENMP
-echo -e  "\n"
-read -p "Should I try to build all libraries? (y/n)? " -n 1  BUILD_ALL
 echo -e  "\n"
 
 
@@ -71,6 +69,7 @@ fi
 
 
 
+
 CURRENTDIR=${PWD}
 QT_INFO_LIBS=`qmake -query QT_INSTALL_LIBS`
 QT_INFO_BIN=`qmake -query QT_INSTALL_BINS`
@@ -79,9 +78,10 @@ QT_INFO_INSTALLDIR=`qmake -query QT_INSTALL_PREFIX`
 QT_INFO_VERSION=`qmake -query QT_VERSION`
 echo -e "\n\nbuilding for\n    Qt version ${QT_INFO_VERSION}\n       in ${QT_INFO_INSTALLDIR}\n\n"
 
-PICFLAGS="-fPIC"
 
 
+
+#PICFLAGS="-fPIC"
 echo "detecting compile system ... "
 ISMSYS=`uname -a`
 echo $ISMSYS
@@ -106,6 +106,9 @@ else
     echo -e "building in MSys environment on Windows! -fPIC required\n\n"
     PICFLAGS="-fPIC"
 fi
+
+
+
 
 qtOK=-5
 if [ $ISMSYS == "1" ] ; then
@@ -144,6 +147,84 @@ if [ $ISMSYS == "1" ] ; then
 		qtOK=0
 	fi
 fi
+
+
+
+
+libnidaqmxOK=-5
+if [ $ISMSYS == "1" ] ; then
+	libnidaqmxOK=-1
+	read -p "Do you want to build 'libNIDAQmx' (windows only!!!) (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+	if [ $INSTALL_ANSWER == "y" ] ; then
+
+		echo -e  "------------------------------------------------------------------------\n"\
+		"-- BUILDING: libnidaqmxOK                                             --\n"\
+		"------------------------------------------------------------------------\n\n"\
+
+		cd nidaqmx
+		./makenidaqmx.sh
+		libOK=$?
+		cd ${CURRENTDIR}
+		
+		if [ $libOK -eq 0 ] ; then		
+			libnidaqmxOK=0
+		else
+			libnidaqmxOK=-3
+		fi
+	fi
+fi
+
+
+
+
+libandorOK=-5
+if [ $ISMSYS == "1" ] ; then
+	libandorOK=-1
+	read -p "Do you want to build 'libAndor' (windows only!!!) (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+	if [ $INSTALL_ANSWER == "y" ] ; then
+
+		echo -e  "------------------------------------------------------------------------\n"\
+		"-- BUILDING: libAndor                                                 --\n"\
+		"------------------------------------------------------------------------\n\n"\
+		echo -e "first we have to copy the file ATMCD32D.H from the Andor SDK to \n"
+		echo -e "andor_win32 and andor_win64. Then ATMCD32D.DLL has to be copied \n"
+		echo -e "to andor_win32 and atmcd64d.dll to andor_win64. Finally a script\n"
+		echo -e "in each of these diretories will create the 32bit/64bit link libs\n"
+		echo -e "which are needed to build the andor camera driver with mingw.\n\n"
+	    read -p "please enter the directory of the Andor SDK "  ANDORSDK
+	    echo -e  "\n"
+	    read -p "Do you want to build 32bit or 64bit (3/6)? " -n 1 SELECTBITS
+	    echo -e  "\n"
+	    if [ $SELECTBITS == "6" ] ; then
+            cd andor_win64
+			cp $ANDORSDK/atmcd64d.dll .
+			cp $ANDORSDK/ATMCD32D.H .
+		else
+            cd andor_win32
+			cp $ANDORSDK/ATMCD32D.DLL .
+			cp $ANDORSDK/ATMCD32D.H .
+		fi
+		
+		./create_testcpp.sh
+		libOK=$?
+		cd ${CURRENTDIR}
+		
+		if [ $libOK -eq 0 ] ; then		
+			libandorOK=0
+		else
+			libandorOK=-3
+		fi
+	fi
+fi
+
+
+
+
+read -p "Should all other libraries be built without asking? (y/n)? " -n 1  BUILD_ALL
+echo -e  "\n"
+
 
 
 
@@ -206,22 +287,22 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	
 	zlibOK=$libOK
 
-fi
 
-
-zlib_CFLAGS=
-zlib_LDFLAGS="-lz"
-zlib_CONFIG=
-if [ -e ${CURRENTDIR}/zlib/lib/libz.a ] ; then
-	zlib_CFLAGS="-I${CURRENTDIR}/zlib/include"
-	zlib_LDFLAGS="-L${CURRENTDIR}/zlib/lib -lz"
-	zlib_CONFIG="--with-zlib-include-dir=${CURRENTDIR}/zlib/include  --with-zlib-lib-dir=${CURRENTDIR}/zlib/lib"
+	# zlib_CFLAGS=
+	# zlib_LDFLAGS="-lz"
+	# zlib_CONFIG=
+	# if [ -e ${CURRENTDIR}/zlib/lib/libz.a ] ; then
+		# zlib_CFLAGS="-I${CURRENTDIR}/zlib/include"
+		# zlib_LDFLAGS="-L${CURRENTDIR}/zlib/lib -lz"
+		# zlib_CONFIG="--with-zlib-include-dir=${CURRENTDIR}/zlib/include  --with-zlib-lib-dir=${CURRENTDIR}/zlib/lib"
+	# fi
+	# echo -e "\n\n\n USING THESE zlib compiler commands:\nCFLAGS="
+	# echo $zlib_CFLAGS
+	# echo -e "\nLDFLAGS="
+	# echo $zlib_LDFLAGS
+	# echo -e "\n\n\n"
+	
 fi
-echo -e "\n\n\n USING THESE zlib compiler commands:\nCFLAGS="
-echo $zlib_CFLAGS
-echo -e "\nLDFLAGS="
-echo $zlib_LDFLAGS
-echo -e "\n\n\n"
 
 
 
@@ -270,49 +351,158 @@ lzmaOK=-1
 #
 #fi
 
+# lzma_CFLAGS=
+# #lzma_LDFLAGS="-llzma"
+# lzma_LDFLAGS=
+# if [ -e ${CURRENTDIR}/lzma/lib/liblzma.a ] ; then
+	# lzma_CFLAGS="-I${CURRENTDIR}/lzma/include"
+	# lzma_LDFLAGS="-L${CURRENTDIR}/lzma/lib -llzma"
+# fi
+# echo -e "\n\n\n USING THESE lzma compiler commands:\nCFLAGS="
+# echo $lzma_CFLAGS
+# echo -e "\nLDFLAGS="
+# echo $lzma_LDFLAGS
+# echo -e "\n\n\n"
 
-lzma_CFLAGS=
-#lzma_LDFLAGS="-llzma"
-lzma_LDFLAGS=
-if [ -e ${CURRENTDIR}/lzma/lib/liblzma.a ] ; then
-	lzma_CFLAGS="-I${CURRENTDIR}/lzma/include"
-	lzma_LDFLAGS="-L${CURRENTDIR}/lzma/lib -llzma"
-fi
-echo -e "\n\n\n USING THESE lzma compiler commands:\nCFLAGS="
-echo $lzma_CFLAGS
-echo -e "\nLDFLAGS="
-echo $lzma_LDFLAGS
-echo -e "\n\n\n"
 
 
-lmfitOK=-1
+
+# lmfitOK=-1
+# if [ $BUILD_ALL == "y" ] ; then
+	# INSTALL_ANSWER="y"
+# else
+	# read -p "Do you want to build 'lmfit' (y/n)? " -n 1 INSTALL_ANSWER
+	# echo -e  "\n"
+# fi
+# if [ $INSTALL_ANSWER == "y" ] ; then
+	# echo -e  "\n------------------------------------------------------------------------\n"\
+	# "-- BUILDING: lmfit                                                    --\n"\
+	# "------------------------------------------------------------------------\n\n"\
+
+	# cd lmfit
+	# mkdir build
+	# tar xvf lmfit-3.2.tar -C ./build/
+	# cd build/lmfit-3.2
+	# export LDFLAGS="${LDFLAGS} ${PICFLAGS} -lm"
+	# export CFLAGS="${CFLAGS} ${PICFLAGS} "
+	# export CPPFLAGS="${CPPFLAGS} ${PICFLAGS}"
+	# ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit  CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"	LDFLAGS="${PICFLAGS} ${MORELDFLAGS} -lm" 
+	# libOK=$?
+	# if [ $libOK -eq 0 ] ; then
+		# make -j${MAKE_PARALLEL_BUILDS}
+		
+		# libOK=$?
+		# if [ $libOK -eq 0 ] ; then		
+		    # mkdir ${CURRENTDIR}/lmfit/include
+		    # cp ./lib/*.h ${CURRENTDIR}/lmfit/include
+			# make -j${MAKE_PARALLEL_BUILDS} install
+			# libOK=$?
+			# if [ $libOK -ne 0 ] ; then		
+				# libOK=-4
+			# fi
+		# else
+			# libOK=-3
+		# fi
+	# else
+	    # libOK=-2
+	# fi
+	
+
+	# cd ../../
+	# if [ $KEEP_BUILD_DIR == "n" ] ; then
+		# rm -rf build
+	# fi
+	# cd ${CURRENTDIR}
+	
+	# lmfitOK=$libOK
+
+# fi
+
+
+
+
+# lmfit5OK=-1
+# if [ $BUILD_ALL == "y" ] ; then
+	# INSTALL_ANSWER="y"
+# else
+	# read -p "Do you want to build 'lmfit v5' (y/n)? " -n 1 INSTALL_ANSWER
+	# echo -e  "\n"
+# fi
+# if [ $INSTALL_ANSWER == "y" ] ; then
+	# echo -e  "\n------------------------------------------------------------------------\n"\
+	# "-- BUILDING: lmfit v5                                                 --\n"\
+	# "------------------------------------------------------------------------\n\n"\
+
+	# cd lmfit5
+	# mkdir build
+	# tar xvf lmfit-5.1.tar -C ./build/
+	# cd build/lmfit-5.1
+        # export LDFLAGS="${LDFLAGS} "
+        # export CFLAGS="${CFLAGS} "
+        # export CPPFLAGS="${CPPFLAGS} "
+        # ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit5  CFLAGS=" ${MORECFLAGS}" CPPFLAGS=" ${MORECFLAGS}"	LDFLAGS=" ${MORELDFLAGS}"
+	# libOK=$?
+	# if [ $libOK -eq 0 ] ; then
+		# make -j${MAKE_PARALLEL_BUILDS}
+		
+		# libOK=$?
+		# if [ $libOK -eq 0 ] ; then		
+		    # mkdir ${CURRENTDIR}/lmfit5/include
+		    # cp ./lib/*.h ${CURRENTDIR}/lmfit5/include
+			# make -j${MAKE_PARALLEL_BUILDS} install
+			# libOK=$?
+			# if [ $libOK -ne 0 ] ; then		
+				# libOK=-4
+			# fi
+		# else
+			# libOK=-3
+		# fi
+	# else
+	    # libOK=-2
+	# fi
+	
+
+	# cd ../../
+	# if [ $KEEP_BUILD_DIR == "n" ] ; then
+		# rm -rf build
+	# fi
+	# cd ${CURRENTDIR}
+	
+	# lmfit5OK=$libOK
+
+# fi
+
+
+
+
+lmfit6OK=-1
 if [ $BUILD_ALL == "y" ] ; then
 	INSTALL_ANSWER="y"
 else
-	read -p "Do you want to build 'lmfit' (y/n)? " -n 1 INSTALL_ANSWER
+	read -p "Do you want to build 'lmfit v6.2' (y/n)? " -n 1 INSTALL_ANSWER
 	echo -e  "\n"
 fi
 if [ $INSTALL_ANSWER == "y" ] ; then
 	echo -e  "\n------------------------------------------------------------------------\n"\
-	"-- BUILDING: lmfit                                                    --\n"\
+	"-- BUILDING: lmfit v6.2                                                 --\n"\
 	"------------------------------------------------------------------------\n\n"\
 
-	cd lmfit
+	cd lmfit6
 	mkdir build
-	tar xvf lmfit-3.2.tar -C ./build/
-	cd build/lmfit-3.2
-	export LDFLAGS="${LDFLAGS} ${PICFLAGS} -lm"
-	export CFLAGS="${CFLAGS} ${PICFLAGS} "
-	export CPPFLAGS="${CPPFLAGS} ${PICFLAGS}"
-	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit  CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"	LDFLAGS="${PICFLAGS} ${MORELDFLAGS} -lm" 
+	tar xvf lmfit-6.2.tgz -C ./build/
+	cd build/lmfit-6.2
+        export LDFLAGS="${LDFLAGS} "
+        export CFLAGS="${CFLAGS} "
+        export CPPFLAGS="${CPPFLAGS} "
+        ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit6  CFLAGS=" ${MORECFLAGS}" CPPFLAGS=" ${MORECFLAGS}"	LDFLAGS=" ${MORELDFLAGS}"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}
 		
 		libOK=$?
 		if [ $libOK -eq 0 ] ; then		
-		    mkdir ${CURRENTDIR}/lmfit/include
-		    cp ./lib/*.h ${CURRENTDIR}/lmfit/include
+		    mkdir ${CURRENTDIR}/lmfit6/include
+		    cp ./lib/*.h ${CURRENTDIR}/lmfit6/include
 			make -j${MAKE_PARALLEL_BUILDS} install
 			libOK=$?
 			if [ $libOK -ne 0 ] ; then		
@@ -332,72 +522,21 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	fi
 	cd ${CURRENTDIR}
 	
-	lmfitOK=$libOK
+	lmfit6OK=$libOK
 
 fi
 
 
 
 
-lmfit5OK=-1
-if [ $BUILD_ALL == "y" ] ; then
-	INSTALL_ANSWER="y"
-else
-	read -p "Do you want to build 'lmfit v5' (y/n)? " -n 1 INSTALL_ANSWER
-	echo -e  "\n"
-fi
-if [ $INSTALL_ANSWER == "y" ] ; then
-	echo -e  "\n------------------------------------------------------------------------\n"\
-	"-- BUILDING: lmfit v5                                                 --\n"\
-	"------------------------------------------------------------------------\n\n"\
-
-	cd lmfit5
-	mkdir build
-	tar xvf lmfit-5.1.tar -C ./build/
-	cd build/lmfit-5.1
-        export LDFLAGS="${LDFLAGS} ${PICFLAGS} "
-        export CFLAGS="${CFLAGS} ${PICFLAGS} "
-        export CPPFLAGS="${CPPFLAGS} ${PICFLAGS} "
-        ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit5  CFLAGS=" ${MORECFLAGS} ${PICFLAGS}" CPPFLAGS=" ${MORECFLAGS} ${PICFLAGS}"	LDFLAGS=" ${MORELDFLAGS} ${PICFLAGS}"
-	libOK=$?
-	if [ $libOK -eq 0 ] ; then
-		make -j${MAKE_PARALLEL_BUILDS}
-		
-		libOK=$?
-		if [ $libOK -eq 0 ] ; then		
-		    mkdir ${CURRENTDIR}/lmfit5/include
-		    cp ./lib/*.h ${CURRENTDIR}/lmfit5/include
-			make -j${MAKE_PARALLEL_BUILDS} install
-			libOK=$?
-			if [ $libOK -ne 0 ] ; then		
-				libOK=-4
-			fi
-		else
-			libOK=-3
-		fi
-	else
-	    libOK=-2
-	fi
-	
-
-	cd ../../
-	if [ $KEEP_BUILD_DIR == "n" ] ; then
-		rm -rf build
-	fi
-	cd ${CURRENTDIR}
-	
-	lmfit5OK=$libOK
-
-fi
-
-
+levmarOK=-1
 if [ $BUILD_ALL == "y" ] ; then
 	INSTALL_ANSWER="y"
 else
 	read -p "Do you want to build 'levmar' (y/n)? " -n 1 INSTALL_ANSWER
 	echo -e  "\n"
 fi
-levmarOK=-1
+
 if [ $INSTALL_ANSWER == "y" ] ; then
 	echo -e  "\n------------------------------------------------------------------------\n"\
 	"-- BUILDING: levmar                                                    --\n"\
@@ -489,6 +628,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 fi
 
 
+
+
 libpngOK=-1
 if [ $BUILD_ALL == "y" ] ; then
 	INSTALL_ANSWER="y"
@@ -562,6 +703,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 fi
 
 
+
+
 libJPEGOK=-1
 if [ $BUILD_ALL == "y" ] ; then
 	INSTALL_ANSWER="y"
@@ -618,6 +761,8 @@ if [ -e ${CURRENTDIR}/libjpeg/lib/libjpeg.a ] ; then
 fi
 
 
+
+
 libtiffOK=-1
 if [ $BUILD_ALL == "y" ] ; then
 	INSTALL_ANSWER="y"
@@ -632,8 +777,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 	cd libtiff
 	mkdir build
-	tar xvf tiff-4.0.4.tar.gz -C ./build/
-	cd build/tiff-4.0.4
+	tar xvf tiff-4.0.10.tar.gz -C ./build/
+	cd build/tiff-4.0.10
 	if [ -e ${CURRENTDIR}/libjpeg/lib/libjpeg.a ] ; then
 		./configure --enable-static --disable-shared  --enable-jpeg --enable-old-jpeg --disable-jbig ${zlib_CONFIG}  ${LIBJPEG_CONFIGFLAGS} --prefix=${CURRENTDIR}/libtiff   CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"     LDFLAGS="${PICFLAGS} ${MORELDFLAGS}"
 	else
@@ -668,6 +813,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	libtiffOK=$libOK
 
 fi
+
 
 
 
@@ -723,6 +869,9 @@ if [ -e ${CURRENTDIR}/gsl/lib/libgsl.a ] ; then
 	gsl_CFLAGS="-I${CURRENTDIR}/gsl/include"
 	gsl_LDDIRS="-L${CURRENTDIR}/gsl/lib"
 fi
+
+
+
 
 libusbOK=-1
 if [ $BUILD_ALL == "y" ] ; then
@@ -796,82 +945,6 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	libusbOK=$libOK
 fi
 
-
-
-
-
-
-
-
-libnidaqmxOK=-5
-if [ $ISMSYS == "1" ] ; then
-	libnidaqmxOK=-1
-	read -p "Do you want to build 'libNIDAQmx' (windows only!!!) (y/n)? " -n 1 INSTALL_ANSWER
-	echo -e  "\n"
-	if [ $INSTALL_ANSWER == "y" ] ; then
-
-		echo -e  "------------------------------------------------------------------------\n"\
-		"-- BUILDING: libnidaqmxOK                                             --\n"\
-		"------------------------------------------------------------------------\n\n"\
-
-		cd nidaqmx
-		./makenidaqmx.sh
-		libOK=$?
-		cd ${CURRENTDIR}
-		
-		if [ $libOK -eq 0 ] ; then		
-			libnidaqmxOK=0
-		else
-			libnidaqmxOK=-3
-		fi
-	fi
-fi
-
-
-
-
-
-
-libandorOK=-5
-if [ $ISMSYS == "1" ] ; then
-	libandorOK=-1
-	read -p "Do you want to build 'libAndor' (windows only!!!) (y/n)? " -n 1 INSTALL_ANSWER
-	echo -e  "\n"
-	if [ $INSTALL_ANSWER == "y" ] ; then
-
-		echo -e  "------------------------------------------------------------------------\n"\
-		"-- BUILDING: libAndor                                                 --\n"\
-		"------------------------------------------------------------------------\n\n"\
-		echo -e "first we have to copy the file ATMCD32D.H from the Andor SDK to \n"
-		echo -e "andor_win32 and andor_win64. Then ATMCD32D.DLL has to be copied \n"
-		echo -e "to andor_win32 and atmcd64d.dll to andor_win64. Finally a script\n"
-		echo -e "in each of these diretories will create the 32bit/64bit link libs\n"
-		echo -e "which are needed to build the andor camera driver with mingw.\n\n"
-	    read -p "please enter the directory of the Andor SDK "  ANDORSDK
-	    echo -e  "\n"
-	    read -p "Do you want to build 32bit or 64bit (3/6)? " -n 1 SELECTBITS
-	    echo -e  "\n"
-	    if [ $SELECTBITS == "6" ] ; then
-            cd andor_win64
-			cp $ANDORSDK/atmcd64d.dll .
-			cp $ANDORSDK/ATMCD32D.H .
-		else
-            cd andor_win32
-			cp $ANDORSDK/ATMCD32D.DLL .
-			cp $ANDORSDK/ATMCD32D.H .
-		fi
-		
-		./create_testcpp.sh
-		libOK=$?
-		cd ${CURRENTDIR}
-		
-		if [ $libOK -eq 0 ] ; then		
-			libandorOK=0
-		else
-			libandorOK=-3
-		fi
-	fi
-fi
 
 
 
@@ -1052,6 +1125,9 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 fi
 
+
+
+
 cimgOK=-1
 if [ $BUILD_ALL == "y" ] ; then
 	INSTALL_ANSWER="y"
@@ -1084,9 +1160,6 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	cimgOK=$libOK
 
 fi
-
-
-
 
 
 
@@ -1136,6 +1209,9 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	libpixmanOK=$libOK
 
 fi
+
+
+
 
 libcairoOK=-1
 if [ $BUILD_ALL == "y" ] ; then
@@ -1199,23 +1275,27 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 fi
 
+
+
+
 echo -e  "\n------------------------------------------------------------------------\n"\
 "-- BUILD RESULTS                                                       --\n"\
 "------------------------------------------------------------------------\n\n"\
 
 print_result "Qt DLLs copy" $qtOK
+print_result "libNIDAQmx" $libnidaqmxOK
+print_result "libAndor" $libandorOK
 print_result "zlib" $zlibOK
 #print_result "lzma" $lzmaOK
-print_result "lmfit" $lmfitOK
-print_result "lmfit v5" $lmfit5OK
+#print_result "lmfit" $lmfitOK
+#print_result "lmfit v5" $lmfit5OK
+print_result "lmfit v6" $lmfit6OK
 print_result "levmar" $levmarOK
 print_result "libpng" $libpngOK
 print_result "libjpeg" $libJPEGOK
 print_result "libtiff" $libtiffOK
 print_result "gsl" $libgslOK
 print_result "libusb" $libusbOK
-print_result "libNIDAQmx" $libnidaqmxOK
-print_result "libAndor" $libandorOK
 print_result "eigen" $eigenOK
 print_result "nlopt" $libnloptOK
 print_result "OOL" $libOOLOK

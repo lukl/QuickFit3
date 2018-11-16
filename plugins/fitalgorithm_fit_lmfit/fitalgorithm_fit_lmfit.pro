@@ -27,7 +27,8 @@ DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 include(../../qf3plugins.pri)
 #include(../../extlibs/lmfit.pri)
-include(../../extlibs/lmfit5.pri)
+#include(../../extlibs/lmfit5.pri)
+include(../../extlibs/lmfit6.pri)
 
 DESTDIR = $${QFOUTPUT}/plugins/
 include(../../libquickfitwidgets.pri)
