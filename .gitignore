@@ -125,6 +125,9 @@ Thumbs.db
 /extlibs/lmfit5/include
 /extlibs/lmfit5/lib
 /extlibs/lmfit5/share
+/extlibs/lmfit6/include
+/extlibs/lmfit6/lib
+/extlibs/lmfit6/share
 /extlibs/nlopt/include
 /extlibs/nlopt/lib
 /extlibs/nlopt/share
