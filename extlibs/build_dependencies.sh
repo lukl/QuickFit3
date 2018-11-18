@@ -645,12 +645,13 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 	cd libpng
 	mkdir build
-	tar xvf libpng-1.6.18.tar.gz -C ./build/
-	cd build/libpng-1.6.18
+	tar xvf libpng-1.6.35.tar.gz -C ./build/
+	cd build/libpng-1.6.35
 	ZLIBINC=../../../zlib/lib/include/
 	ZLIBLIB=../../../zlib/lib/
 	if [ -e ../../../zlib/lib/libz.a ] ; then
-		./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/libpng LDFLAGS="${PICFLAGS} ${MORELDFLAGS} -L${CURRENTDIR}/zlib/lib" CFLAGS="${PICFLAGS} ${MORECFLAGS} -I${CURRENTDIR}/zlib/include" CXXFLAGS="${PICFLAGS} ${MORECFLAGS} -I${CURRENTDIR}/zlib/include/ "
+		echo -e "\nzlib build found in extlibs, using copy in /extlibs/zlib \n"
+		./configure --enable-static --disable-shared --with-zlib-prefix=${CURRENTDIR}/zlib/ --prefix=${CURRENTDIR}/libpng LDFLAGS="${PICFLAGS} ${MORELDFLAGS}" CFLAGS="${PICFLAGS} ${MORECFLAGS}" CXXFLAGS="${PICFLAGS} ${MORECFLAGS}"
 	else
 		ZLIBINC=.
 		ZLIBLIB=.
@@ -1280,17 +1281,20 @@ fi
 
 
 echo -e  "\n------------------------------------------------------------------------\n"\
-"-- BUILD RESULTS                                                       --\n"\
+"-- BUILD RESULTS                                                      --\n"\
 "------------------------------------------------------------------------\n\n"\
 
-echo -e  "-- Windows only libraries                                              --\n"\
+echo -e  "-- Windows only libraries                                             --\n"
+
 print_result "libNIDAQmx" $libnidaqmxOK
 print_result "libAndor" $libandorOK
 
-echo -e  "-- Qt DLLS                                                             --\n"\
-print_result "Qt DLLs copy" $qtOK
+echo -e  "\n-- Qt DLLS                                                            --\n"
 
-echo -e  "-- General Libraries                                                   --\n"\
+print_result "\nQt DLLs copy" $qtOK
+
+echo -e  "\n-- General Libraries                                                  --\n"
+
 print_result "zlib" $zlibOK
 #print_result "lzma" $lzmaOK
 #print_result "lmfit" $lmfitOK
