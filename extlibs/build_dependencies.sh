@@ -23,16 +23,52 @@ function print_result {
 
 
 
-echo -e "========================================================================\n"\
+echo -e \
+"========================================================================\n"\
 "= QuickFit 3 dependency build script                                   =\n"\
 "========================================================================\n\n"\
-"This script will try to build all the dependency libraries \n"\
+"This script will try to build all the dependency libraries.\n"\
 "needed for QuickFit. All libraries will be built in static linking mode\n"\
 "and stay inside their subdirectory of this extlibs directory, so they\n"\
 "don't interfere with your system-libraries. The .pri-files in this di-\n"\
-"rectory include the libraries in a way that preferences these libraries.\n\n"\
+"rectory include the libraries in a way that configures these libraries.\n\n"\
+"========================================================================\n\n"\
 
 
+echo "detecting compile system ... "
+ISMSYS=`uname -a`
+echo $ISMSYS
+if echo $ISMSYS | grep -iq msys ; then
+	echo "   => this is MSys on Windows"
+	ISMSYS="1"
+else
+	echo "   => this is a default non-MSys system"
+	ISMSYS="0"
+fi
+
+
+PICFLAGS=""
+if [ $ISMSYS == "1" ] ; then
+
+	PICFLAGS="-fPIC"
+    echo -e "   => MSys environment on Windows: $PICFLAGS flag required"
+	
+	echo -e "   => MSys environment on Windows: mingw32-make.exe is used instead of make\n"
+	shopt -s expand_aliases
+	#source .alias
+	alias make='mingw32-make.exe'
+	
+	MINGWBINPATH="/c/Qt/5.5/mingw492_32/bin:/c/Qt/Tools/mingw492_32/bin"
+	#MINGWBINPATH="" # Add your bin paths here
+	
+	echo -e "Please make sure your compiler is found (seen in compiler missing errors)\n"\
+	"(if encountered, add binary path to qmake and C/C++ compilers to path variable)\n"\
+	"QuickFit should then ideally be built with the same compiler version.\n"\
+	"A default path added here:"
+	echo $MINGWBINPATH
+	echo -e "If this is wrong, change in build_dependencies.sh accordingly\n"
+	export PATH=$PATH:$MINGWBINPATH
+fi
 
 
 CURRENTDIR=${PWD}
@@ -41,7 +77,18 @@ QT_INFO_BIN=`qmake -query QT_INSTALL_BINS`
 QT_INFO_PLUGINS=`qmake -query QT_INSTALL_PLUGINS`
 QT_INFO_INSTALLDIR=`qmake -query QT_INSTALL_PREFIX`
 QT_INFO_VERSION=`qmake -query QT_VERSION`
-echo -e "\n\nBuilding for\n    Qt version ${QT_INFO_VERSION}\n       in ${QT_INFO_INSTALLDIR}\n\n"
+
+if [[ -z "$QT_INFO_LIBS" ]] ; then
+	echo -e "\nERROR: qmake not found.\n"
+	read -p "Cancel (some libs won't build, maybe QF won't build) (y/n)? " -n 1  CANCELLING
+	echo -e  "\n"
+	if [ $CANCELLING == "y" ] ; then
+		exit 1
+	fi
+else
+	echo -e "\n\nBuilding for\n    Qt version ${QT_INFO_VERSION}\n       in ${QT_INFO_INSTALLDIR}\n\n"
+fi	
+
 
 
 echo -e "First we need to set some basics for the builds:"\
@@ -57,6 +104,14 @@ read -p "Do you want to optimize libraries for your local machine? (y/n)? " -n 1
 echo -e  "\n"
 read -p "Do you want to use OpenMP? (y/n)? " -n 1  MAKE_USEOPENMP
 echo -e  "\n"
+if [ $ISMSYS == "0" ] ; then
+	read -p "Do you need the -fPIC flags? (y/n)? " -n 1  MAKE_PICFLAGS
+else
+	MAKE_PICFLAGS="n"
+fi
+echo -e  "\n"
+
+
 
 
 #sh ../output/get_bit_depth.sh
@@ -81,34 +136,10 @@ if [ $MAKE_USEOPENMP == "y" ] ; then
 	MORELDFLAGS=" $MORELDFLAGS -fopenmp"
 fi
 
-
-
-
-
-echo "detecting compile system ... "
-ISMSYS=`uname -a`
-echo $ISMSYS
-if echo $ISMSYS | grep -iq msys ; then
-	echo "   => this is MSys on Windows"
-	ISMSYS="1"
-else
-	echo "   => this is a default non-MSys system"
-	ISMSYS="0"
+if [ $MAKE_PICFLAGS == "y" ] ; then
+		PICFLAGS="-fPIC"
 fi
 
-
-if [ $ISMSYS == "0" ] ; then
-	read -p "Do you need the -fPIC flags? (y/n)? " -n 1  MAKE_PICFLAGS
-    echo -e  "\n"
-
-    PICFLAGS="-fPIC"
-    if [ $MAKE_PICFLAGS == "n" ] ; then
-            PICFLAGS=""
-    fi
-else
-    echo -e "building in MSys environment on Windows! -fPIC required\n\n"
-    PICFLAGS="-fPIC"
-fi
 
 
 libnidaqmxOK=-5
@@ -243,8 +274,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 	cd zlib
 	mkdir build
-	tar xvf zlib-1.2.8.tar.gz -C ./build/
-	cd build/zlib-1.2.8
+	tar xvf zlib-1.2.11.tar.gz -C ./build/
+	cd build/zlib-1.2.11
  	if [ $ISMSYS == "1" ] ; then
 		BINARY_PATH='../../bin'
 		INCLUDE_PATH='../../include'
@@ -254,6 +285,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 		
 		MAKEFILE="Makefile.gcc"
 	else
+		echo -e "Running on native Linux, not MSYS"
 		export LDFLAGS="${MORELDFLAGS} ${PICFLAGS}"
 		export CFLAGS="${MORECFLAGS} ${PICFLAGS}"
 		export CPPFLAGS="${MORECFLAGS} ${PICFLAGS}"
@@ -264,11 +296,11 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	fi
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
-		make -j${MAKE_PARALLEL_BUILDS} -f $MAKEFILE
+		 make -j${MAKE_PARALLEL_BUILDS} -f $MAKEFILE
 		
 		libOK=$?
 		if [ $libOK -eq 0 ] ; then		
-			make -j${MAKE_PARALLEL_BUILDS} install -f $MAKEFILE
+			 make -j${MAKE_PARALLEL_BUILDS} install -f $MAKEFILE
 			libOK=$?
 			if [ $libOK -ne 0 ] ; then		
 				libOK=-4
@@ -304,7 +336,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	# echo -e "\n\n\n"
 	
 fi
-
+print_result "zlib" $zlibOK
 
 
 
@@ -326,11 +358,11 @@ lzmaOK=-1
 #        ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lzma  CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"	LDFLAGS="${PICFLAGS}"
 #	libOK=$?
 #	if [ $libOK -eq 0 ] ; then
-#		make -j${MAKE_PARALLEL_BUILDS} 
+#		 make -j${MAKE_PARALLEL_BUILDS} 
 #		
 #		libOK=$?
 #		if [ $libOK -eq 0 ] ; then		
-#			make -j${MAKE_PARALLEL_BUILDS} install 
+#			 make -j${MAKE_PARALLEL_BUILDS} install 
 #			libOK=$?
 #			if [ $libOK -ne 0 ] ; then		
 #				libOK=-4
@@ -364,11 +396,11 @@ lzmaOK=-1
 # echo -e "\nLDFLAGS="
 # echo $lzma_LDFLAGS
 # echo -e "\n\n\n"
+print_result "lzma (old age)" $lzmaOK
 
 
 
-
-# lmfitOK=-1
+ lmfitOK=-1
 # if [ $BUILD_ALL == "y" ] ; then
 	# INSTALL_ANSWER="y"
 # else
@@ -390,7 +422,7 @@ lzmaOK=-1
 	# ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit  CFLAGS="${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="${PICFLAGS} ${MORECFLAGS}"	LDFLAGS="${PICFLAGS} ${MORELDFLAGS} -lm" 
 	# libOK=$?
 	# if [ $libOK -eq 0 ] ; then
-		# make -j${MAKE_PARALLEL_BUILDS}
+		#  make -j${MAKE_PARALLEL_BUILDS}
 		
 		# libOK=$?
 		# if [ $libOK -eq 0 ] ; then		
@@ -418,11 +450,11 @@ lzmaOK=-1
 	# lmfitOK=$libOK
 
 # fi
+print_result "lmfit(old age)" $lmfitOK
 
 
 
-
-# lmfit5OK=-1
+ lmfit5OK=-1
 # if [ $BUILD_ALL == "y" ] ; then
 	# INSTALL_ANSWER="y"
 # else
@@ -441,7 +473,7 @@ lzmaOK=-1
         # export LDFLAGS="${LDFLAGS} "
         # export CFLAGS="${CFLAGS} "
         # export CPPFLAGS="${CPPFLAGS} "
-        # ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit5  CFLAGS=" ${MORECFLAGS}" CPPFLAGS=" ${MORECFLAGS}"	LDFLAGS=" ${MORELDFLAGS}"
+        # ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit6  CFLAGS="-Wno-error ${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="-Wno-error ${PICFLAGS} ${MORECFLAGS}"	LDFLAGS="${PICFLAGS} ${MORELDFLAGS}"
 	# libOK=$?
 	# if [ $libOK -eq 0 ] ; then
 		# make -j${MAKE_PARALLEL_BUILDS}
@@ -472,7 +504,7 @@ lzmaOK=-1
 	# lmfit5OK=$libOK
 
 # fi
-
+print_result "lmfit v5(old age)" $lmfit5OK
 
 
 
@@ -495,7 +527,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
         export LDFLAGS="${LDFLAGS} "
         export CFLAGS="${CFLAGS} "
         export CPPFLAGS="${CPPFLAGS} "
-        ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit6  CFLAGS=" ${MORECFLAGS}" CPPFLAGS=" ${MORECFLAGS}"	LDFLAGS=" ${MORELDFLAGS}"
+        ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit6  CFLAGS="-Wno-error ${PICFLAGS} ${MORECFLAGS}" CPPFLAGS="-Wno-error ${PICFLAGS} ${MORECFLAGS}"	LDFLAGS="${PICFLAGS} ${MORELDFLAGS}"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}
@@ -526,7 +558,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	lmfit6OK=$libOK
 
 fi
-
+print_result "lmfit v6" $lmfit6OK
 
 
 
@@ -596,10 +628,14 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 		rm ./levmar2.h
 		
 	fi 
-	echo "OPTIMIZATIONFLAGS=${MORECFLAGS}"|cat - Makefile > Makefile.tmp && mv Makefile.tmp Makefile 
+	echo "OPTIMIZATIONFLAGS=${MORECFLAGS}"|cat - Makefile > Makefile.tmp && mv Makefile.tmp Makefile
+	
+	if [ $ISMSYS == "1" ] ; then
+		echo "CXX=gcc"|cat - Makefile > Makefile.tmp && mv Makefile.tmp Makefile # Dirty workaround to prevent cxx compilation of c code happening in mingw32-make.exe
+		echo -e "Dirty workaround on Windows, shoving in gcc as CXX compiler\n"
+	fi
 
 	if [ $SKIP == "0" ] ; then
-
 		make -j${MAKE_PARALLEL_BUILDS} 
 		
 		libOK=$?
@@ -627,7 +663,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	cd ${CURRENTDIR}
 
 fi
-
+print_result "levmar" $levmarOK
 
 
 
@@ -703,7 +739,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	libpngOK=$libOK
 
 fi
-
+print_result "libpng" $libpngOK
 
 
 
@@ -761,7 +797,7 @@ LIBJPEG_CONFIGFLAGS=
 if [ -e ${CURRENTDIR}/libjpeg/lib/libjpeg.a ] ; then
 	LIBJPEG_CONFIGFLAGS="--with-jpeg-include-dir=${CURRENTDIR}/libjpeg/include --with-jpeg-lib-dir=${CURRENTDIR}/libjpeg/lib"
 fi
-
+print_result "libjpeg" $libJPEGOK
 
 
 
@@ -815,7 +851,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	libtiffOK=$libOK
 
 fi
-
+print_result "libtiff" $libtiffOK
 
 
 
@@ -871,8 +907,7 @@ if [ -e ${CURRENTDIR}/gsl/lib/libgsl.a ] ; then
 	gsl_CFLAGS="-I${CURRENTDIR}/gsl/include"
 	gsl_LDDIRS="-L${CURRENTDIR}/gsl/lib"
 fi
-
-
+print_result "gsl" $libgslOK
 
 
 libusbOK=-1
@@ -946,7 +981,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	
 	libusbOK=$libOK
 fi
-
+print_result "libusb" $libusbOK
 
 
 
@@ -986,7 +1021,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	eigenOK=$libOK
 
 fi
-
+print_result "eigen" $eigenOK
 
 
 
@@ -1077,7 +1112,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	libnloptOK=$libOK
 
 fi
-
+print_result "nlopt" $libnloptOK
 
 
 
@@ -1126,7 +1161,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	libOOLOK=$libOK
 
 fi
-
+print_result "OOL" $libOOLOK
 
 
 
@@ -1162,7 +1197,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	cimgOK=$libOK
 
 fi
-
+print_result "cimg" $cimgOK
 
 
 
@@ -1211,7 +1246,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	libpixmanOK=$libOK
 
 fi
-
+print_result "pixman" $libpixmanOK
 
 
 
@@ -1276,7 +1311,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	libcairoOK=$libOK
 
 fi
-
+print_result "cairo" $libcairoOK
 
 
 
@@ -1296,9 +1331,9 @@ print_result "\nQt DLLs copy" $qtOK
 echo -e  "\n-- General Libraries                                                  --\n"
 
 print_result "zlib" $zlibOK
-#print_result "lzma" $lzmaOK
-#print_result "lmfit" $lmfitOK
-#print_result "lmfit v5" $lmfit5OK
+print_result "lzma (old age)" $lzmaOK
+print_result "lmfit(old age)" $lmfitOK
+print_result "lmfit v5(old age)" $lmfit5OK
 print_result "lmfit v6" $lmfit6OK
 print_result "levmar" $levmarOK
 print_result "libpng" $libpngOK
