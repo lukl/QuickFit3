@@ -55,7 +55,6 @@ if [ $ISMSYS == "1" ] ; then
 	
 	echo -e "   => MSys environment on Windows: mingw32-make.exe is used instead of make\n"
 	shopt -s expand_aliases
-	#source .alias
 	alias make='mingw32-make.exe'
 	
 	MINGWBINPATH="/c/Qt/5.5/mingw492_32/bin:/c/Qt/Tools/mingw492_32/bin"
@@ -1312,6 +1311,10 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 fi
 print_result "cairo" $libcairoOK
+
+
+cd quazip
+tar xvf quazip-0.7.6.tar.gz -C ./
 
 
 
