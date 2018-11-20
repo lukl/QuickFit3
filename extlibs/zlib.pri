@@ -20,9 +20,16 @@
 #
 
 !contains(DEFINES, QF_HAS_ZLIB) {
-	LIBS += -L$$PWD/zlib/lib -lz
-	INCLUDEPATH += $$PWD/zlib/include
-	DEFINES += QF_HAS_ZLIB cimg_use_zlib
+       equals(QT_MAJOR_VERSION, 5){
+            INCLUDEPATH += $$[QT_INSTALL_HEADERS]/QtZlib
+            LIBS += -lz
+       }
+       equals(QT_MAJOR_VERSION, 4){
+            LIBS += -L$$PWD/zlib/lib -lz
+            INCLUDEPATH += $$PWD/zlib/include
+       }
+       DEFINES += QF_HAS_ZLIB cimg_use_zlib
+
 }else{
 	LIBS += -lz
 }
