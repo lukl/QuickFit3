@@ -28,8 +28,8 @@ win32 {
     #DEFINES += NOMINMAX
 }
 
-include(./quazip/quazip-0.7.1/quazip.pri)
+include(./quazip/quazip-0.7.6/quazip.pri)
 
-INCLUDEPATH += $$PWD/quazip/quazip-0.7.1
+INCLUDEPATH += $$PWD/quazip/quazip-0.7.6/
 
 DEFINES += QF_HAS_QUAZIP QF_HAS_MINIZIP
