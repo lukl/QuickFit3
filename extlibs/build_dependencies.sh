@@ -79,6 +79,7 @@ QT_INFO_VERSION=`qmake -query QT_VERSION`
 
 if [[ -z "$QT_INFO_LIBS" ]] ; then
 	echo -e "\nERROR: qmake not found.\n"
+	echo -e "You may add the math via "export PATH=$PATH:/path/to/bin/qmake""
 	read -p "Cancel (some libs won't build, maybe QF won't build) (y/n)? " -n 1  CANCELLING
 	echo -e  "\n"
 	if [ $CANCELLING == "y" ] ; then
