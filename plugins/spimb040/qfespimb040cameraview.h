@@ -535,6 +535,7 @@ class QFESPIMB040CameraView : public QWidget {
         void saveTransformedImage();
         void histogramMask();
         void histogramChecked(bool checked);
+        void FTchecked(bool checked);
 
         void updateGrid();
 

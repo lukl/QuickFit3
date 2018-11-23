@@ -111,8 +111,8 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCa
 
     //initialise image histogram data arrays
     histogram_n=255;
-    histogram_x=(double*)malloc(histogram_n*sizeof(double));
-    histogram_y=(double*)malloc(histogram_n*sizeof(double));
+    histogram_x=(double*)qfMalloc(histogram_n*sizeof(double));
+    histogram_y=(double*)qfMalloc(histogram_n*sizeof(double));
     for (unsigned int i=0; i<histogram_n; i++) {
         histogram_x[i]=i;
         histogram_y[i]=0;
@@ -183,14 +183,14 @@ void QFESPIMB040CameraView::init(int cameraID, QFCameraConfigComboBoxStartResume
 QFESPIMB040CameraView::~QFESPIMB040CameraView()
 {
     image.clear();
-    free(histogram_x);
-    free(histogram_y);
-    free(ft_x);
-    free(ft_y);
-    free(ft_ix);
-    free(ft_iy);
-    free(currentline_y);
-    free(currentline_x);
+    qfFree(histogram_x);
+    qfFree(histogram_y);
+    qfFree(ft_x);
+    qfFree(ft_y);
+    qfFree(ft_ix);
+    qfFree(ft_iy);
+    qfFree(currentline_y);
+    qfFree(currentline_x);
     qfFree(pltDataMarginalLeftX);
     qfFree(pltDataMarginalLeftY);
     qfFree(pltDataMarginalBottomX);
@@ -346,7 +346,6 @@ void QFESPIMB040CameraView::createMainWidgets() {
     stathbl->addStretch();
     connect(chkImageStatisticsHistogram, SIGNAL(toggled(bool)), this, SLOT(histogramChecked(bool)));
 
-
     pltCountsHistogram=new JKQTFastPlotter(w);
     QColor bt=QColor("blue");
     bt.setAlphaF(0.5);
@@ -356,6 +355,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
     pltCountsHistogram->addPlot(plteHistogram);
     pltCountsHistogram->set_xAxisLabel("grayvalue");
     pltCountsHistogram->set_yAxisLabel("# pixels");
+    pltCountsHistogram->setMinimumHeight(250);
 
     vbl->addWidget(pltCountsHistogram);
     QHBoxLayout* hbl;
@@ -418,16 +418,15 @@ void QFESPIMB040CameraView::createMainWidgets() {
     QHBoxLayout* fthbl=new QHBoxLayout();
     vbl->addLayout(fthbl);
     fthbl->setContentsMargins(0,0,0,0);
-    chkFourierTransform=new QCheckBox(tr("Sharpness Fourier Transform"), w);
+    chkFourierTransform=new QCheckBox(tr("Fourier Transform Sharpness"), w);
     fthbl->addWidget(chkFourierTransform);
     chkFourierTransform->setChecked(false);
+    connect(chkFourierTransform, SIGNAL(toggled(bool)),this, SLOT(FTchecked(bool)));
     fthbl->addStretch();
     labelSharpness_x=new QLabel(tr("x-Sharpness: Inactive"));
-    labelSharpness_x->setStyleSheet("font-weight:bold; font-size: 16px");
     fthbl->addWidget(labelSharpness_x);
     fthbl->addStretch();
     labelSharpness_y=new QLabel(tr("y-Sharpness: Inactive"));
-    labelSharpness_y->setStyleSheet("font-weight:bold; font-size: 16px");
     fthbl->addWidget(labelSharpness_y);
     fthbl->addStretch();
 
@@ -443,13 +442,18 @@ void QFESPIMB040CameraView::createMainWidgets() {
     pltFourierTransform->addPlot(plteFourierTransformRangeY);
     pltFourierTransform->set_xAxisLabel("frequency [imagesize/pixel]");
     pltFourierTransform->set_yAxisLabel("Fourier Transform x-dir");
+    pltFourierTransform->setMinimumHeight(250);
     vbl->addWidget(pltFourierTransform);
+    pltFourierTransform->setVisible(false);
 
 
     //labMarginalFitResults=new QLabel(w);
     labMarginalFitResults=new QFastTableLabel(w);
     labMarginalFitResults->setGrid(false);
+    labMarginalFitResults->setMinimumHeight(250);
     vbl->addWidget(labMarginalFitResults);
+
+    vbl->addStretch(0);
 
     tabSettings->addTab(w, tr("&Statistics"));
     setCountsAutoscale(false);
@@ -811,10 +815,10 @@ void QFESPIMB040CameraView::loadSettings(QSettings& settings, QString prefix) {
     histogram_n=settings.value(prefix+"histogram.items", histogram_n).toUInt();
     spinHistogramBins->setValue(histogram_n);
     // reallocate histogram and initialize
-    if (histogram_x) free(histogram_x);
-    if (histogram_y) free(histogram_y);
-    histogram_x=(double*)malloc(histogram_n*sizeof(double));
-    histogram_y=(double*)malloc(histogram_n*sizeof(double));
+    if (histogram_x) qfFree(histogram_x);
+    if (histogram_y) qfFree(histogram_y);
+    histogram_x=(double*)qfMalloc(histogram_n*sizeof(double));
+    histogram_y=(double*)qfMalloc(histogram_n*sizeof(double));
     for (unsigned int i=0; i<histogram_n; i++) {
         histogram_x[i]=i;
         histogram_y[i]=0;
@@ -878,10 +882,10 @@ void QFESPIMB040CameraView::loadSettings(QFManyFilesSettings &settings, QString 
      histogram_n=settings.value(prefix+"histogram.items", histogram_n).toUInt();
      spinHistogramBins->setValue(histogram_n);
      // reallocate histogram and initialize
-     if (histogram_x) free(histogram_x);
-     if (histogram_y) free(histogram_y);
-     histogram_x=(double*)malloc(histogram_n*sizeof(double));
-     histogram_y=(double*)malloc(histogram_n*sizeof(double));
+     if (histogram_x) qfFree(histogram_x);
+     if (histogram_y) qfFree(histogram_y);
+     histogram_x=(double*)qfMalloc(histogram_n*sizeof(double));
+     histogram_y=(double*)qfMalloc(histogram_n*sizeof(double));
      for (unsigned int i=0; i<histogram_n; i++) {
          histogram_x[i]=i;
          histogram_y[i]=0;
@@ -2171,9 +2175,12 @@ void QFESPIMB040CameraView::deleteUserAction(QAction* action) {
 }
 
 void QFESPIMB040CameraView::histogramChecked(bool /*checked*/) {
+    pltCountsHistogram->setVisible(chkImageStatisticsHistogram->isChecked());
 }
 
-
+void QFESPIMB040CameraView::FTchecked(bool /*checked*/) {
+    setFourierTransform(chkFourierTransform->isChecked());
+}
 
 
 void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
@@ -2827,14 +2834,14 @@ void QFESPIMB040CameraView::FtMemoryRealloc() {
     ftsizey=image.height();
 
 
-    ft_ix=(double*)malloc(ftsizex*sizeof(double));
-    ft_x=(double*)malloc(ftsizex*sizeof(double));
-    currentline_x=(double*)malloc(ftsizex*sizeof(double));
-    ft_iy=(double*)malloc(ftsizey*sizeof(double));
-    ft_y=(double*)malloc(ftsizey*sizeof(double));
-    currentline_y=(double*)malloc(ftsizey*sizeof(double));
-    ft_x_tempstorage=(double*)malloc(ftsizex*sizeof(double));
-    ft_y_tempstorage=(double*)malloc(ftsizey*sizeof(double));
+    ft_ix=(double*)qfMalloc(ftsizex*sizeof(double));
+    ft_x=(double*)qfMalloc(ftsizex*sizeof(double));
+    currentline_x=(double*)qfMalloc(ftsizex*sizeof(double));
+    ft_iy=(double*)qfMalloc(ftsizey*sizeof(double));
+    ft_y=(double*)qfMalloc(ftsizey*sizeof(double));
+    currentline_y=(double*)qfMalloc(ftsizey*sizeof(double));
+    ft_x_tempstorage=(double*)qfMalloc(ftsizex*sizeof(double));
+    ft_y_tempstorage=(double*)qfMalloc(ftsizey*sizeof(double));
 
     for (unsigned int i=0; i<ftsizex; i++) {
         ft_ix[i]=i;
@@ -2853,9 +2860,16 @@ void QFESPIMB040CameraView::FtMemoryRealloc() {
 void QFESPIMB040CameraView::setFourierTransform(bool state) {
     chkFourierTransform->setChecked(state);
     chkFourierTransform->setCheckable(true);
+    pltFourierTransform->setVisible(chkFourierTransform->isChecked());
     if (state==false) {
+        labelSharpness_x->setStyleSheet(styleSheet());
+        labelSharpness_y->setStyleSheet(styleSheet());
         labelSharpness_x->setText("x: Inactive");
         labelSharpness_y->setText("y: Inactive");
+    }
+    else {
+        labelSharpness_x->setStyleSheet("font-weight:bold; font-size: 16px");
+        labelSharpness_y->setStyleSheet("font-weight:bold; font-size: 16px");
     }
 }
 
