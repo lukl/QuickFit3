@@ -204,6 +204,7 @@ void QFExtensionShutterServoArduino::setShutterAlex(unsigned int shutter, bool A
     QMutex* mutex=ports.getMutex(shutters[shutter].port);
     QMutexLocker locker(mutex);
     if (!com->isConnectionOpen()) return ;
+    qDebug()<<"Command send to shutter:"<<(QString("A")+QString::number(AlexOnOff));
     shutters[shutter].serial->sendCommand(QString("A")+QString::number(AlexOnOff));
     shutters[shutter].lastAction=QTime::currentTime();
 
