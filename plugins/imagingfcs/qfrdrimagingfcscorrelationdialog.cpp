@@ -699,7 +699,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnAddCellsAndJobs_clicked() {
         lastImagefileDir=QFileInfo(fileName).dir().absolutePath();
         ui->cmbFileformat->setCurrentIndex(imageFilters.indexOf(lastImagefileFilter));
         ui->edtImageFile->setFocus(Qt::MouseFocusReason);
-        on_btnLoad_clicked();
+        on_btnLoadNoCount_clicked();
         writeSettings();
         on_btnAddJob_clicked();
     }
