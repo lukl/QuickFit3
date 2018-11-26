@@ -50,6 +50,7 @@ QFRDRImagingFCSMaskByIntensity::QFRDRImagingFCSMaskByIntensity(QWidget *parent, 
     ui->chkColorScaling->setChecked(ProgramOptions::getConfigValue(iniName+"/chkColorScaling", false).toBool());
     ui->edtImgRangeMin->setValue(ProgramOptions::getConfigValue(iniName+"/edtImgRangeMin", 5).toDouble());
     ui->edtImgRangeMax->setValue(ProgramOptions::getConfigValue(iniName+"/edtImgRangeMax", 5).toDouble());
+    ui->edtInitRatio->setValue(ProgramOptions::getConfigValue(iniName+"/edtInitRatio", 30).toDouble());
     loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, iniName+"/geo/");
     updateDualView();
     updateEnabledWidgets();
@@ -64,6 +65,7 @@ QFRDRImagingFCSMaskByIntensity::~QFRDRImagingFCSMaskByIntensity() {
     ProgramOptions::setConfigValue(iniName+"/chkColorScaling", ui->chkColorScaling->isChecked());
     ProgramOptions::setConfigValue(iniName+"/edtImgRangeMin", ui->edtImgRangeMin->value());
     ProgramOptions::setConfigValue(iniName+"/edtImgRangeMax", ui->edtImgRangeMax->value());
+    ProgramOptions::setConfigValue(iniName+"/edtInitRatio", ui->edtInitRatio->value());
     delete ui;
 }
 
@@ -278,7 +280,7 @@ void QFRDRImagingFCSMaskByIntensity::on_btnHelp_clicked()
 void QFRDRImagingFCSMaskByIntensity::updateDualView()
 {
     updateEnabledWidgets();
-
+    double initratio=0.01*ui->edtInitRatio->value();
     double l1=ui->edtLevel->value();
     double l2=ui->edtLevel2->value();
 
@@ -304,9 +306,9 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel->setRange(min-10.0, max+10.0);
             ui->edtLevel_2->setRange(min-10.0, max+10.0);
 
-            ui->edtLevel->setValue(min+0.25*(max-min));
+            ui->edtLevel->setValue(min+initratio*(max-min));
             ui->edtLevel_2->setValue(max);
-            ui->sldLevel->setDValue(min+0.25*(max-min));
+            ui->sldLevel->setDValue(min+initratio*(max-min));
             ui->sldLevel_2->setDValue(max);
 
 
@@ -315,9 +317,9 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel2->setRange(min-10.0, max+10.0);
             ui->edtLevel2_2->setRange(min-10.0, max+10.0);
 
-            ui->edtLevel2->setValue(min+0.25*(max-min));
+            ui->edtLevel2->setValue(min+initratio*(max-min));
             ui->edtLevel2_2->setValue(max);
-            ui->sldLevel2->setDValue(min+0.25*(max-min));
+            ui->sldLevel2->setDValue(min+initratio*(max-min));
             ui->sldLevel2_2->setDValue(max);
 
 
@@ -348,9 +350,9 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel->setRange(min-10.0, max+10.0);
             ui->edtLevel_2->setRange(min-10.0, max+10.0);
 
-            ui->edtLevel->setValue(min+0.25*(max-min));
+            ui->edtLevel->setValue(min+initratio*(max-min));
             ui->edtLevel_2->setValue(max);
-            ui->sldLevel->setDValue(min+0.25*(max-min));
+            ui->sldLevel->setDValue(min+initratio*(max-min));
             ui->sldLevel_2->setDValue(max);
 
 
@@ -359,9 +361,9 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel2->setRange(min2-10.0, max2+10.0);
             ui->edtLevel2_2->setRange(min2-10.0, max2+10.0);
 
-            ui->edtLevel2->setValue(min2+0.25*(max2-min2));
+            ui->edtLevel2->setValue(min2+initratio*(max2-min2));
             ui->edtLevel2_2->setValue(max2);
-            ui->sldLevel2->setDValue(min2+0.25*(max2-min2));
+            ui->sldLevel2->setDValue(min2+initratio*(max2-min2));
             ui->sldLevel2_2->setDValue(max2);
 
         } else if (ui->cmbDualView->currentIndex()==2) {
@@ -391,9 +393,9 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel->setRange(min-10.0, max+10.0);
             ui->edtLevel_2->setRange(min-10.0, max+10.0);
 
-            ui->edtLevel->setValue(min+0.25*(max-min));
+            ui->edtLevel->setValue(min+initratio*(max-min));
             ui->edtLevel_2->setValue(max);
-            ui->sldLevel->setDValue(min+0.25*(max-min));
+            ui->sldLevel->setDValue(min+initratio*(max-min));
             ui->sldLevel_2->setDValue(max);
 
 
@@ -402,9 +404,9 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel2->setRange(min2-10.0, max2+10.0);
             ui->edtLevel2_2->setRange(min2-10.0, max2+10.0);
 
-            ui->edtLevel2->setValue(min2+0.25*(max2-min2));
+            ui->edtLevel2->setValue(min2+initratio*(max2-min2));
             ui->edtLevel2_2->setValue(max2);
-            ui->sldLevel2->setDValue(min2+0.25*(max2-min2));
+            ui->sldLevel2->setDValue(min2+initratio*(max2-min2));
             ui->sldLevel2_2->setDValue(max2);
         }
     }

@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>750</width>
+    <width>852</width>
     <height>500</height>
    </rect>
   </property>
@@ -103,7 +103,9 @@
          </layout>
         </item>
         <item>
-         <widget class="QFPlotter" name="pltMain" native="true"/>
+         <widget class="QFPlotter" name="pltMain" native="true">
+          <zorder></zorder>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -298,15 +300,44 @@
          </property>
         </spacer>
        </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>mask m&amp;ode:</string>
+         </property>
+         <property name="buddy">
+          <cstring>cmbMaskMode</cstring>
+         </property>
+        </widget>
+       </item>
        <item row="7" column="1">
+        <widget class="QComboBox" name="cmbMaskMode">
+         <item>
+          <property name="text">
+           <string>add</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>replace</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>remove</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="8" column="1">
         <widget class="QPushButton" name="pushButton">
          <property name="text">
           <string>&amp;update mask</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
-        <spacer name="verticalSpacer">
+       <item row="9" column="1">
+        <spacer name="verticalSpacer_3">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -318,33 +349,18 @@
          </property>
         </spacer>
        </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>mask m&amp;ode:</string>
-         </property>
-         <property name="buddy">
-          <cstring>cmbMaskMode</cstring>
+       <item row="10" column="1">
+        <widget class="QDoubleSpinBox" name="edtInitRatio">
+         <property name="suffix">
+          <string> %</string>
          </property>
         </widget>
        </item>
-       <item row="9" column="1">
-        <widget class="QComboBox" name="cmbMaskMode">
-         <item>
-          <property name="text">
-           <string>replace</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>add</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>remove</string>
-          </property>
-         </item>
+       <item row="10" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>Initial Threshold percentage:</string>
+         </property>
         </widget>
        </item>
       </layout>
