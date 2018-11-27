@@ -280,6 +280,12 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     //QWidget* wFitStat=new QWidget(this);
     //wFitStat->setLayout(layFitStat);
     //splitFitStatistics->addWidget(wFitStat);
+
+    txtFitStatistics=new QTextEdit(this);
+    txtFitStatistics->setReadOnly(true);
+    tabResiduals->addTab(txtFitStatistics, tr("Fit Statistics"));
+
+
     pltResidualHistogram=new QFPlotter(true, this);
     pltResidualHistogram->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltResidualHistogram->resize(200,200);
@@ -302,8 +308,22 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     pltResidualHistogram->getYAxis()->set_minTicks(5);
     pltResidualHistogram->getYAxis()->set_minTicks(5);
     pltResidualHistogram->useExternalDatastore(pltData->getDatastore());
-    tabResiduals->addTab(pltResidualHistogram, tr("Histogram"));
 
+    layHistogramAnalysis=new QVBoxLayout();
+    layHistogramAnalysis->addWidget(pltResidualHistogram);
+
+
+    layHistogramBins=new QFormLayout();
+    //layHistogramBins->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
+    //layFitStat->addLayout(layResidualAnalysis, 1);
+    spinResidualHistogramBins=new QSpinBox(this);
+    spinResidualHistogramBins->setRange(1,1000);
+    layHistogramBins->addRow(tr("# bins:"), spinResidualHistogramBins);
+    layHistogramAnalysis->addLayout(layHistogramBins);
+    QWidget* widResidualParameters=new QWidget(this);
+    widResidualParameters->setLayout(layHistogramAnalysis);
+
+    tabResiduals->addTab(widResidualParameters, tr("Histogram"));
 
     pltResidualCorrelation=new QFPlotter(true, this);
     pltResidualCorrelation->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
@@ -328,22 +348,6 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     pltResidualCorrelation->getYAxis()->set_minTicks(5);
     pltResidualCorrelation->useExternalDatastore(pltData->getDatastore());
     tabResiduals->addTab(pltResidualCorrelation, tr("Correlation"));
-
-    layResidualAnalysis=new QFormLayout();
-    layResidualAnalysis->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
-    QWidget* widResidualParameters=new QWidget(this);
-    widResidualParameters->setLayout(layResidualAnalysis);
-    //layFitStat->addLayout(layResidualAnalysis, 1);
-    spinResidualHistogramBins=new QSpinBox(this);
-    spinResidualHistogramBins->setRange(1,1000);
-    layResidualAnalysis->addRow(tr("# bins:"), spinResidualHistogramBins);
-
-    tabResiduals->addTab(widResidualParameters, tr("Parameters"));
-
-    txtFitStatistics=new QTextEdit(this);
-    txtFitStatistics->setReadOnly(true);
-    //splitFitStatistics->addWidget(txtFitStatistics);
-    tabResiduals->addTab(txtFitStatistics, tr("Fit Statistics"));
 
 
     QWidget* modelWidget=new QWidget(this);

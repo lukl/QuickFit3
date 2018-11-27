@@ -123,6 +123,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QHBoxLayout* layModel;
         QHBoxLayout* layAfterModel;
 
+
         /** \brief ploter for the data&curves */
         QFPlotter* pltData;
         /** \brief ploter for the residuals */
@@ -184,8 +185,9 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QSpinBox* spinResidualHistogramBins;
         /** \brief splitter between residual statistics plotter pltResidualHistogram and fit results txtFitStatistics */
         QVisibleHandleSplitter* splitFitStatistics;
-        /** \brief layout used to configure the residuals evaluation */
-        QFormLayout* layResidualAnalysis;
+        /** \brief layout used to configure the histogram */
+        QFormLayout* layHistogramBins;
+        QVBoxLayout* layHistogramAnalysis;
         /** \brief toolbox to switch between residual histogram and parameters */
         QTabWidget* tabResiduals;
         /** \brief to fit current file */
