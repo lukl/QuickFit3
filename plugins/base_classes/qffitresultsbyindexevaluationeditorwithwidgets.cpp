@@ -265,14 +265,15 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     vbl->addWidget(datacut,0);
     splitPlot->addWidget(widgetResiduals);
 
-    splitFitStatistics=new QVisibleHandleSplitter(this);
-    splitPlot->addWidget(splitFitStatistics);
-    tabResidulas=new QTabWidget(this);
-    //tabResidulas->setTabPosition(QTabWidget::West);
-    tabResidulas->setTabPosition(QTabWidget::North);
-    tabResidulas->setTabShape(QTabWidget::Triangular);
-    tabResidulas->setDocumentMode(true);
-    splitFitStatistics->addWidget(tabResidulas);
+    //splitFitStatistics=new QVisibleHandleSplitter(this);
+    //splitPlot->addWidget(splitFitStatistics);
+    tabResiduals=new QTabWidget(this);
+    //tabResiduals->setTabPosition(QTabWidget::West);
+    //tabResiduals->setTabPosition(QTabWidget::North);
+    //tabResiduals->setTabShape(QTabWidget::Triangular);
+    tabResiduals->setDocumentMode(true);
+    //splitFitStatistics->addWidget(tabResiduals);
+    splitPlot->addWidget(tabResiduals);
     //QHBoxLayout* layFitStat=new QHBoxLayout();
     //layFitStat->setContentsMargins(0,0,0,0);
     //layFitStat->setMargin(0);
@@ -301,7 +302,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     pltResidualHistogram->getYAxis()->set_minTicks(5);
     pltResidualHistogram->getYAxis()->set_minTicks(5);
     pltResidualHistogram->useExternalDatastore(pltData->getDatastore());
-    tabResidulas->addTab(pltResidualHistogram, tr("Histogram"));
+    tabResiduals->addTab(pltResidualHistogram, tr("Histogram"));
 
 
     pltResidualCorrelation=new QFPlotter(true, this);
@@ -326,7 +327,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     pltResidualCorrelation->getYAxis()->set_minTicks(5);
     pltResidualCorrelation->getYAxis()->set_minTicks(5);
     pltResidualCorrelation->useExternalDatastore(pltData->getDatastore());
-    tabResidulas->addTab(pltResidualCorrelation, tr("Correlation"));
+    tabResiduals->addTab(pltResidualCorrelation, tr("Correlation"));
 
     layResidualAnalysis=new QFormLayout();
     layResidualAnalysis->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
@@ -337,12 +338,12 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     spinResidualHistogramBins->setRange(1,1000);
     layResidualAnalysis->addRow(tr("# bins:"), spinResidualHistogramBins);
 
-    tabResidulas->addTab(widResidualParameters, tr("Parameters"));
+    tabResiduals->addTab(widResidualParameters, tr("Parameters"));
 
     txtFitStatistics=new QTextEdit(this);
     txtFitStatistics->setReadOnly(true);
-    splitFitStatistics->addWidget(txtFitStatistics);
-
+    //splitFitStatistics->addWidget(txtFitStatistics);
+    tabResiduals->addTab(txtFitStatistics, tr("Fit Statistics"));
 
 
     QWidget* modelWidget=new QWidget(this);
@@ -400,7 +401,6 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     tbEditRanges=new QTabBar(this);
     tbEditRanges->addTab(tr("Parameter Values"));
     tbEditRanges->addTab(tr("Parameter Ranges"));
-    tbEditRanges->setShape(QTabBar::TriangularNorth);
     tbEditRanges->setDrawBase(false);
     tbEditRanges->setCurrentIndex(0);
     QVBoxLayout* hblfp=new QVBoxLayout();
@@ -815,12 +815,12 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::writeSettings() {
         //hlpFunction->writeSettings(*settings->getQSettings(), QString("fitevaleditor_%1%2/function_").arg(current->getType()).arg(current->getID()));
         saveSplitter(*(settings->getQSettings()), splitPlot, QString("fitevaleditor_%1%2/splitter_plot").arg(current->getType()).arg(current->getID()));
         saveSplitter(*(settings->getQSettings()), splitModel, QString("fitevaleditor_%1%2/splitter_model").arg(current->getType()).arg(current->getID()));
-        saveSplitter(*(settings->getQSettings()), splitFitStatistics, QString("fitevaleditor_%1%2/splitter_fitstatistics").arg(current->getType()).arg(current->getID()));
+        //saveSplitter(*(settings->getQSettings()), splitFitStatistics, QString("fitevaleditor_%1%2/splitter_fitstatistics").arg(current->getType()).arg(current->getID()));
         settings->getQSettings()->setValue(QString("fitevaleditor_%1%2/parameterWidgetWidth").arg(current->getType()).arg(current->getID()), m_parameterWidgetWidth);
         settings->getQSettings()->setValue(QString("fitevaleditor_%1%2/parameterCheckboxWidth").arg(current->getType()).arg(current->getID()), m_parameterCheckboxWidth);
         settings->getQSettings()->setValue(QString("fitevaleditor_%1%2/display_range_widgets").arg(current->getType()).arg(current->getID()), tbEditRanges->currentIndex());
         settings->getQSettings()->setValue(QString("fitevaleditor_%1%2/residual_histogram_bins").arg(current->getType()).arg(current->getID()), spinResidualHistogramBins->value());
-        settings->getQSettings()->setValue(QString("fitevaleditor_%1%2/residual_toolbox_current").arg(current->getType()).arg(current->getID()), tabResidulas->currentIndex());
+        settings->getQSettings()->setValue(QString("fitevaleditor_%1%2/residual_toolbox_current").arg(current->getType()).arg(current->getID()), tabResiduals->currentIndex());
         QFFitResultsEvaluationEditorBase::writeSettings();
     }
 }
@@ -835,12 +835,12 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::readSettings() {
         //hlpFunction->readSettings(*settings->getQSettings(), QString("fitevaleditor_%1%2/function_").arg(current->getType()).arg(current->getID()));
         loadSplitter(*(settings->getQSettings()), splitPlot, QString("fitevaleditor_%1%2/splitter_plot").arg(current->getType()).arg(current->getID()));
         loadSplitter(*(settings->getQSettings()), splitModel, QString("fitevaleditor_%1%2/splitter_model").arg(current->getType()).arg(current->getID()));
-        loadSplitter(*(settings->getQSettings()), splitFitStatistics, QString("fitevaleditor_%1%2/splitter_fitstatistics").arg(current->getType()).arg(current->getID()));
+        //loadSplitter(*(settings->getQSettings()), splitFitStatistics, QString("fitevaleditor_%1%2/splitter_fitstatistics").arg(current->getType()).arg(current->getID()));
         m_parameterWidgetWidth=settings->getQSettings()->value(QString("fitevaleditor_%1%2/parameterWidgetWidth").arg(current->getType()).arg(current->getID()), m_parameterWidgetWidth).toInt();
         m_parameterCheckboxWidth=settings->getQSettings()->value(QString("fitevaleditor_%1%2/parameterCheckboxWidth").arg(current->getType()).arg(current->getID()), m_parameterCheckboxWidth).toInt();
         tbEditRanges->setCurrentIndex(settings->getQSettings()->value(QString("fitevaleditor_%1%2/display_range_widgets").arg(current->getType()).arg(current->getID()), 0).toInt());
         spinResidualHistogramBins->setValue(settings->getQSettings()->value(QString("fitevaleditor_%1%2/residual_histogram_bins").arg(current->getType()).arg(current->getID()), 25).toInt());
-        tabResidulas->setCurrentIndex(settings->getQSettings()->value(QString("fitevaleditor_%1%2/residual_toolbox_current").arg(current->getType()).arg(current->getID()), 0).toInt());
+        tabResiduals->setCurrentIndex(settings->getQSettings()->value(QString("fitevaleditor_%1%2/residual_toolbox_current").arg(current->getType()).arg(current->getID()), 0).toInt());
         QFFitResultsEvaluationEditorBase::readSettings();
 
     }

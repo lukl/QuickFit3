@@ -387,10 +387,10 @@ void QFImFCSFitEvaluationEditor::createWidgets() {
     layButtons->addWidget(chkLeaveoutMasked, layButtons->rowCount(),0,1,2);
 
     pltOverview=new QFRDRImageToRunPreview(this);
-    pltOverview->setMaskEditable(true);
+    pltOverview->setMaskEditable(false);
     pltOverview->setSelectionEditable(true);
-    tabResidulas->insertTab(0, pltOverview, tr("Overview"));
-    tabResidulas->setCurrentIndex(0);
+    tabResiduals->insertTab(0, pltOverview, tr("Overview"));
+    tabResiduals->setCurrentIndex(0);
 
 
     actSetParameterFromFile=new QFActionWithNoMenuRole(tr("set fit parameter from file ..."), this)    ;
@@ -1126,11 +1126,11 @@ void QFImFCSFitEvaluationEditor::populateFitButtons(bool mulThreadEnabledInModel
 
 void QFImFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     // make sure all widgets ahave the right size
-    {   int trci=tabResidulas->currentIndex();
-        for (int i=0;i<tabResidulas->count(); i++) {
-            tabResidulas->setCurrentIndex(i);
+    {   int trci=tabResiduals->currentIndex();
+        for (int i=0;i<tabResiduals->count(); i++) {
+            tabResiduals->setCurrentIndex(i);
         }
-        tabResidulas->setCurrentIndex(trci);
+        tabResiduals->setCurrentIndex(trci);
     }
 
     int PicTextFormat=QTextFormat::UserObject + 1;

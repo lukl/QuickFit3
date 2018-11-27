@@ -1204,11 +1204,11 @@ void QFFCSFitEvaluationEditor::calibrateFocalVolume() {
 
 void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     // make sure all widgets ahave the right size
-    {   int trci=tabResidulas->currentIndex();
-        for (int i=0;i<tabResidulas->count(); i++) {
-            tabResidulas->setCurrentIndex(i);
+    {   int trci=tabResiduals->currentIndex();
+        for (int i=0;i<tabResiduals->count(); i++) {
+            tabResiduals->setCurrentIndex(i);
         }
-        tabResidulas->setCurrentIndex(trci);
+        tabResiduals->setCurrentIndex(trci);
     }
 
     int PicTextFormat=QTextFormat::UserObject + 1;

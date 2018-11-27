@@ -69,7 +69,7 @@ void QFFCSByIndexAndModelEvaluationEditor::readSettings() {
         loadSplitter(*(settings->getQSettings()), splitModel, m_iniPrefix+"splitter_model");
         loadSplitter(*(settings->getQSettings()), splitFitStatistics, m_iniPrefix+"splitter_fitstatistics");
         spinResidualHistogramBins->setValue(settings->getQSettings()->value(m_iniPrefix+"residual_histogram_bins", 25).toInt());
-        tabResidulas->setCurrentIndex(settings->getQSettings()->value(m_iniPrefix+"residual_toolbox_current", 0).toInt());
+        tabResiduals->setCurrentIndex(settings->getQSettings()->value(m_iniPrefix+"residual_toolbox_current", 0).toInt());
 
     }
 
@@ -84,7 +84,7 @@ void QFFCSByIndexAndModelEvaluationEditor::writeSettings() {
         saveSplitter(*(settings->getQSettings()), splitModel, m_iniPrefix+"splitter_model");
         saveSplitter(*(settings->getQSettings()), splitFitStatistics, m_iniPrefix+"splitter_fitstatistics");
         settings->getQSettings()->setValue(m_iniPrefix+"residual_histogram_bins", spinResidualHistogramBins->value());
-        settings->getQSettings()->setValue(m_iniPrefix+"residual_toolbox_current", tabResidulas->currentIndex());
+        settings->getQSettings()->setValue(m_iniPrefix+"residual_toolbox_current", tabResiduals->currentIndex());
     }
 }
 
@@ -248,11 +248,11 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
 
     splitFitStatistics=new QVisibleHandleSplitter(this);
     splitPlots->addWidget(splitFitStatistics);
-    tabResidulas=new QTabWidget(this);
-    tabResidulas->setTabPosition(QTabWidget::North);
-    tabResidulas->setTabShape(QTabWidget::Triangular);
-    tabResidulas->setDocumentMode(true);
-    splitFitStatistics->addWidget(tabResidulas);
+    tabResiduals=new QTabWidget(this);
+    //tabResiduals->setTabPosition(QTabWidget::North);
+    //tabResiduals->setTabShape(QTabWidget::Triangular);
+    tabResiduals->setDocumentMode(true);
+    splitFitStatistics->addWidget(tabResiduals);
     pltResidualHistogram=new QFPlotter(true, this);
     pltResidualHistogram->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltResidualHistogram->resize(200,200);
@@ -275,7 +275,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     pltResidualHistogram->getYAxis()->set_minTicks(5);
     pltResidualHistogram->getYAxis()->set_minTicks(5);
     pltResidualHistogram->useExternalDatastore(pltData->getDatastore());
-    tabResidulas->addTab(pltResidualHistogram, tr("Histogram"));
+    tabResiduals->addTab(pltResidualHistogram, tr("Histogram"));
 
 
     pltResidualCorrelation=new QFPlotter(true, this);
@@ -300,7 +300,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     pltResidualCorrelation->getYAxis()->set_minTicks(5);
     pltResidualCorrelation->getYAxis()->set_minTicks(5);
     pltResidualCorrelation->useExternalDatastore(pltData->getDatastore());
-    tabResidulas->addTab(pltResidualCorrelation, tr("Correlation"));
+    tabResiduals->addTab(pltResidualCorrelation, tr("Correlation"));
 
     layResidualAnalysis=new QFormLayout();
     layResidualAnalysis->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
@@ -311,7 +311,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     spinResidualHistogramBins->setRange(1,1000);
     layResidualAnalysis->addRow(tr("# bins:"), spinResidualHistogramBins);
 
-    tabResidulas->addTab(widResidualParameters, tr("Parameters"));
+    tabResiduals->addTab(widResidualParameters, tr("Parameters"));
 
     txtFitStatistics=new QTextEdit(this);
     txtFitStatistics->setReadOnly(true);

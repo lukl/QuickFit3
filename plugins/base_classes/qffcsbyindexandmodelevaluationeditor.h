@@ -207,7 +207,7 @@ class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluati
         /** \brief layout used to configure the residuals evaluation */
         QFormLayout* layResidualAnalysis;
         /** \brief toolbox to switch between residual histogram and parameters */
-        QTabWidget* tabResidulas;
+        QTabWidget* tabResiduals;
         /** \brief to fit current file */
         QAction* actFitCurrent;
         /** \brief to fit all runs in current file */

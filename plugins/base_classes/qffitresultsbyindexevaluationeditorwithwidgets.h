@@ -187,7 +187,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         /** \brief layout used to configure the residuals evaluation */
         QFormLayout* layResidualAnalysis;
         /** \brief toolbox to switch between residual histogram and parameters */
-        QTabWidget* tabResidulas;
+        QTabWidget* tabResiduals;
         /** \brief to fit current file */
         QAction* actFitCurrent;
         /** \brief to guess current file&run */

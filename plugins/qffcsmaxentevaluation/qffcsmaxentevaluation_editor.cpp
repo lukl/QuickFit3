@@ -404,7 +404,7 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     pltOverview=new QFRDRImageToRunPreview(this);
     pltOverview->setMaskEditable(true);
     pltOverview->setSelectionEditable(true);
-    tabResidulas->addTab(pltOverview, tr("Overview Image"));
+    tabResiduals->addTab(pltOverview, tr("Overview Image"));
 
     actCopyAverageData=new QFActionWithNoMenuRole(QIcon(":/copy.png"), tr("&copy runs-average of MaxEnt distributions"), this);
     connect(actCopyAverageData, SIGNAL(triggered()), this, SLOT(copyAverageData()));
@@ -563,10 +563,10 @@ void QFFCSMaxEntEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRec
             pltOverview->setRDR(currentRecord);
             connect(pltOverview, SIGNAL(currentRunChanged(int)), spinRun, SLOT(setValue(int)));
             connect(spinRun, SIGNAL(valueChanged(int)), pltOverview, SLOT(setCurrentRun(int)));
-            tabResidulas->setTabEnabled(tabResidulas->indexOf(pltOverview), true);
+            tabResiduals->setTabEnabled(tabResiduals->indexOf(pltOverview), true);
         } else {
             pltOverview->setRDR(0);
-            tabResidulas->setTabEnabled(tabResidulas->indexOf(pltOverview), false);
+            tabResiduals->setTabEnabled(tabResiduals->indexOf(pltOverview), false);
         }
 
         edtWxy->setValue(eval->getWXY());
@@ -1776,11 +1776,11 @@ void QFFCSMaxEntEvaluationEditor::createReportDoc(QTextDocument* document) {
 
 void QFFCSMaxEntEvaluationEditor::createReportDoc(QTextDocument* document) {
     // make sure all widgets ahave the right size
-    {   int trci=tabResidulas->currentIndex();
-        for (int i=0;i<tabResidulas->count(); i++) {
-            tabResidulas->setCurrentIndex(i);
+    {   int trci=tabResiduals->currentIndex();
+        for (int i=0;i<tabResiduals->count(); i++) {
+            tabResiduals->setCurrentIndex(i);
         }
-        tabResidulas->setCurrentIndex(trci);
+        tabResiduals->setCurrentIndex(trci);
     }
 
     int PicTextFormat=QTextFormat::UserObject + 1;

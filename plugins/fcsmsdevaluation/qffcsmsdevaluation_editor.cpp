@@ -646,7 +646,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     pltOverview=new QFRDRImageToRunPreview(this);
     pltOverview->setMaskEditable(true);
     pltOverview->setSelectionEditable(true);
-    tabResidulas->addTab(pltOverview, tr("Overview Image"));
+    tabResiduals->addTab(pltOverview, tr("Overview Image"));
 
     menuTools=propertyEditor->addOrFindMenu("&Tools", 0);
     menuTools->addAction(menuOverlays->menuAction());
@@ -929,10 +929,10 @@ void QFFCSMSDEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
             pltOverview->setRDR(currentRecord);
             connect(pltOverview, SIGNAL(currentRunChanged(int)), spinRun, SLOT(setValue(int)));
             connect(spinRun, SIGNAL(valueChanged(int)), pltOverview, SLOT(setCurrentRun(int)));
-            tabResidulas->setTabEnabled(tabResidulas->indexOf(pltOverview), true);
+            tabResiduals->setTabEnabled(tabResiduals->indexOf(pltOverview), true);
         } else {
             pltOverview->setRDR(0);
-            tabResidulas->setTabEnabled(tabResidulas->indexOf(pltOverview), false);
+            tabResiduals->setTabEnabled(tabResiduals->indexOf(pltOverview), false);
         }
 
 
@@ -2932,11 +2932,11 @@ void QFFCSMSDEvaluationEditor::createReportDoc(QTextDocument* document) {
 
 void QFFCSMSDEvaluationEditor::createReportDoc(QTextDocument* document) {
     // make sure all widgets ahave the right size
-    {   int trci=tabResidulas->currentIndex();
-        for (int i=0;i<tabResidulas->count(); i++) {
-            tabResidulas->setCurrentIndex(i);
+    {   int trci=tabResiduals->currentIndex();
+        for (int i=0;i<tabResiduals->count(); i++) {
+            tabResiduals->setCurrentIndex(i);
         }
-        tabResidulas->setCurrentIndex(trci);
+        tabResiduals->setCurrentIndex(trci);
     }
 
     int PicTextFormat=QTextFormat::UserObject + 1;
