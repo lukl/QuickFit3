@@ -271,7 +271,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         /** \brief sets the current result set style for all records. */
         void useThisParam2SetForAllRDRs();
         /** \brief sets the current result set style for all records. */
-        void useThisParamsSetForAllRDRs();
+        void useThisResultAndParamsSetForAllRDRs();
         void useThisOverviewStyleForAllRDRs();
         void useThisHist1ForAllRDRs();
         void useThisHist2ForAllRDRs();
@@ -679,6 +679,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QToolButton* btnCopyDataToMatlab;
         /** \brief action to copy image data as column table (CSV) */
         QToolButton* btnCopyDataAsColumns;
+        /** \brief action to use current result set and parameter selection for all RDRs*/
+        QToolButton* btnUseSelectionForAllRDRs;
 
         QComboBox* cmbDualView;
         QLabel* labDV;
@@ -741,7 +743,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QAction* actUseResultSetForAll;
         QAction* actUseParam1SetForAll;
         QAction* actUseParam2SetForAll;
-        QAction* actUseParam1and2SetForAll;
+        QAction* actUseResultParam1and2SetForAll;
 
         QAction* actAnnotateModelComparison;
         QAction* actAnnotationDeleteCurrent;

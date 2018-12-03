@@ -167,144 +167,22 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     actUseParam1and2StyleForAll=new QFActionWithNoMenuRole(tr("use these parameter image 1 and 2 styles for all records ..."), this);
     connect(actUseParam1and2StyleForAll, SIGNAL(triggered()), this, SLOT(useThisParam1and2StyleForAllRDRs()));
 
-    actUseResultSetForAll=new QFActionWithNoMenuRole(tr("use this result set for all records ..."), this);
+    actUseResultSetForAll=new QFActionWithNoMenuRole(tr("use current result set for all records ..."), this);
     connect(actUseResultSetForAll, SIGNAL(triggered()), this, SLOT(useThisResultSetForAllRDRs()));
 
-    actUseParam1SetForAll=new QFActionWithNoMenuRole(tr("use this parameter 1 selection for all records ..."), this);
+    actUseParam1SetForAll=new QFActionWithNoMenuRole(tr("use current parameter 1 selection for all records ..."), this);
     connect(actUseParam1SetForAll, SIGNAL(triggered()), this, SLOT(useThisParam1SetForAllRDRs()));
 
-    actUseParam2SetForAll=new QFActionWithNoMenuRole(tr("use this parameter 2 selection for all records ..."), this);
+    actUseParam2SetForAll=new QFActionWithNoMenuRole(tr("use current parameter 2 selection for all records ..."), this);
     connect(actUseParam2SetForAll, SIGNAL(triggered()), this, SLOT(useThisParam2SetForAllRDRs()));
 
-    actUseParam1and2SetForAll=new QFActionWithNoMenuRole(tr("use this parameter 1 and 2 selection for all records ..."), this);
-    connect(actUseParam2SetForAll, SIGNAL(triggered()), this, SLOT(useThisParamsSetForAllRDRs()));
-
-    ///////////////////////////////////////////////////////////////
-    // GROUPBOX: parameter selection group box
-    ///////////////////////////////////////////////////////////////
-
-    QGroupBox* grpTop=new QGroupBox(tr(" Parameter Image Plot Settings "), this);
-    grpTop->setFlat(true);
-    QGridLayout* topgrid=new QGridLayout();
-    grpTop->setLayout(topgrid);
-
-    int row=0;
-    cmbResultGroup=new QComboBox(this);
-    cmbResultGroup->setMaximumWidth(500);
-    cmbResultGroup->view()->setTextElideMode(Qt::ElideMiddle);
-    cmbResultGroup->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    cmbResultGroup->addAction(actUseResultSetForAll);
-    cmbResultGroup->addAction(actUseParam1and2SetForAll);
-
-    cmbResultGroup->setContextMenuPolicy(Qt::ActionsContextMenu);
-    topgrid->addWidget((l=new QLabel(tr("&result set:"))), row, 0);
-    l->setBuddy(cmbResultGroup);
-    topgrid->addWidget(cmbResultGroup, row, 1);
-
-    cmbParameter=new QComboBox(this);
-    cmbParameter->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    cmbParameter->addAction(actUseParam1SetForAll);
-    cmbParameter->addAction(actUseParam1and2SetForAll);
-    cmbParameter->setMaximumWidth(500);
-    cmbParameter->setContextMenuPolicy(Qt::ActionsContextMenu);
-
-    topgrid->addWidget((labParameter=new QLabel(tr("&parameter:"))), row, 3);
-    labParameter->setBuddy(cmbParameter);
-    topgrid->addWidget(cmbParameter, row, 4);
-    cmbParameterTransform=new QComboBox(this);
-    cmbParameterTransform->addItem(QIcon(":/imaging_fcs/none.png"), tr("none"));
-    cmbParameterTransform->addItem(QIcon(":/imaging_fcs/abs.png"), tr("abs"));
-    cmbParameterTransform->addItem(QIcon(":/imaging_fcs/log.png"), tr("log"));
-    cmbParameterTransform->addItem(QIcon(":/imaging_fcs/reci.png"), tr("reciprocal"));
-    cmbParameterTransform->addItem(QIcon(":/imaging_fcs/sqrt.png"), tr("sqrt"));
-    cmbParameterTransform->addAction(actUseParam1SetForAll);
-    cmbParameterTransform->addAction(actUseParam1and2SetForAll);
-    cmbParameterTransform->setContextMenuPolicy(Qt::ActionsContextMenu);
-    topgrid->addWidget((labParameterTransform=new QLabel(tr("    &transform:"))), row, 5);
-    labParameterTransform->setBuddy(cmbParameterTransform);
-    topgrid->addWidget(cmbParameterTransform, row, 6);
-
-    row++;
-    QHBoxLayout* hblp2=new QHBoxLayout();
-    topgrid->addLayout(hblp2, row, 3, 1, 4);
-    chkOtherFileP2=new QCheckBox(tr("other RDR for parameter 2, role:"), this);
-    chkOtherFileP2->addAction(actUseParam2SetForAll);
-    chkOtherFileP2->addAction(actUseParam1and2SetForAll);
-    chkOtherFileP2->setContextMenuPolicy(Qt::ActionsContextMenu);
-    hblp2->addWidget(chkOtherFileP2);
-    cmbOtherFileRole=new QComboBox(this);
-    cmbOtherFileRole->setEnabled(false);
-    cmbOtherFileRole->addAction(actUseParam2SetForAll);
-    cmbOtherFileRole->addAction(actUseParam1and2SetForAll);
-    cmbOtherFileRole->setContextMenuPolicy(Qt::ActionsContextMenu);
-    hblp2->addWidget(cmbOtherFileRole);
-    hblp2->addWidget(new QLabel(tr("result set:")));
-    cmbOtherFilesResultGroup=new QComboBox(this);
-    cmbOtherFilesResultGroup->setMaximumWidth(500);
-    cmbOtherFilesResultGroup->view()->setTextElideMode(Qt::ElideMiddle);
-    cmbOtherFilesResultGroup->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    cmbOtherFilesResultGroup->setEnabled(false);
-    cmbOtherFilesResultGroup->addAction(actUseParam2SetForAll);
-    cmbOtherFilesResultGroup->addAction(actUseParam1and2SetForAll);
-    cmbOtherFilesResultGroup->setContextMenuPolicy(Qt::ActionsContextMenu);
-    hblp2->addWidget(cmbOtherFilesResultGroup);
-    connect(chkOtherFileP2, SIGNAL(toggled(bool)), cmbOtherFileRole, SLOT(setEnabled(bool)));
-    connect(chkOtherFileP2, SIGNAL(toggled(bool)), cmbOtherFilesResultGroup, SLOT(setEnabled(bool)));
-
-
-    row++;
-    cmbParameter2=new QComboBox(this);
-    cmbParameter2->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    cmbParameter2->addAction(actUseParam2SetForAll);
-    cmbParameter2->addAction(actUseParam1and2SetForAll);
-    cmbParameter2->setContextMenuPolicy(Qt::ActionsContextMenu);
-    cmbParameter2->setMaximumWidth(500);
-    topgrid->addWidget((labParameter2=new QLabel(tr("paramater &2:"))), row, 3);
-    labParameter2->setBuddy(cmbParameter2);
-    topgrid->addWidget(cmbParameter2, row, 4);
-    cmbParameter2Transform=new QComboBox(this);
-    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/none.png"), tr("none"));
-    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/abs.png"), tr("abs"));
-    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/log.png"), tr("log"));
-    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/reci.png"), tr("reciprocal"));
-    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/sqrt.png"), tr("sqrt"));
-    cmbParameter2Transform->addAction(actUseParam2SetForAll);
-    cmbParameter2Transform->addAction(actUseParam1and2SetForAll);
-    cmbParameter2Transform->setContextMenuPolicy(Qt::ActionsContextMenu);
-    topgrid->addWidget((labParameter2Transform=new QLabel(tr("    tr&ansform:"))), row, 5);
-    labParameter2Transform->setBuddy(cmbParameter2Transform);
-    topgrid->addWidget(cmbParameter2Transform, row, 6);
-
-    cmbRDRAnnotation=new QFEnhancedComboBox(this);
-    cmbRDRAnnotation->addItem(tr("--- none ---"));
-    cmbRDRAnnotation->setMaximumWidth(500);
-    chkShowRDRAnnotation=new QCheckBox(tr("&annotation:"), this);
-    chkShowRDRAnnotation->setChecked(false);
-    cmbRDRAnnotation->setEnabled(false);
-    cmbRDRAnnotation->setContextMenuPolicy(Qt::ActionsContextMenu);
-    connect(chkShowRDRAnnotation, SIGNAL(toggled(bool)), cmbRDRAnnotation, SLOT(setEnabled(bool)));
-    topgrid->addWidget(chkShowRDRAnnotation, row, 0);
-    topgrid->addWidget(cmbRDRAnnotation, row, 1);
-
-
-
-
-    topgrid->addWidget(new QWidget(), 0, 2);
-    topgrid->addWidget(new QWidget(), 0, 5);
-    topgrid->addWidget(new QWidget(), 0, 7);
-    topgrid->setColumnStretch(0, 0);
-    topgrid->setColumnStretch(1, 0);
-    topgrid->setColumnStretch(2, 1);
-    topgrid->setColumnStretch(3, 0);
-    topgrid->setColumnStretch(4, 0);
-    topgrid->setColumnStretch(5, 0);
-    topgrid->setColumnStretch(6, 0);
-    topgrid->setColumnStretch(7, 1);
+    actUseResultParam1and2SetForAll=new QFActionWithNoMenuRole(tr("Use current result set, parameter 1 and 2 selections for all RDRs"), this);
+    connect(actUseResultParam1and2SetForAll, SIGNAL(triggered()), this, SLOT(useThisResultAndParamsSetForAllRDRs()));
 
 
     JKVerticalScrollArea* area=new JKVerticalScrollArea(this);
     QWidget* w=new QWidget(this);
-    w->setMinimumWidth(300);
+    w->setMinimumWidth(250);
     area->setWidgetResizable(true);
     area->setWidget(w);
     QVBoxLayout* vbl=new QVBoxLayout();
@@ -326,6 +204,208 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
                     //"  border: 1px solid gray;"
                     "}");//.arg(palette().color(QPalette::Window).name()).arg(palette().color(QPalette::Window).lighter(120).name());
     w->setStyleSheet(w->styleSheet()+QString("\n\n")+stylesheetGroupBox);
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////
+    // GROUPBOX: buttons for data/report saving
+    ///////////////////////////////////////////////////////////////
+
+    QGroupBox* grpTopDataEx=new QGroupBox(tr(" Data export options "), this);
+    grpTopDataEx->setFlat(true);
+
+    QGridLayout* grdTopDataEx=new QGridLayout();
+    grpTopDataEx->setLayout(grdTopDataEx);
+    btnPrintReport = createButtonForActionShowText(actPrintReport/*, QIcon(":/imaging_fcs/report_print.png"), tr("&Print report")*/, this);
+    actPrintReport->setToolTip(tr("print a report which contains all data on the current screen:<br><ul>"
+                                  "<li>all images (parameter, mask, parameter 2, overview</li>"
+                                  "<li>correlation curves and fit parameters</li>"
+                                  "<li>histpgram and statistics</li>"
+                                  "<li>additional data (files, description configuration ...)</li>"
+                                  "</ul>"));
+
+    connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
+    btnSaveReport = createButtonForActionShowText(actSaveReport/*, QIcon(":/imaging_fcs/report_save.png"), tr("&Save report")*/, this);
+    actSaveReport->setToolTip(tr("save a report which contains all data on the current screen as PDF or PostScript file:<br><ul>"
+                                  "<li>all images (parameter, mask, parameter 2, overview)</li>"
+                                  "<li>correlation curves and fit parameters</li>"
+                                  "<li>histpgram and statistics</li>"
+                                  "<li>additional data (files, description configuration ...)</li>"
+                                  "</ul>"));
+    btnSaveData = createButtonAndActionShowText(actSaveData, QIcon(":/imaging_fcs/preview_savedata.png"), tr("Save &data"), this);
+    actSaveData->setToolTip(tr("save the currently displayed images (parameter, mask, parameter 2, overview)\nas image files (e.g. TIFF), so they can be processed in other programs."));
+    connect(actSaveData, SIGNAL(triggered()), this, SLOT(saveData()));
+
+    actInsertSelectedCorrelationsAsFCSRDR=new QFActionWithNoMenuRole(tr("Insert Correlation Curves as new RDR into Project"), this);
+    connect(actInsertSelectedCorrelationsAsFCSRDR, SIGNAL(triggered()), this, SLOT(insertSelectedCorrelationsAsFCSRDR()));
+
+    btnCopyDataToMatlab = createButtonAndActionShowText(actCopyDataToMatlab, QIcon(":/imaging_fcs/copydatatomatlab.png"), tr("Copy Images to &Matlab"), this);
+    actCopyDataToMatlab->setToolTip(tr("copy the currently dispalyed images (parameter, mask, parameter 2, overview) as a Matlab script."));
+    connect(actCopyDataToMatlab, SIGNAL(triggered()), this, SLOT(copyToMatlab()));
+    btnCopyDataAsColumns = createButtonAndActionShowText(actCopyDataAsColumns, QIcon(":/imaging_fcs/copydata.png"), tr("Copy Images as &Columns"), this);
+    actCopyDataAsColumns->setToolTip(tr("copy the currently dispalyed images (parameter, mask, parameter 2, overview) as columns of data to the clipboard. The data may be pasted e.g. into a spreadsheet program like Excel"));
+    connect(actCopyDataAsColumns, SIGNAL(triggered()), this, SLOT(copyDataAsColumns()));
+
+    actCopyFitResultStatistics=new QFActionWithNoMenuRole(tr("copy fit result statistics for Excel/Origin..."), this);
+    actCopyFitResultStatistics->setIconText(tr("copy result stats."));
+    btnCopyFitResults=createButtonForActionShowText(actCopyFitResultStatistics, w);
+    connect(actCopyFitResultStatistics, SIGNAL(triggered()), this, SLOT(copyFitResultStatistics()));
+
+    grdTopDataEx->addWidget(btnSaveData, 0, 0);
+    grdTopDataEx->addWidget(btnCopyDataToMatlab, 1, 0);
+    grdTopDataEx->addWidget(btnCopyDataAsColumns, 2, 0);
+    grdTopDataEx->addWidget(btnSaveReport, 0, 1);
+    grdTopDataEx->addWidget(btnPrintReport, 1, 1);
+    grdTopDataEx->addWidget(btnCopyFitResults, 2, 1);
+
+
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////
+    // GROUPBOX: parameter selection group box
+    ///////////////////////////////////////////////////////////////
+
+    QGroupBox* grpTopParameters=new QGroupBox(tr(" Parameter Image Plot Settings "), this);
+    grpTopParameters->setFlat(true);
+    QGridLayout* topgrid=new QGridLayout();
+    grpTopParameters->setLayout(topgrid);
+
+    int row=0;
+    cmbResultGroup=new QComboBox(this);
+    cmbResultGroup->setMaximumWidth(600);
+    cmbResultGroup->view()->setTextElideMode(Qt::ElideMiddle);
+    cmbResultGroup->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    cmbResultGroup->addAction(actUseResultSetForAll);
+    cmbResultGroup->addAction(actUseResultParam1and2SetForAll);
+
+    cmbResultGroup->setContextMenuPolicy(Qt::ActionsContextMenu);
+    topgrid->addWidget((l=new QLabel(tr("&result set:"))), row, 0);
+    l->setBuddy(cmbResultGroup);
+    topgrid->addWidget(cmbResultGroup, row, 1);
+
+    cmbParameter=new QComboBox(this);
+    cmbParameter->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    cmbParameter->addAction(actUseParam1SetForAll);
+    cmbParameter->addAction(actUseResultParam1and2SetForAll);
+    cmbParameter->setMaximumWidth(450);
+    cmbParameter->setContextMenuPolicy(Qt::ActionsContextMenu);
+
+    topgrid->addWidget((labParameter=new QLabel(tr("&parameter:"))), row, 3);
+    labParameter->setBuddy(cmbParameter);
+    topgrid->addWidget(cmbParameter, row, 4);
+    cmbParameterTransform=new QComboBox(this);
+    cmbParameterTransform->addItem(QIcon(":/imaging_fcs/none.png"), tr("none"));
+    cmbParameterTransform->addItem(QIcon(":/imaging_fcs/abs.png"), tr("abs"));
+    cmbParameterTransform->addItem(QIcon(":/imaging_fcs/log.png"), tr("log"));
+    cmbParameterTransform->addItem(QIcon(":/imaging_fcs/reci.png"), tr("reciprocal"));
+    cmbParameterTransform->addItem(QIcon(":/imaging_fcs/sqrt.png"), tr("sqrt"));
+    cmbParameterTransform->addAction(actUseParam1SetForAll);
+    cmbParameterTransform->addAction(actUseResultParam1and2SetForAll);
+    cmbParameterTransform->setContextMenuPolicy(Qt::ActionsContextMenu);
+    topgrid->addWidget((labParameterTransform=new QLabel(tr("    &transform:"))), row, 5);
+    labParameterTransform->setBuddy(cmbParameterTransform);
+    topgrid->addWidget(cmbParameterTransform, row, 6);
+
+    row++;
+
+    cmbParameter2=new QComboBox(this);
+    cmbParameter2->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    cmbParameter2->addAction(actUseParam2SetForAll);
+    cmbParameter2->addAction(actUseResultParam1and2SetForAll);
+    cmbParameter2->setContextMenuPolicy(Qt::ActionsContextMenu);
+    cmbParameter2->setMaximumWidth(450);
+    topgrid->addWidget((labParameter2=new QLabel(tr("paramater &2:"))), row, 3);
+    labParameter2->setBuddy(cmbParameter2);
+    topgrid->addWidget(cmbParameter2, row, 4);
+    cmbParameter2Transform=new QComboBox(this);
+    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/none.png"), tr("none"));
+    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/abs.png"), tr("abs"));
+    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/log.png"), tr("log"));
+    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/reci.png"), tr("reciprocal"));
+    cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/sqrt.png"), tr("sqrt"));
+    cmbParameter2Transform->addAction(actUseParam2SetForAll);
+    cmbParameter2Transform->addAction(actUseResultParam1and2SetForAll);
+    cmbParameter2Transform->setContextMenuPolicy(Qt::ActionsContextMenu);
+    topgrid->addWidget((labParameter2Transform=new QLabel(tr("    tr&ansform:"))), row, 5);
+    labParameter2Transform->setBuddy(cmbParameter2Transform);
+    topgrid->addWidget(cmbParameter2Transform, row, 6);
+
+    cmbRDRAnnotation=new QFEnhancedComboBox(this);
+    cmbRDRAnnotation->addItem(tr("--- none ---"));
+    cmbRDRAnnotation->setMaximumWidth(600);
+    chkShowRDRAnnotation=new QCheckBox(tr("&annotation:"), this);
+    chkShowRDRAnnotation->setChecked(false);
+    cmbRDRAnnotation->setEnabled(false);
+    cmbRDRAnnotation->setContextMenuPolicy(Qt::ActionsContextMenu);
+    connect(chkShowRDRAnnotation, SIGNAL(toggled(bool)), cmbRDRAnnotation, SLOT(setEnabled(bool)));
+    topgrid->addWidget(chkShowRDRAnnotation, row, 0);
+    topgrid->addWidget(cmbRDRAnnotation, row, 1);
+
+
+    row++;
+
+    btnUseSelectionForAllRDRs=new QToolButton();
+    btnUseSelectionForAllRDRs->setText(tr("Use current selection for all RDRs"));
+    btnUseSelectionForAllRDRs->setToolTip(tr("Use current result set and parameter selections for all RDRs"));
+    connect(btnUseSelectionForAllRDRs,SIGNAL(released()),this, SLOT(useThisResultAndParamsSetForAllRDRs()));
+    topgrid->addWidget(btnUseSelectionForAllRDRs,row,1);
+
+    chkOtherFileP2=new QCheckBox(tr("result parameter 2:"), this);
+    chkOtherFileP2->addAction(actUseParam2SetForAll);
+    chkOtherFileP2->addAction(actUseResultParam1and2SetForAll);
+    chkOtherFileP2->setContextMenuPolicy(Qt::ActionsContextMenu);
+    chkOtherFileP2->setToolTip(tr("Use different result set for parameter 2"));
+    topgrid->addWidget(chkOtherFileP2,row,3);
+
+    cmbOtherFilesResultGroup=new QComboBox(this);
+    cmbOtherFilesResultGroup->setMaximumWidth(450);
+    cmbOtherFilesResultGroup->view()->setTextElideMode(Qt::ElideMiddle);
+    cmbOtherFilesResultGroup->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    cmbOtherFilesResultGroup->setEnabled(false);
+    cmbOtherFilesResultGroup->addAction(actUseParam2SetForAll);
+    cmbOtherFilesResultGroup->addAction(actUseResultParam1and2SetForAll);
+    cmbOtherFilesResultGroup->setContextMenuPolicy(Qt::ActionsContextMenu);
+    topgrid->addWidget(cmbOtherFilesResultGroup,row,4);
+
+    cmbOtherFileRole=new QComboBox(this);
+    cmbOtherFileRole->setEnabled(false);
+    cmbOtherFileRole->addAction(actUseParam2SetForAll);
+    cmbOtherFileRole->addAction(actUseResultParam1and2SetForAll);
+    cmbOtherFileRole->setContextMenuPolicy(Qt::ActionsContextMenu);
+
+    QLabel* labOtherFileRole;
+    topgrid->addWidget(labOtherFileRole=new QLabel(tr("    role:")),row,5);
+    labOtherFileRole->setBuddy(cmbOtherFileRole);
+    topgrid->addWidget(cmbOtherFileRole,row,6);
+
+    connect(chkOtherFileP2, SIGNAL(toggled(bool)), cmbOtherFileRole, SLOT(setEnabled(bool)));
+    connect(chkOtherFileP2, SIGNAL(toggled(bool)), cmbOtherFilesResultGroup, SLOT(setEnabled(bool)));
+
+
+
+
+    topgrid->addWidget(new QWidget(), 0, 2);
+    topgrid->addWidget(new QWidget(), 0, 5);
+    topgrid->addWidget(new QWidget(), 0, 7);
+    topgrid->setColumnStretch(0, 0);
+    topgrid->setColumnStretch(1, 0);
+    topgrid->setColumnStretch(2, 1);
+    topgrid->setColumnStretch(3, 0);
+    topgrid->setColumnStretch(4, 0);
+    topgrid->setColumnStretch(5, 0);
+    topgrid->setColumnStretch(6, 0);
+    topgrid->setColumnStretch(7, 1);
+
+
+
+    QGridLayout* grdTop=new QGridLayout();
+    grdTop->addWidget(grpTopDataEx,0,0);
+    grdTop->addWidget(grpTopParameters,0,1);
 
 
 
@@ -1119,65 +1199,6 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
     ///////////////////////////////////////////////////////////////
-    // GROUPBOX: buttons for data/report saving
-    ///////////////////////////////////////////////////////////////
-
-    QGridLayout* grdTop=new QGridLayout();
-    btnPrintReport = createButtonForActionShowText(actPrintReport/*, QIcon(":/imaging_fcs/report_print.png"), tr("&Print report")*/, this);
-    actPrintReport->setToolTip(tr("print a report which contains all data on the current screen:<br><ul>"
-                                  "<li>all images (parameter, mask, parameter 2, overview</li>"
-                                  "<li>correlation curves and fit parameters</li>"
-                                  "<li>histpgram and statistics</li>"
-                                  "<li>additional data (files, description configuration ...)</li>"
-                                  "</ul>"));
-
-    connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
-    btnSaveReport = createButtonForActionShowText(actSaveReport/*, QIcon(":/imaging_fcs/report_save.png"), tr("&Save report")*/, this);
-    actSaveReport->setToolTip(tr("save a report which contains all data on the current screen as PDF or PostScript file:<br><ul>"
-                                  "<li>all images (parameter, mask, parameter 2, overview)</li>"
-                                  "<li>correlation curves and fit parameters</li>"
-                                  "<li>histpgram and statistics</li>"
-                                  "<li>additional data (files, description configuration ...)</li>"
-                                  "</ul>"));
-    btnSaveData = createButtonAndActionShowText(actSaveData, QIcon(":/imaging_fcs/preview_savedata.png"), tr("Save &data"), this);
-    actSaveData->setToolTip(tr("save the currently displayed images (parameter, mask, parameter 2, overview)\nas image files (e.g. TIFF), so they can be processed in other programs."));
-    connect(actSaveData, SIGNAL(triggered()), this, SLOT(saveData()));
-
-    actInsertSelectedCorrelationsAsFCSRDR=new QFActionWithNoMenuRole(tr("Insert Correlation Curves as new RDR into Project"), this);
-    connect(actInsertSelectedCorrelationsAsFCSRDR, SIGNAL(triggered()), this, SLOT(insertSelectedCorrelationsAsFCSRDR()));
-
-    btnCopyDataToMatlab = createButtonAndActionShowText(actCopyDataToMatlab, QIcon(":/imaging_fcs/copydatatomatlab.png"), tr("Copy Images to &Matlab"), this);
-    actCopyDataToMatlab->setToolTip(tr("copy the currently dispalyed images (parameter, mask, parameter 2, overview) as a Matlab script."));
-    connect(actCopyDataToMatlab, SIGNAL(triggered()), this, SLOT(copyToMatlab()));
-    btnCopyDataAsColumns = createButtonAndActionShowText(actCopyDataAsColumns, QIcon(":/imaging_fcs/copydata.png"), tr("Copy Images as &Columns"), this);
-    actCopyDataAsColumns->setToolTip(tr("copy the currently dispalyed images (parameter, mask, parameter 2, overview) as columns of data to the clipboard. The data may be pasted e.g. into a spreadsheet program like Excel"));
-    connect(actCopyDataAsColumns, SIGNAL(triggered()), this, SLOT(copyDataAsColumns()));
-
-    actCopyFitResultStatistics=new QFActionWithNoMenuRole(tr("copy fit result statistics for Excel/Origin..."), this);
-    actCopyFitResultStatistics->setIconText(tr("copy result stats."));
-    btnCopyFitResults=createButtonForActionShowText(actCopyFitResultStatistics, w);
-    connect(actCopyFitResultStatistics, SIGNAL(triggered()), this, SLOT(copyFitResultStatistics()));
-
-
-    grdTop->addWidget(grpTop, 0, 2, 3, 1);
-    grdTop->addWidget(btnSaveData, 0, 0);
-    grdTop->addWidget(btnCopyDataToMatlab, 1, 0);
-    grdTop->addWidget(btnCopyDataAsColumns, 2, 0);
-    grdTop->addWidget(btnSaveReport, 0, 1);
-    grdTop->addWidget(btnPrintReport, 1, 1);
-    grdTop->addWidget(btnCopyFitResults, 2, 1);
-    grdTop->setColumnStretch(1,0);
-    grdTop->setColumnStretch(0,0);
-
-
-
-
-
-
-
-
-
-    ///////////////////////////////////////////////////////////////
     // TOOLBAR & ACTIONS: edit image plots
     ///////////////////////////////////////////////////////////////
     actImagesZoom=new QFActionWithNoMenuRole(QIcon(":/imaging_fcs/zoom.png"), tr("zoom"), this);
@@ -1459,7 +1480,6 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     tabDisplay->addTab(widCorr, tr("&Correlations"));
 
 
-    //lb->addWidget(grpTop, 1, 0, 1, 2);
     lb->addLayout(grdTop, 0,0);
     lb->addWidget(tabDisplay, 1,0);
 
@@ -1830,11 +1850,11 @@ void QFRDRImagingFCSImageEditor::useThisParam2SetForAllRDRs()
 
 }
 
-void QFRDRImagingFCSImageEditor::useThisParamsSetForAllRDRs()
+void QFRDRImagingFCSImageEditor::useThisResultAndParamsSetForAllRDRs()
 {
+    useThisResultSetForAllRDRs();
     useThisParam1SetForAllRDRs();
     useThisParam2SetForAllRDRs();
-    useThisResultSetForAllRDRs();
 }
 
 void QFRDRImagingFCSImageEditor::saveImageSettings() {
@@ -4462,7 +4482,7 @@ void QFRDRImagingFCSImageEditor::readSettings() {
     cmbRDRAnnotationDrawMode->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/imfcs_imed_anotmode"), 0).toInt());
     cmbRunStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/run_style"), 1).toInt());
     cmbRunErrorStyle->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/run_error_style"), JKQTPerrorPolygons).toInt());
-    loadSplitter(*(settings->getQSettings()), splitterTop, "imfcsimageeditor/splittertopSizes");
+    //loadSplitter(*(settings->getQSettings()), splitterTop, "imfcsimageeditor/splittertopSizes");
     loadSplitter(*(settings->getQSettings()), splitterTopBot, "imfcsimageeditor/splittertopbotSizes");
     loadSplitter(*(settings->getQSettings()), splitterBot, "imfcsimageeditor/splitterbotSizes");
     corrView->readSettings(*(settings->getQSettings()), "imfcsimageeditor/corrView/");
@@ -4506,7 +4526,7 @@ void QFRDRImagingFCSImageEditor::writeSettings() {
     settings->getQSettings()->value(QString("imfcsimageeditor/overview_visible"), chkOverviewVisible->isChecked());
     settings->getQSettings()->value(QString("imfcsimageeditor/image2_visible"), chkParamImage2Visible->isChecked());
     settings->getQSettings()->value(QString("imfcsimageeditor/mask_visible"), chkMaskVisible->isChecked());
-    saveSplitter(*(settings->getQSettings()), splitterTop, "imfcsimageeditor/splittertopSizes");
+    //saveSplitter(*(settings->getQSettings()), splitterTop, "imfcsimageeditor/splittertopSizes");
     saveSplitter(*(settings->getQSettings()), splitterBot, "imfcsimageeditor/splitterbotSizes");
     saveSplitter(*(settings->getQSettings()), splitterTopBot, "imfcsimageeditor/splittertopbotSizes");
     corrView->writeSettings(*(settings->getQSettings()), "imfcsimageeditor/corrView/");
@@ -5666,7 +5686,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
     cmbSelection->addItem(tr("all non-masked pixels"));
     cmbSelection->addItem(tr("selected pixels"));
     cmbSelection->addItem(tr("pixels from named selections"));
-    cmbSelection->setCurrentIndex((selected.size()<=1)?0:1);
+    cmbSelection->setCurrentIndex((selected.size()<=1)?0:2);
     dlg->addWidget(tr("pixel range:"), cmbSelection);
 
     QLineEdit* edtSelections=new QLineEdit(dlg);
@@ -5686,6 +5706,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
     addCheckableQListWidgetItem(listMode, tr("minimum"), Qt::CheckState(settings->value(prefix+"copymin", Qt::Unchecked).toInt()));
     addCheckableQListWidgetItem(listMode, tr("maximum"), Qt::CheckState(settings->value(prefix+"copymax", Qt::Unchecked).toInt()));
 
+    listMode->setMinimumHeight(60);
     dlg->addWidget(tr("which statistics?"), listMode);
 
     QCheckBox* chkCopyNumber=new QCheckBox("", dlg);
