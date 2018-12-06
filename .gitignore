@@ -87,6 +87,7 @@ Thumbs.db
 /extlibs/cairo/include
 /extlibs/cairo/lib
 /extlibs/cairo/share
+/extlibs/cairo/bin
 /extlibs/cimg/Licence_CeCILL_V2-en.txt
 /extlibs/cimg/Licence_CeCILL-C_V1-en.txt
 /extlibs/cimg/README.txt
