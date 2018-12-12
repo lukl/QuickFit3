@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1040</width>
+    <width>1419</width>
     <height>638</height>
    </rect>
   </property>
@@ -23,7 +23,16 @@
       <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <property name="spacing">
@@ -222,7 +231,7 @@
       <item row="0" column="12">
        <widget class="QLabel" name="label_11">
         <property name="text">
-         <string>   &amp;delay/step::</string>
+         <string>   de&amp;lay/step::</string>
         </property>
         <property name="buddy">
          <cstring>spinDelay</cstring>
@@ -298,7 +307,16 @@
       <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <property name="spacing">
@@ -617,7 +635,16 @@ p, li { white-space: pre-wrap; }
       <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <property name="spacing">
@@ -1291,7 +1318,7 @@ p, li { white-space: pre-wrap; }
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>25</height>
+         <height>30</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -1299,6 +1326,12 @@ p, li { white-space: pre-wrap; }
          <width>150</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
        </property>
        <property name="text">
         <string>&amp;Acquire</string>
@@ -1317,7 +1350,7 @@ p, li { white-space: pre-wrap; }
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>25</height>
+         <height>30</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -1325,6 +1358,12 @@ p, li { white-space: pre-wrap; }
          <width>150</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
        </property>
        <property name="text">
         <string>Acquire &amp;Next</string>

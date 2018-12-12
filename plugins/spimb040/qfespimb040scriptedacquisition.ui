@@ -347,6 +347,18 @@
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,1,0">
      <item>
       <widget class="QPushButton" name="btnExecute">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
        <property name="text">
         <string>&amp;Execute Script</string>
        </property>
@@ -358,6 +370,18 @@
      </item>
      <item>
       <widget class="QPushButton" name="btnCancel">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
        <property name="text">
         <string>&amp;Cancel Script</string>
        </property>

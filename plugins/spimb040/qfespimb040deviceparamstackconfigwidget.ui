@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1162</width>
-    <height>409</height>
+    <width>1629</width>
+    <height>451</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -106,7 +106,7 @@ p, li { white-space: pre-wrap; }
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>25</height>
+       <height>30</height>
       </size>
      </property>
      <property name="maximumSize">
@@ -114,6 +114,12 @@ p, li { white-space: pre-wrap; }
        <width>150</width>
        <height>16777215</height>
       </size>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
      </property>
      <property name="text">
       <string>&amp;Acquire</string>
@@ -219,7 +225,16 @@ p, li { white-space: pre-wrap; }
    <item row="10" column="3" colspan="2">
     <widget class="QWidget" name="widScanParam1" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -552,7 +567,16 @@ p, li { white-space: pre-wrap; }
    <item row="0" column="0" colspan="5">
     <widget class="QWidget" name="widget_2" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_17">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
