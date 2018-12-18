@@ -445,7 +445,11 @@ void QFESPIMB040ImageStackConfigWidget2::on_chkUse1_clicked(bool /*enabled*/) {
     ui->widStage2->setEnabled((ui->chkUse1->isChecked() || ui->chkUse2->isChecked()) && ui->chkStage2->isChecked());
     ui->widStage3->setEnabled((ui->chkUse1->isChecked() || ui->chkUse2->isChecked()) && ui->chkStage3->isChecked());
     ui->edtPrefix1->setEnabled(ui->chkUse1->isChecked());
+    ui->edtPrefix1->setVisible(ui->chkUse1->isChecked());
     ui->cmbCam1Settings->setEnabled(ui->chkUse1->isChecked());
+    ui->cmbCam1Settings->setVisible(ui->chkUse1->isChecked());
+    ui->btnTestAcq1->setEnabled(ui->chkUse1->isChecked());
+    ui->btnTestAcq1->setVisible(ui->chkUse1->isChecked());
     if (widVisible) setUpdatesEnabled(updt);
 }
 
@@ -460,7 +464,11 @@ void QFESPIMB040ImageStackConfigWidget2::on_chkUse2_clicked(bool /*enabled*/) {
     ui->widStage2->setEnabled((ui->chkUse1->isChecked() || ui->chkUse2->isChecked()) && ui->chkStage2->isChecked());
     ui->widStage3->setEnabled((ui->chkUse1->isChecked() || ui->chkUse2->isChecked()) && ui->chkStage3->isChecked());
     ui->edtPrefix2->setEnabled(ui->chkUse2->isChecked());
+    ui->edtPrefix2->setVisible(ui->chkUse2->isChecked());
     ui->cmbCam2Settings->setEnabled(ui->chkUse2->isChecked());
+    ui->cmbCam2Settings->setVisible(ui->chkUse2->isChecked());
+    ui->btnTestAcq2->setEnabled(ui->chkUse2->isChecked());
+    ui->btnTestAcq2->setVisible(ui->chkUse2->isChecked());
     if (widVisible) setUpdatesEnabled(updt);
 }
 
