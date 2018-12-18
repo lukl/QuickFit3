@@ -833,6 +833,8 @@ void QFESPIMB040OverviewAcquisitionConfigWidget::performAcquisition()
 {
     if (!(use1() || use2())) return;
 
+    bool previousShutterState=0;
+
     QDateTime startDateTime=QDateTime::currentDateTime();
     QList<QFESPIMB040OpticsSetupBase::measuredValues> measured;
 
@@ -877,8 +879,11 @@ void QFESPIMB040OverviewAcquisitionConfigWidget::performAcquisition()
         // switch off light
         //////////////////////////////////////////////////////////////////////////////////////
         if (opticsSetup->isMainIlluminationShutterAvailable()){
-            log->log_text(tr("  - switch main shutter on!\n"));
-            opticsSetup->setMainIlluminationShutter(false, false);
+            log->log_text(tr("  - switch main shutter off!\n"));
+            previousShutterState=opticsSetup->getMainIlluminationShutter();
+            if (previousShutterState) {
+                opticsSetup->setMainIlluminationShutter(false, true);
+            }
         }
 
 
@@ -952,12 +957,6 @@ void QFESPIMB040OverviewAcquisitionConfigWidget::performAcquisition()
         if (ok && useCam1) log->log_text(tr("  - prefix 1: '%1'\n").arg(acquisitionPrefix1));
         if (ok && useCam2) log->log_text(tr("  - prefix 2: '%1'\n").arg(acquisitionPrefix2));
 
-        // set order of overview images (basically: lightpath 0 as last image ... so we do not have to reset the lightpath
-        QList<int> prevs;
-        for (int ovrImg=1; ovrImg<previewCount(); ovrImg++) {
-            prevs<<ovrImg;
-        }
-        prevs<<0;
 
         //////////////////////////////////////////////////////////////////////////////////////
         // acquire background images
@@ -974,7 +973,7 @@ void QFESPIMB040OverviewAcquisitionConfigWidget::performAcquisition()
             //////////////////////////////////////////////////////////////////////////////////////
             // switch off light
             //////////////////////////////////////////////////////////////////////////////////////
-            if (opticsSetup->isMainIlluminationShutterAvailable()) {
+            if (opticsSetup->isMainIlluminationShutterAvailable() && opticsSetup->getMainIlluminationShutter()) {
                 log->log_text(tr("  - switch main shutter off!\n"));
                 ok=ok&opticsSetup->setMainIlluminationShutter(false, true);
                 if (!ok) {
@@ -985,8 +984,7 @@ void QFESPIMB040OverviewAcquisitionConfigWidget::performAcquisition()
             //////////////////////////////////////////////////////////////////////////////////////
             // acquire background series
             //////////////////////////////////////////////////////////////////////////////////////
-            for (int ovrImgI=0; ovrImgI<prevs.size(); ovrImgI++) {
-                int ovrImg=prevs[ovrImgI];
+            for (int ovrImg=0; ovrImg<previewCount(); ovrImg++) {
                 if (ok && lightpathActivatedPreview(ovrImg)) {
                     if (ok && useCam1 && (!ui->chkNoBackground1->isChecked())&&(ui->chkBackground->isChecked())) {
                         progress.setLabelText(tr("acquiring overview background image from camera 1, lightpath %1 ...").arg(ovrImg+1));
@@ -1028,7 +1026,7 @@ void QFESPIMB040OverviewAcquisitionConfigWidget::performAcquisition()
         //////////////////////////////////////////////////////////////////////////////////////
         // switch on light
         //////////////////////////////////////////////////////////////////////////////////////
-        if (opticsSetup->isMainIlluminationShutterAvailable()) {
+        if ((opticsSetup->isMainIlluminationShutterAvailable()) && !(ui->chkCloseMainShutter->isChecked())) {
             log->log_text(tr("  - switch main shutter back on!\n"));
             ok=ok&opticsSetup->setMainIlluminationShutter(true, true);
         }
@@ -1045,8 +1043,7 @@ void QFESPIMB040OverviewAcquisitionConfigWidget::performAcquisition()
             ok=false;
         }
 
-        for (int ovrImgI=0; ovrImgI<prevs.size(); ovrImgI++) {
-            int ovrImg=prevs[ovrImgI];
+        for (int ovrImg=0; ovrImg<previewCount(); ovrImg++) {
             if (ok && lightpathActivatedPreview(ovrImg)) {
                 if (ok && useCam1 ) {
                     progress.setLabelText(tr("acquiring overview image from camera 1, lightpath %1 ...").arg(ovrImg+1));
@@ -1085,7 +1082,7 @@ void QFESPIMB040OverviewAcquisitionConfigWidget::performAcquisition()
         //////////////////////////////////////////////////////////////////////////////////////
         // switch off light
         //////////////////////////////////////////////////////////////////////////////////////
-        if (opticsSetup->isMainIlluminationShutterAvailable()) {
+        if (opticsSetup->isMainIlluminationShutterAvailable() && opticsSetup->getMainIlluminationShutter()) {
             log->log_text(tr("  - switch main shutter off!\n"));
             ok=ok&opticsSetup->setMainIlluminationShutter(false, false);
         }
@@ -1189,8 +1186,8 @@ void QFESPIMB040OverviewAcquisitionConfigWidget::performAcquisition()
     // switch on light
     //////////////////////////////////////////////////////////////////////////////////////
     if (opticsSetup->isMainIlluminationShutterAvailable()) {
-        log->log_text(tr("  - switch main shutter back on!\n"));
-        ok=ok&opticsSetup->setMainIlluminationShutter(true, true);
+        log->log_text(tr("  - switch main shutter back to previous state!\n"));
+        ok=ok&opticsSetup->setMainIlluminationShutter(previousShutterState, false);
     }
 
     opticsSetup->unlockLightpath();

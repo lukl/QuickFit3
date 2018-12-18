@@ -1748,38 +1748,22 @@ bool QFESPIMB040OpticsSetup2::setMainIlluminationShutter(bool opened, bool block
 bool QFESPIMB040OpticsSetup2::setAlex(bool alexOnOff, bool blocking) {
     if (!isMainIlluminationShutterAvailable()) return false;
     if (getLaserCount()==0) return false;
+    if (shutterMain.isEmpty()) return false;
 
-    waitForMainShutter.clear();
-    for (int i=0; i<shutterMain.size(); i++) {
-            shutterMain[i].shutter->setAlex(alexOnOff);
-            waitForMainShutter.insert(i);
-    }
 
-    for (int i=0; i<laserIndex.size(); i++) {
-        getLaser(i)->setExternalModulation(0, true);
+    shutterMain[0].shutter->setAlex(alexOnOff); // Switch alex on in shutter driver
+
+    for(int i=0; i<getLaserCount(); i++) {
+        for (uint j=0; j<getLaser(i)->getLightSourceCount();j++)
+        getLaser(i)->setExternalModulation(j, alexOnOff);
     }
 
     if (blocking) {
         QTime t;
         t.start();
-        bool ok=false;
-        while (!ok && t.elapsed()<10000) {
-            ok=true;
-            for (int i=0; i<shutterMain.size(); i++) {
-                    shutterMain[i].shutter->setAlex(alexOnOff);
-                    waitForMainShutter.insert(i);
-            }
-        }
-
-
+        while (t.elapsed()<300) {
             QApplication::processEvents();
-
-
-        if (t.elapsed()>=10000) {
-            m_log->log_error("main shutter timed out after 10s!\n");
-            return false;
         }
-        return true;
     }
     return true;
 }

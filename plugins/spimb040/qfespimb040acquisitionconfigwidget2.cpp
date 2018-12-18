@@ -930,6 +930,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
     QList<QFESPIMB040OpticsSetupBase::measuredValues> measured;
 
     bool ok=true;
+    bool previousShutterState=false;
     log->log_text(tr("starting image series acquisition:\n"));
     opticsSetup->lockLightpath();
 
@@ -971,8 +972,11 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         // switch off light
         //////////////////////////////////////////////////////////////////////////////////////
         if (opticsSetup->isMainIlluminationShutterAvailable()){
-            log->log_text(tr("  - switch main shutter on!\n"));
-            opticsSetup->setMainIlluminationShutter(false, false);
+            log->log_text(tr("  - switch main shutter off!\n"));
+            previousShutterState=opticsSetup->getMainIlluminationShutter();
+            if (previousShutterState) {
+                opticsSetup->setMainIlluminationShutter(false, true);
+            }
         }
 
         //////////////////////////////////////////////////////////////////////////////////////
@@ -1109,7 +1113,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
             //////////////////////////////////////////////////////////////////////////////////////
             // switch off light
             //////////////////////////////////////////////////////////////////////////////////////
-            if (opticsSetup->isMainIlluminationShutterAvailable()) {
+            if (opticsSetup->isMainIlluminationShutterAvailable() && (opticsSetup->getMainIlluminationShutter())) {
                 log->log_text(tr("  - switch main shutter off!\n"));
                 ok=ok&opticsSetup->setMainIlluminationShutter(false, true);
                 if (!ok) {
@@ -1186,7 +1190,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         //////////////////////////////////////////////////////////////////////////////////////
         // switch on light
         //////////////////////////////////////////////////////////////////////////////////////
-        if (opticsSetup->isMainIlluminationShutterAvailable()) {
+        if (opticsSetup->isMainIlluminationShutterAvailable() && !(ui->chkCloseMainShutter->isChecked())) {
             log->log_text(tr("  - switch main shutter back on!\n"));
             ok=ok&opticsSetup->setMainIlluminationShutter(true, true);
         }
@@ -1249,7 +1253,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         //////////////////////////////////////////////////////////////////////////////////////
         // switch off light
         //////////////////////////////////////////////////////////////////////////////////////
-        if (opticsSetup->isMainIlluminationShutterAvailable()) {
+        if (opticsSetup->isMainIlluminationShutterAvailable() && opticsSetup->getMainIlluminationShutter()) {
             log->log_text(tr("  - switch main shutter off!\n"));
             ok=ok&opticsSetup->setMainIlluminationShutter(false, false);
         }
@@ -1269,6 +1273,19 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
             }
         }
         //////////////////////////////////////////////////////////////////////////////////////
+        // switch on alex if activated
+        //////////////////////////////////////////////////////////////////////////////////////
+
+        if(ui->chkAlex->isChecked()) {
+            if (opticsSetup->isMainIlluminationShutterAvailable()) {
+                log->log_text(tr("Switch Alex on before acquisition"));
+                ok=ok&opticsSetup->setAlex(true, true);
+            }
+        }
+
+
+
+        //////////////////////////////////////////////////////////////////////////////////////
         // switch on light
         //////////////////////////////////////////////////////////////////////////////////////
         if (opticsSetup->isMainIlluminationShutterAvailable()) {
@@ -1276,20 +1293,6 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
             ok=ok&opticsSetup->setMainIlluminationShutter(true, true);
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////
-        // switch on alex if activated
-        //////////////////////////////////////////////////////////////////////////////////////
-
-        if(ui->chkAlex->isChecked()) {
-            if (opticsSetup->isMainIlluminationShutterAvailable()) {
-                log->log_text(tr("Switch Alex on"));
-                opticsSetup->setAlex(true, false);
-                //opticsSetup->getLaser()
-                QTime t;
-                t.start();
-                while(t.elapsed()<10) QApplication::processEvents();
-            }
-        }
 
         //////////////////////////////////////////////////////////////////////////////////////
         // acquire image series
@@ -1313,18 +1316,25 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
             log->log_text(tr("  - acquired image series!\n"));
         }
 
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // switch off light
+        //////////////////////////////////////////////////////////////////////////////////////
+        if (opticsSetup->isMainIlluminationShutterAvailable() && (ui->chkCloseMainShutter->isChecked())) {
+            log->log_text(tr("  - switch main shutter off!\n"));
+            ok=ok&opticsSetup->setMainIlluminationShutter(false, true);
+        }
+
         //////////////////////////////////////////////////////////////////////////////////////
         // switch off alex after acquisition
         //////////////////////////////////////////////////////////////////////////////////////
 
-        if(ui->chkBackground->isChecked()) {
+        if(ui->chkAlex->isChecked()) {
             if (opticsSetup->isMainIlluminationShutterAvailable()) {
-                log->log_text(tr("Switch Alex on"));
-                opticsSetup->setAlex(false, false);
+                log->log_text(tr("Switch Alex off after acquisition"));
+                ok=ok&opticsSetup->setAlex(false, true);
             }
         }
-
-
 
         //////////////////////////////////////////////////////////////////////////////////////
         // acquire overview images
@@ -1387,7 +1397,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         //////////////////////////////////////////////////////////////////////////////////////
         // switch off light
         //////////////////////////////////////////////////////////////////////////////////////
-        if (opticsSetup->isMainIlluminationShutterAvailable()) {
+        if (opticsSetup->isMainIlluminationShutterAvailable() && ui->chkCloseMainShutter->isChecked() && opticsSetup->getMainIlluminationShutter()) {
             log->log_text(tr("  - switch main shutter off!\n"));
             ok=ok&opticsSetup->setMainIlluminationShutter(false, false);
         }
@@ -1493,7 +1503,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
     //////////////////////////////////////////////////////////////////////////////////////
     if (opticsSetup->isMainIlluminationShutterAvailable()) {
         log->log_text(tr("  - switch main shutter back on!\n"));
-        ok=ok&opticsSetup->setMainIlluminationShutter(true, true);
+        ok=ok&opticsSetup->setMainIlluminationShutter(previousShutterState, false);
     }
 
     opticsSetup->unlockLightpath();
