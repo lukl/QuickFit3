@@ -1386,6 +1386,13 @@ void  QFExtensionCameraAndor::setShutterState(unsigned int shutter, bool opened)
 
 }
 
+void  QFExtensionCameraAndor::setShutterAlex(unsigned int shutter, bool AlexOnOff) {
+    // Dummy logic for the function to be defined
+    if (shutter>=getShutterCount()) return;
+    if (AlexOnOff) return;
+    return;
+}
+
 QString QFExtensionCameraAndor::getShutterDescription(unsigned int shutter) {
     if (shutter<getShutterCount()) return tr("internal camera shutter");
     return QString("");

@@ -347,6 +347,13 @@ void QFExtensionPCCSLED::setShutterState(unsigned int shutter, bool opened) {
     setLightSourceLineEnabled(shutter, 0, opened);
 }
 
+void  QFExtensionPCCSLED::setShutterAlex(unsigned int shutter, bool AlexOnOff) {
+    // Dummy logic for the function to be defined
+    if (shutter>=getShutterCount()) return;
+    if (AlexOnOff) return;
+    return;
+}
+
 bool QFExtensionPCCSLED::isLastShutterActionFinished(unsigned int shutter) {
     return isLastLightSourceActionFinished(shutter);
 }
@@ -365,7 +372,10 @@ void QFExtensionPCCSLED::showShutterSettingsDialog(unsigned int shutter, QWidget
 
 /** \brief set the laser to external modulation if possible */
 void QFExtensionPCCSLED::setExternalModulation(unsigned int lightSource, bool OnOff, QWidget* parent) {
-
+    if (lightSource>=getLightSourceCount()) log_error("Invalid light source");
+    if (!OnOff) return;
+    log_text(tr("There is no external modulation"));
+    return;
 }
 
 

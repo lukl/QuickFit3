@@ -136,6 +136,8 @@ class QFWIDLIB_EXPORT QFShutterConfigWidget : public QWidget {
         /** \brief action to configure to a shutter */
         QAction* actConfigure;
         QAction* actState;
+
+        /** \brief action to switch ALEX on or off on a shutter driver */
         QAction* actAlexOnOff;
 
         QTimer* timUpdate;
@@ -186,10 +188,10 @@ class QFWIDLIB_EXPORT QFShutterConfigWidget : public QWidget {
         void displayShutterStates();
         void updateActionProperties();
         void updateActionProperties(bool opened);
+        void shutterActionAlexClicked(bool AlexOnOff);
     public slots:
         void shutterActionClicked(bool shutterOpened);
         void shutterStateChanged(bool state);
-        void shutterActionAlexClicked(bool AlexOnOff);
 };
 
 #endif // QFSHUTTERCONFIGWIDGET_H

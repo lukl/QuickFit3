@@ -129,6 +129,8 @@ class QFWIDLIB_EXPORT QFLightSourceConfigWidget : public QFrame {
         void setLineEnabled(int line, bool enabled);
         /** \brief set the given line power. While the widget is NOT locked, this function is blocking until the action completes  */
         void setLinePower(int line, double power);
+        /** \brief set Laser Mode to external modulation  */
+        void toggleexternalmod();
 
     protected:
         QFPluginLogService* m_log;
@@ -204,7 +206,6 @@ class QFWIDLIB_EXPORT QFLightSourceConfigWidget : public QFrame {
         void lineEnabledToggled(bool enabled);
         void linesChanged(QTime time, QList<bool> lineenabled, QList<double> setValues, QList<double> measuredValues, QStringList powerUnits, QStringList lineNames, QList<bool> widgetsEnabled);
         void setPowerEditingFinished();
-        void toggleexternalmod(bool extmod);
 
         
 };

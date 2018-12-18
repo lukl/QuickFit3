@@ -133,7 +133,7 @@ void QFShutterConfigWidget::createWidgets() {
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    // create input widgets for camera devices
+    // create input widgets for shutter devices
     ////////////////////////////////////////////////////////////////////////////////////////////////
     btnState=new QToolButton(this);
     btnState->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -148,8 +148,8 @@ void QFShutterConfigWidget::createWidgets() {
     widgetLayout->addWidget(btnAlexOnOff,0,4);
     QWidget* w=new QWidget(this);
     w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    widgetLayout->addWidget(w,0,4);
-    widgetLayout->setColumnStretch(4,1);
+    widgetLayout->addWidget(w,0,5);
+    widgetLayout->setColumnStretch(5,1);
     cmbShutter->setEnabled(false);
 
 
@@ -161,6 +161,15 @@ void QFShutterConfigWidget::createActions() {
     connect(actConnect, SIGNAL(toggled(bool)), this, SLOT(disConnect()));
     btnConnect->setDefaultAction(actConnect);
 
+    actAlexOnOff=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/shutter_alex.png"), tr("Switch On/Off Alternating laser excitation ..."), this);
+    actAlexOnOff->setCheckable(true);
+    actAlexOnOff->setToolTip(tr("Switch ALEX On/Off"));
+    connect(actAlexOnOff, SIGNAL(toggled(bool)), this, SLOT(shutterActionAlexClicked(bool)));
+    btnAlexOnOff->setDefaultAction(actAlexOnOff);
+
+    // Debug dummy
+    //connect(actAlexOnOff, SIGNAL(toggled(bool)), this, SLOT(disConnect()));
+    //btnAlexOnOff->setDefaultAction(actConnect);
 
     actConfigure=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/configure_shutter.png"), tr("Configure shutter ..."), this);
     connect(actConfigure, SIGNAL(triggered()), this, SLOT(configure()));
@@ -173,10 +182,6 @@ void QFShutterConfigWidget::createActions() {
     connect(actState, SIGNAL(toggled(bool)), this, SLOT(shutterActionClicked(bool)));
     btnState->setDefaultAction(actState);
 
-    actAlexOnOff=new QFActionWithNoMenuRole(QIcon(":/libqf3widgets/shutter_alex.png"), tr("Switch On/Off Alternating laser excitation ..."), this);
-    actAlexOnOff->setCheckable(true);
-    connect(actAlexOnOff, SIGNAL(toggled(bool)), this, SLOT(shutterActionAlexClicked(bool)));
-    btnAlexOnOff->setDefaultAction(actAlexOnOff);
 }
 
 void QFShutterConfigWidget::updateStates() {
@@ -202,9 +207,9 @@ void QFShutterConfigWidget::updateStates() {
     }
     actConfigure->setEnabled(shutter!=NULL && shutterID>=0);
     actConnect->setEnabled(shutter!=NULL && shutterID>=0);
-    actAlexOnOff->setEnabled(shutter!=NULL && shutterID>=0);
     cmbShutter->setEnabled(!conn);
     actState->setEnabled(conn && shutter!=NULL && (!moving));
+    actAlexOnOff->setEnabled(conn && shutter!=NULL && (!moving));
 
 }
 
@@ -393,17 +398,8 @@ void QFShutterConfigWidget::shutterActionAlexClicked(bool AlexOnOff) {
     shutterID=getShutterID();
     if (shutter) {
         //qDebug()<<"set shutter state opened="<<opened;
+        //bool AlexOnOff=actAlexOnOff->isChecked();
         shutter->setShutterAlex(shutterID, AlexOnOff);
-        if (!locked) {
-            moving=true;
-            actState->setEnabled(false);
-            QTime started=QTime::currentTime();
-            while (!shutter->isLastShutterActionFinished(shutterID) && (started.elapsed()<10000)) {
-                //qDebug()<<started.elapsed();
-                QApplication::processEvents();
-            }
-            moving=false;
-        }
     }
 }
 

@@ -124,6 +124,8 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
         virtual bool isShutterOpen(unsigned int shutter) ;
         /** \copydoc QFExtensionShutter::setShutterState() */
         virtual void setShutterState(unsigned int shutter, bool opened);
+        /** \copydoc QFExtensionShutter::setShutterAlex() */
+        virtual void setShutterAlex(unsigned int shutter, bool AlexOnOff);
         /** \copydoc QFExtensionShutter::getShutterDescription() */
         virtual QString getShutterDescription(unsigned int shutter);
         /** \copydoc QFExtensionShutter::getShutterShortName() */

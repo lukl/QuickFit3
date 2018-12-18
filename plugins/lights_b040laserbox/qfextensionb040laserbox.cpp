@@ -320,10 +320,12 @@ void QFExtensionB040LaserBox::showLightSourceSettingsDialog(unsigned int lightSo
 }
 
 ///** \brief set the laser to external modulation if possible */
-//void QFExtensionB040LaserBox::setExternalModulation(unsigned int lightSource, bool OnOff, QWidget* parent) {
-//    if (lightSource>=getLightSourceCount()) log_error("Invalid light source");
-//    QMessageBox::information(parent, getName(), tr("There is no external modulation"));
-//}
+void QFExtensionB040LaserBox::setExternalModulation(unsigned int lightSource, bool OnOff, QWidget* parent) {
+    if (lightSource>=getLightSourceCount()) log_error("Invalid light source");
+    if (!OnOff) return;
+    log_text(tr("There is no external modulation"));
+    return;
+}
 
 
 
