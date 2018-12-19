@@ -987,10 +987,27 @@ bool QFESPIMB040OpticsSetup::setMainIlluminationShutter(bool opened, bool blocki
     return true;
 }
 
-bool QFESPIMB040OpticsSetup::setAlex(bool AlexOnOff, bool blocking) {
+/** \brief Switch Laser alternation (ALEX) on or off */
+bool QFESPIMB040OpticsSetup::setAlex(bool alexOnOff, bool blocking) {
     if (!isMainIlluminationShutterAvailable()) return false;
+    if (getLaserCount()==0) return false;
+    if (getShutterCount()==0) return false;
 
-    ui->shutterMainIllumination->setAlex(AlexOnOff);
+
+    ui->shutterMainIllumination->setAlex(alexOnOff); // Switch alex on in shutter driver
+
+    for(int i=0; i<getLaserCount(); i++) {
+        for (uint j=0; j<getLaser(i)->getLightSourceCount();j++)
+        getLaser(i)->setExternalModulation(j, alexOnOff);
+    }
+
+    if (blocking) {
+        QTime t;
+        t.start();
+        while (t.elapsed()<300) {
+            QApplication::processEvents();
+        }
+    }
     return true;
 }
 
