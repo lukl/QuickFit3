@@ -563,10 +563,16 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     lstvbl->addWidget(widFilterRecords);
 
     lstvbl->addWidget(lstRawData, 10);
-    btnRemoveRawData=new QPushButton(QIcon(":/lib/item_delete.png"), tr("remove record"), widRDRList);
-    btnRemoveRawData->setToolTip(tr("remove the current raw data record from the project"));
+
+    btnRemoveRawData=new QPushButton(QIcon(":/lib/item_delete.png"), tr("remove RDR"), widRDRList);
+    btnRemoveRawData->setToolTip(tr("remove the current raw data record (RDR) from the project"));
     connect(btnRemoveRawData, SIGNAL(clicked()), this, SLOT(removeRawData()));
     lstvbl->addWidget(btnRemoveRawData);
+
+    btnRemoveRawDataGroup=new QPushButton(QIcon(":/lib/item_delete.png"), tr("remove RDR+group"), widRDRList);
+    btnRemoveRawDataGroup->setToolTip(tr("remove the current raw data record (RDR) and its group files from the project"));
+    connect(btnRemoveRawDataGroup, SIGNAL(clicked()), this, SLOT(removeRawDataGroup()));
+    lstvbl->addWidget(btnRemoveRawDataGroup);
 
     splitMain->addWidget(widRDRList);
 
@@ -1216,6 +1222,22 @@ void QFEvaluationPropertyEditorPrivate::removeRawData() {
             if (ret==QMessageBox::Yes) {
                 d->deselectCurrent();
                 d->current->getProject()->deleteRawData(r->getID());
+            }
+        }
+    }
+}
+
+void QFEvaluationPropertyEditorPrivate::removeRawDataGroup() {
+    if (d->current) {
+        QFRawDataRecord* r=d->current->getHighlightedRecord();
+        if (r) {
+            int ret = QMessageBox::question(d, tr("QuickFit %1").arg(qfInfoVersionFull()),
+                                    tr("Do you really want to delete the current record?\n   '%1'").arg(r->getName()),
+                                    QMessageBox::Yes | QMessageBox::No,
+                                    QMessageBox::No);
+            if (ret==QMessageBox::Yes) {
+                d->deselectCurrent();
+                d->current->getProject()->deleteRawDataGroup(r->getID());
             }
         }
     }

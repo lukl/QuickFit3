@@ -112,7 +112,9 @@ class QFRawDataPropertyEditor_private : public QObject
         /** \brief button to switch to previous record */
         QToolButton* btnPrevious;
         /** \brief button to delete the current record */
-        QToolButton* btnDeleteReord;
+        QToolButton* btnDeleteRecord;
+        /** \brief button to delete the current record */
+        QToolButton* btnDeleteRecordGroup;
         /** \brief points to a settings object that is used to store application settings */
         ProgramOptions* settings;
         /** \brief tabel display the evaluation results associated with this file  */
@@ -144,6 +146,7 @@ class QFRawDataPropertyEditor_private : public QObject
         QAction* actPrevious;
         QAction* actNext;
         QAction* actDelete;
+        QAction* actDeleteGroup;
         QAction* actClose;
         QAction* actPreviousSameRole;
         QAction* actNextSameRole;
@@ -272,6 +275,8 @@ class QFRawDataPropertyEditor_private : public QObject
         void resizePropertiesTable();
         /** \brief remove the current record */
         void deleteRecord();
+        /** \brief remove the current record and it's group */
+        void deleteRecordGroup();
         void tvResultsSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
         /** \brief delete selected results */
         void deleteSelectedResults();

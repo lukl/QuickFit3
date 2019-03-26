@@ -152,22 +152,37 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     connect(actNextSameRole, SIGNAL(triggered()), this, SLOT(nextOfRolePressed()));
     vl->addWidget(btnNext);
     vl->addWidget(btnNextSameRole);
-    labTopIcon=new QLabel(d);
-    vl->addWidget(labTopIcon);
-    labTop=new QLabel(d);
-   /* labTop->setElided(true);
-    labTop->setElidedMode(Qt::ElideMiddle);*/
-    vl->addWidget(labTop);
     vl->addStretch();
 
-    actDelete=new QFActionWithNoMenuRole(QIcon(":/lib/item_delete.png"), tr("&Remove Record"), d);
+    QHBoxLayout* vl2=new QHBoxLayout();
+    ml->addLayout(vl2);
+
+    labTopIcon=new QLabel(d);
+    vl2->addWidget(labTopIcon);
+    labTop=new QLabel(d);
+    /*labTop->setElided(true);
+    labTop->setElidedMode(Qt::ElideMiddle);*/
+    vl2->addStretch();
+    vl2->addWidget(labTop);
+    vl2->addStretch();
+
+    actDelete=new QFActionWithNoMenuRole(QIcon(":/lib/item_delete.png"), tr("&Delete RDR"), d);
     actDelete->setToolTip(tr("removes the currently displayed record from the project"));
-    btnDeleteReord=new QToolButton(d);
-    btnDeleteReord->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    btnDeleteReord->setDefaultAction(actDelete);
-    btnDeleteReord->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    vl->addWidget(btnDeleteReord);
+    btnDeleteRecord=new QToolButton(d);
+    btnDeleteRecord->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    btnDeleteRecord->setDefaultAction(actDelete);
+    btnDeleteRecord->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    vl->addWidget(btnDeleteRecord);
     connect(actDelete, SIGNAL(triggered()), this, SLOT(deleteRecord()));
+
+    actDeleteGroup=new QFActionWithNoMenuRole(QIcon(":/lib/item_delete.png"), tr("&Delete RDR+Group"), d);
+    actDeleteGroup->setToolTip(tr("removes the currently displayed record and its group items from the project"));
+    btnDeleteRecordGroup=new QToolButton(d);
+    btnDeleteRecordGroup->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    btnDeleteRecordGroup->setDefaultAction(actDeleteGroup);
+    btnDeleteRecordGroup->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    vl->addWidget(btnDeleteRecordGroup);
+    connect(actDeleteGroup, SIGNAL(triggered()), this, SLOT(deleteRecordGroup()));
 
     actClose=new QFActionWithNoMenuRole(QIcon(":/lib/exit.png"), tr("&Close Window"), d);
     connect(actClose, SIGNAL(triggered()), d, SLOT(close()));
@@ -177,6 +192,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     menuRDR->addAction(actNextSameRole);
     menuRDR->addSeparator();
     menuRDR->addAction(actDelete);
+    menuRDR->addAction(actDeleteGroup);
     menuRDR->addSeparator();
     menuRDR->addAction(actExportPluginData);
     menuRDR->addSeparator();
@@ -1868,6 +1884,23 @@ void QFRawDataPropertyEditor_private::deleteRecord() {
             QPointer<QFRawDataRecord> m=current;
             previousPressed();
             current->getProject()->deleteRawData(m->getID());
+            if (current==m) {
+                d->close();
+            }
+        }
+    }
+}
+
+void QFRawDataPropertyEditor_private::deleteRecordGroup() {
+    if (current) {
+        int ret = QMessageBox::question(d, tr("QuickFit %1").arg(qfInfoVersionFull()),
+                                tr("Do you really want to delete the Group of the current record?\n   '%1'").arg(current->getName()),
+                                QMessageBox::Yes | QMessageBox::No,
+                                QMessageBox::No);
+        if (ret==QMessageBox::Yes) {
+            QPointer<QFRawDataRecord> m=current;
+            previousPressed();
+            current->getProject()->deleteRawDataGroup(m->getID());
             if (current==m) {
                 d->close();
             }

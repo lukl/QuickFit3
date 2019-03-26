@@ -89,6 +89,8 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
         QHBoxLayout* layWidgets;
         /** \brief remove the currently selected QFRawDataRecord */
         QPushButton* btnRemoveRawData;
+        /** \brief remove the currently selected QFRawDataRecord and its group */
+        QPushButton* btnRemoveRawDataGroup;
         /** \brief widget containing the RDR list on the rhs */
         QWidget* widRDRList;
 
@@ -227,6 +229,9 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
 
         /** \brief remove the currently selected QFRawDataRecord */
         void removeRawData();
+
+        /** \brief remove the currently selected QFRawDataRecord and its group */
+        void removeRawDataGroup();
 
         /** \brief if this was the last record this applies to, we close it */
         void recordAboutToBeDeleted(QFRawDataRecord* record);

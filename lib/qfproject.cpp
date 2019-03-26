@@ -547,6 +547,16 @@ void QFProject::deleteRawData(int ID) {
     }
 }
 
+void QFProject::deleteRawDataGroup(int ID) {
+    if (rawDataIDExists(ID)) {
+        QFRawDataRecord* rec=rawData[ID];
+        QList<QFRawDataRecord*> members=rec->getGroupMembers();
+        for (int i=0; i<members.size();i++) {
+            deleteRawData(members[i]->getID());
+        }
+    }
+}
+
 void QFProject::deleteEvaluation(int ID) {
     QFProjectWriteLocker locker(p->lock);
     if (evaluationIDExists(ID)) {

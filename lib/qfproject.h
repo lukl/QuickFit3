@@ -287,6 +287,8 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         QList<const QFEvaluationItem*> getEvaluationListConst() const;
         /** \brief delete the specified raw data record */
         void deleteRawData(int ID);
+        /** \brief delete the specified RDR plus group via RDR id */
+        void deleteRawDataGroup(int ID);
         /** \brief delete the specified evaluation record */
         void deleteEvaluation(int ID);
         /** \brief duplicate the specified raw data record */
