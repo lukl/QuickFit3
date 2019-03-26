@@ -200,4 +200,12 @@ QList<QPointer<QFRawDataEditor> > QFRawDataPropertyEditor::getEditorList() const
     return p->editorList;
 }
 
+void QFRawDataPropertyEditor::nextOfRolePressed()
+{
+    p->nextOfRolePressed();
+}
 
+void QFRawDataPropertyEditor::nextPressed()
+{
+    p->nextPressed();
+}

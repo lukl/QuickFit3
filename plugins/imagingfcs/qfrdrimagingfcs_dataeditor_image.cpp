@@ -2135,8 +2135,15 @@ void QFRDRImagingFCSImageEditor::excludeByImage(double* imageIn) {
             mask[i]=false;
             image[i]=imageIn[i];
         }
-        dialog->init(mask, image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(),  (cmbDualView->isEnabled())?cmbDualView->currentIndex():0);
-        if (dialog->exec()==QDialog::Accepted) {
+
+        bool* useMaskForRDRGroup=new bool(false);
+        bool* changeToNextFile=new bool(false);
+
+        dialog->init(mask, image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(),  (cmbDualView->isEnabled())?cmbDualView->currentIndex():0, useMaskForRDRGroup, changeToNextFile);
+
+        bool accepted=(dialog->exec()==QDialog::Accepted);
+
+        if (accepted) {
             if (dialog->getMaskMode()==2) {
                 bool* newMask=m->maskGet();
                 for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
@@ -2156,6 +2163,17 @@ void QFRDRImagingFCSImageEditor::excludeByImage(double* imageIn) {
         qfFree(mask);
         qfFree(image);
         delete dialog;
+
+        if (accepted) {
+            if(useMaskForRDRGroup[0]) btnCopyMaskToGroup->click();
+            if(changeToNextFile[0]) {
+                if(useMaskForRDRGroup[0]) propertyEditor->nextOfRolePressed();
+                else propertyEditor->nextPressed();
+                btnMaskByIntensity->click();
+            }
+        }
+
+
     }
 }
 

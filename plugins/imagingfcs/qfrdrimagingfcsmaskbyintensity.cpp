@@ -31,13 +31,15 @@ QFRDRImagingFCSMaskByIntensity::QFRDRImagingFCSMaskByIntensity(QWidget *parent, 
 {
     m_mask=NULL;
     m_image=NULL;
+    m_useMaskForGroup=NULL;
+    m_switchToNextFile=NULL;
     m_width=0;
     m_height=0;
     ui->setupUi(this);
     plteImage=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0,JKQTPMathImageGRAY, ui->pltMain->get_plotter());
     ui->pltMain->addGraph(plteImage);
     QColor colTrue=QColor("red");
-    colTrue.setAlphaF(0.7);
+    colTrue.setAlphaF(0.4);
     plteMask=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0,0,colTrue, ui->pltMain->get_plotter());
     ui->pltMain->addGraph(plteMask);
     min=max=0;
@@ -50,7 +52,10 @@ QFRDRImagingFCSMaskByIntensity::QFRDRImagingFCSMaskByIntensity(QWidget *parent, 
     ui->chkColorScaling->setChecked(ProgramOptions::getConfigValue(iniName+"/chkColorScaling", false).toBool());
     ui->edtImgRangeMin->setValue(ProgramOptions::getConfigValue(iniName+"/edtImgRangeMin", 5).toDouble());
     ui->edtImgRangeMax->setValue(ProgramOptions::getConfigValue(iniName+"/edtImgRangeMax", 5).toDouble());
-    ui->edtInitRatio->setValue(ProgramOptions::getConfigValue(iniName+"/edtInitRatio", 30).toDouble());
+    ui->edtInitRatio_min->setValue(ProgramOptions::getConfigValue(iniName+"/edtInitRatioMin", 30).toDouble());
+    ui->edtInitRatio_max->setValue(ProgramOptions::getConfigValue(iniName+"/edtInitRatioMax", 95).toDouble());
+    ui->chkApplyToGroup->setChecked(ProgramOptions::getConfigValue(iniName+"/chkApplyToGroup", false).toBool());
+    ui->chkSwitchToNextFile->setChecked(ProgramOptions::getConfigValue(iniName+"/chkSwitchToNextFile", false).toBool());
     loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, iniName+"/geo/");
     updateDualView();
     updateEnabledWidgets();
@@ -65,7 +70,10 @@ QFRDRImagingFCSMaskByIntensity::~QFRDRImagingFCSMaskByIntensity() {
     ProgramOptions::setConfigValue(iniName+"/chkColorScaling", ui->chkColorScaling->isChecked());
     ProgramOptions::setConfigValue(iniName+"/edtImgRangeMin", ui->edtImgRangeMin->value());
     ProgramOptions::setConfigValue(iniName+"/edtImgRangeMax", ui->edtImgRangeMax->value());
-    ProgramOptions::setConfigValue(iniName+"/edtInitRatio", ui->edtInitRatio->value());
+    ProgramOptions::setConfigValue(iniName+"/edtInitRatioMin", ui->edtInitRatio_min->value());
+    ProgramOptions::setConfigValue(iniName+"/edtInitRatioMax", ui->edtInitRatio_max->value());
+    ProgramOptions::setConfigValue(iniName+"/chkApplyToGroup", ui->chkApplyToGroup->isChecked());
+    ProgramOptions::setConfigValue(iniName+"/chkSwitchToNextFile", ui->chkSwitchToNextFile->isChecked());
     delete ui;
 }
 
@@ -98,6 +106,11 @@ void QFRDRImagingFCSMaskByIntensity::init(bool *mask, double *image, uint32_t wi
 
     ui->cmbDualView->setCurrentIndex(dualView);
     ui->chkEqualChannels->setChecked(false);
+
+    ui->sldInitRatio_min->setDRange(0.0,100.0);
+    ui->sldInitRatio_min->setDRange(0.0,100.0);
+    ui->sldInitRatio_min->setDValue(ui->edtInitRatio_min->value());
+    ui->sldInitRatio_max->setDValue(ui->edtInitRatio_max->value());
 
     updateDualView();
     updateImage();
@@ -280,7 +293,8 @@ void QFRDRImagingFCSMaskByIntensity::on_btnHelp_clicked()
 void QFRDRImagingFCSMaskByIntensity::updateDualView()
 {
     updateEnabledWidgets();
-    double initratio=0.01*ui->edtInitRatio->value();
+    double initratio_min=0.01*ui->edtInitRatio_min->value();
+    double initratio_max=0.01*ui->edtInitRatio_max->value();
     double l1=ui->edtLevel->value();
     double l2=ui->edtLevel2->value();
 
@@ -306,10 +320,10 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel->setRange(min-10.0, max+10.0);
             ui->edtLevel_2->setRange(min-10.0, max+10.0);
 
-            ui->edtLevel->setValue(min+initratio*(max-min));
-            ui->edtLevel_2->setValue(max);
-            ui->sldLevel->setDValue(min+initratio*(max-min));
-            ui->sldLevel_2->setDValue(max);
+            ui->edtLevel->setValue(min+initratio_min*(max-min));
+            ui->edtLevel_2->setValue(max-(1-initratio_max)*(max-min));
+            ui->sldLevel->setDValue(min+initratio_min*(max-min));
+            ui->sldLevel_2->setDValue(max-(1-initratio_max)*(max-min));
 
 
             ui->sldLevel2->setDRange(min-10.0, max+10.0);
@@ -317,10 +331,10 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel2->setRange(min-10.0, max+10.0);
             ui->edtLevel2_2->setRange(min-10.0, max+10.0);
 
-            ui->edtLevel2->setValue(min+initratio*(max-min));
-            ui->edtLevel2_2->setValue(max);
-            ui->sldLevel2->setDValue(min+initratio*(max-min));
-            ui->sldLevel2_2->setDValue(max);
+            ui->edtLevel2->setValue(min+initratio_min*(max-min));
+            ui->edtLevel2_2->setValue(max-(1-initratio_max)*(max-min));
+            ui->sldLevel2->setDValue(min+initratio_min*(max-min));
+            ui->sldLevel2_2->setDValue(max-(1-initratio_max)*(max-min));
 
 
         } else if (ui->cmbDualView->currentIndex()==1) {
@@ -350,10 +364,10 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel->setRange(min-10.0, max+10.0);
             ui->edtLevel_2->setRange(min-10.0, max+10.0);
 
-            ui->edtLevel->setValue(min+initratio*(max-min));
-            ui->edtLevel_2->setValue(max);
-            ui->sldLevel->setDValue(min+initratio*(max-min));
-            ui->sldLevel_2->setDValue(max);
+            ui->edtLevel->setValue(min+initratio_min*(max-min));
+            ui->edtLevel_2->setValue(max-(1-initratio_max)*(max-min));
+            ui->sldLevel->setDValue(min+initratio_min*(max-min));
+            ui->sldLevel_2->setDValue(max-(1-initratio_max)*(max-min));
 
 
             ui->sldLevel2->setDRange(min2-10.0, max2+10.0);
@@ -361,10 +375,10 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel2->setRange(min2-10.0, max2+10.0);
             ui->edtLevel2_2->setRange(min2-10.0, max2+10.0);
 
-            ui->edtLevel2->setValue(min2+initratio*(max2-min2));
-            ui->edtLevel2_2->setValue(max2);
-            ui->sldLevel2->setDValue(min2+initratio*(max2-min2));
-            ui->sldLevel2_2->setDValue(max2);
+            ui->edtLevel2->setValue(min2+initratio_min*(max2-min2));
+            ui->edtLevel2_2->setValue(max2-(1-initratio_max)*(max2-min2));
+            ui->sldLevel2->setDValue(min2+initratio_min*(max2-min2));
+            ui->sldLevel2_2->setDValue(max2-(1-initratio_max)*(max2-min2));
 
         } else if (ui->cmbDualView->currentIndex()==2) {
             bool first=true, first2=true;
@@ -393,10 +407,10 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel->setRange(min-10.0, max+10.0);
             ui->edtLevel_2->setRange(min-10.0, max+10.0);
 
-            ui->edtLevel->setValue(min+initratio*(max-min));
-            ui->edtLevel_2->setValue(max);
-            ui->sldLevel->setDValue(min+initratio*(max-min));
-            ui->sldLevel_2->setDValue(max);
+            ui->edtLevel->setValue(min+initratio_min*(max-min));
+            ui->edtLevel_2->setValue(max-(1-initratio_max)*(max-min));
+            ui->sldLevel->setDValue(min+initratio_min*(max-min));
+            ui->sldLevel_2->setDValue(max-(1-initratio_max)*(max-min));
 
 
             ui->sldLevel2->setDRange(min2-10.0, max2+10.0);
@@ -404,12 +418,25 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel2->setRange(min2-10.0, max2+10.0);
             ui->edtLevel2_2->setRange(min2-10.0, max2+10.0);
 
-            ui->edtLevel2->setValue(min2+initratio*(max2-min2));
-            ui->edtLevel2_2->setValue(max2);
-            ui->sldLevel2->setDValue(min2+initratio*(max2-min2));
-            ui->sldLevel2_2->setDValue(max2);
+            ui->edtLevel2->setValue(min2+initratio_min*(max2-min2));
+            ui->edtLevel2_2->setValue(max2-(1-initratio_max)*(max2-min2));
+            ui->sldLevel2->setDValue(min2+initratio_min*(max2-min2));
+            ui->sldLevel2_2->setDValue(max2-(1-initratio_max)*(max2-min2));
         }
     }
     updateMask();
+
+    if (m_useMaskForGroup) {
+        m_useMaskForGroup[0]=ui->chkApplyToGroup->isChecked();;
+        m_switchToNextFile[0]=ui->chkSwitchToNextFile->isChecked();
+    }
 }
 
+void QFRDRImagingFCSMaskByIntensity::init(bool *mask, double *image, uint32_t width, uint32_t height, int dualView, bool* useMaskForGroup, bool* switchToNextFile)
+{
+
+    m_useMaskForGroup=useMaskForGroup;
+    m_switchToNextFile=switchToNextFile;
+    init(mask, image, width, height, dualView);
+
+}

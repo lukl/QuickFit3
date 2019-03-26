@@ -43,6 +43,7 @@ class QFRDRImagingFCSMaskByIntensity : public QFDialog
         virtual ~QFRDRImagingFCSMaskByIntensity();
 
         void init(bool* mask, double* image, uint32_t width, uint32_t height, int dualView);
+        void init(bool* mask, double* image, uint32_t width, uint32_t height, int dualView, bool* useMaskForGroup, bool* switchToNextFile);
 
         int getMaskMode() const;
 
@@ -54,6 +55,7 @@ class QFRDRImagingFCSMaskByIntensity : public QFDialog
         void on_edtImgRangeMax_valueChanged(double val);
         void on_chkColorScaling_toggled(bool checked);
         void updateImage();
+        void updateInitialValues();
         void on_btnHelp_clicked();
         
     private:
@@ -69,6 +71,9 @@ class QFRDRImagingFCSMaskByIntensity : public QFDialog
 
         JKQTPMathImage* plteImage;
         JKQTPOverlayImageEnhanced* plteMask;
+
+        bool* m_useMaskForGroup;
+        bool* m_switchToNextFile;
 
         QString iniName;
 };

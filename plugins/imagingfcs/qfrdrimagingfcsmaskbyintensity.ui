@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>852</width>
-    <height>500</height>
+    <width>1000</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -24,7 +24,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
      <item>
       <widget class="QWidget" name="widget" native="true">
        <property name="minimumSize">
@@ -33,7 +33,7 @@
          <height>0</height>
         </size>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1">
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0">
         <property name="leftMargin">
          <number>2</number>
         </property>
@@ -103,267 +103,338 @@
          </layout>
         </item>
         <item>
-         <widget class="QFPlotter" name="pltMain" native="true">
-          <zorder></zorder>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QFPlotter" name="pltMain" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QFormLayout" name="formLayout_2">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetDefaultConstraint</enum>
+            </property>
+            <property name="fieldGrowthPolicy">
+             <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>Mode:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="cmbMaskingMode">
+              <item>
+               <property name="text">
+                <string>mask in-range pixels</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>mask out-of-range pixels</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>mask smaller threshold</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>mask larger threshold</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Data Range:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="labRange">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Thresho&amp;ld:</string>
+              </property>
+              <property name="buddy">
+               <cstring>edtLevel</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <layout class="QGridLayout" name="gridLayout">
+              <item row="0" column="1">
+               <widget class="QFDoubleEdit" name="edtLevel"/>
+              </item>
+              <item row="0" column="2">
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>...</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QFDoubleEdit" name="edtLevel_2"/>
+              </item>
+              <item row="1" column="1">
+               <widget class="QFDoubleSlider" name="sldLevel">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="3">
+               <widget class="QFDoubleSlider" name="sldLevel_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>Threshold &amp;2:</string>
+              </property>
+              <property name="buddy">
+               <cstring>edtLevel</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <layout class="QGridLayout" name="gridLayout_2">
+              <item row="0" column="0">
+               <widget class="QFDoubleEdit" name="edtLevel2"/>
+              </item>
+              <item row="0" column="2">
+               <widget class="QFDoubleEdit" name="edtLevel2_2"/>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="label_8">
+                <property name="text">
+                 <string>...</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QFDoubleSlider" name="sldLevel2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="QFDoubleSlider" name="sldLevel2_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>DualView:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QComboBox" name="cmbDualView">
+              <item>
+               <property name="text">
+                <string>one channel</string>
+               </property>
+               <property name="icon">
+                <iconset resource="qfrdrimagingfcs.qrc">
+                 <normaloff>:/imaging_fcs/dvnone.png</normaloff>:/imaging_fcs/dvnone.png</iconset>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>horizontal</string>
+               </property>
+               <property name="icon">
+                <iconset resource="qfrdrimagingfcs.qrc">
+                 <normaloff>:/imaging_fcs/dvhor.png</normaloff>:/imaging_fcs/dvhor.png</iconset>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>vertical</string>
+               </property>
+               <property name="icon">
+                <iconset resource="qfrdrimagingfcs.qrc">
+                 <normaloff>:/imaging_fcs/dvver.png</normaloff>:/imaging_fcs/dvver.png</iconset>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QCheckBox" name="chkEqualChannels">
+              <property name="text">
+               <string>both channels equal</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="1">
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="7" column="0">
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>&amp;mask mode:</string>
+              </property>
+              <property name="buddy">
+               <cstring>cmbMaskMode</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="1">
+             <widget class="QComboBox" name="cmbMaskMode">
+              <item>
+               <property name="text">
+                <string>add</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>replace</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>remove</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="8" column="1">
+             <widget class="QPushButton" name="pushButton">
+              <property name="text">
+               <string>&amp;update mask</string>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="1">
+             <spacer name="verticalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="12" column="1">
+             <layout class="QGridLayout" name="gridLayout_3">
+              <item row="0" column="1">
+               <widget class="QDoubleSpinBox" name="edtInitRatio_min">
+                <property name="suffix">
+                 <string> %</string>
+                </property>
+                <property name="maximum">
+                 <double>100.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QFDoubleSlider" name="sldInitRatio_min">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="13" column="0">
+             <widget class="QLabel" name="label_10">
+              <property name="text">
+               <string>Initial max:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="13" column="1">
+             <layout class="QGridLayout" name="gridLayout_4">
+              <item row="0" column="1">
+               <widget class="QDoubleSpinBox" name="edtInitRatio_max">
+                <property name="suffix">
+                 <string> %</string>
+                </property>
+                <property name="maximum">
+                 <double>100.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QFDoubleSlider" name="sldInitRatio_max">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="14" column="1">
+             <widget class="QCheckBox" name="chkApplyToGroup">
+              <property name="text">
+               <string>apply mask to RDR group</string>
+              </property>
+             </widget>
+            </item>
+            <item row="15" column="1">
+             <widget class="QCheckBox" name="chkSwitchToNextFile">
+              <property name="text">
+               <string>go to next file</string>
+              </property>
+             </widget>
+            </item>
+            <item row="12" column="0">
+             <widget class="QLabel" name="label_9">
+              <property name="text">
+               <string>Initial min:</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
-     </item>
-     <item>
-      <layout class="QFormLayout" name="formLayout_2">
-       <property name="fieldGrowthPolicy">
-        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-       </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Mode:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="cmbMaskingMode">
-         <item>
-          <property name="text">
-           <string>mask in-range pixels</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>mask out-of-range pixels</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>mask smaller threshold</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>mask larger threshold</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>Data Range:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="labRange">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Threshold:</string>
-         </property>
-         <property name="buddy">
-          <cstring>edtLevel</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="1">
-          <widget class="QFDoubleEdit" name="edtLevel"/>
-         </item>
-         <item row="0" column="2">
-          <widget class="QLabel" name="label_7">
-           <property name="text">
-            <string>...</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="3">
-          <widget class="QFDoubleEdit" name="edtLevel_2"/>
-         </item>
-         <item row="1" column="1">
-          <widget class="QFDoubleSlider" name="sldLevel">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="3">
-          <widget class="QFDoubleSlider" name="sldLevel_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>Threshold 2:</string>
-         </property>
-         <property name="buddy">
-          <cstring>edtLevel</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <layout class="QGridLayout" name="gridLayout_2">
-         <item row="0" column="0">
-          <widget class="QFDoubleEdit" name="edtLevel2"/>
-         </item>
-         <item row="0" column="2">
-          <widget class="QFDoubleEdit" name="edtLevel2_2"/>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLabel" name="label_8">
-           <property name="text">
-            <string>...</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QFDoubleSlider" name="sldLevel2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <widget class="QFDoubleSlider" name="sldLevel2_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string>DualView:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QComboBox" name="cmbDualView">
-         <item>
-          <property name="text">
-           <string>one channel</string>
-          </property>
-          <property name="icon">
-           <iconset resource="qfrdrimagingfcs.qrc">
-            <normaloff>:/imaging_fcs/dvnone.png</normaloff>:/imaging_fcs/dvnone.png</iconset>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>horizontal</string>
-          </property>
-          <property name="icon">
-           <iconset resource="qfrdrimagingfcs.qrc">
-            <normaloff>:/imaging_fcs/dvhor.png</normaloff>:/imaging_fcs/dvhor.png</iconset>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>vertical</string>
-          </property>
-          <property name="icon">
-           <iconset resource="qfrdrimagingfcs.qrc">
-            <normaloff>:/imaging_fcs/dvver.png</normaloff>:/imaging_fcs/dvver.png</iconset>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QCheckBox" name="chkEqualChannels">
-         <property name="text">
-          <string>both channels equal</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>mask m&amp;ode:</string>
-         </property>
-         <property name="buddy">
-          <cstring>cmbMaskMode</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
-        <widget class="QComboBox" name="cmbMaskMode">
-         <item>
-          <property name="text">
-           <string>add</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>replace</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>remove</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="8" column="1">
-        <widget class="QPushButton" name="pushButton">
-         <property name="text">
-          <string>&amp;update mask</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="1">
-        <spacer name="verticalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="10" column="1">
-        <widget class="QDoubleSpinBox" name="edtInitRatio">
-         <property name="suffix">
-          <string> %</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="0">
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string>Initial Threshold percentage:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </item>
     </layout>
    </item>
@@ -860,6 +931,134 @@
     <hint type="destinationlabel">
      <x>284</x>
      <y>31</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sldInitRatio_min</sender>
+   <signal>dsliderMoved(double)</signal>
+   <receiver>edtInitRatio_min</receiver>
+   <slot>setValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>748</x>
+     <y>478</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>933</x>
+     <y>478</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtInitRatio_min</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>sldInitRatio_min</receiver>
+   <slot>setDValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>933</x>
+     <y>478</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>748</x>
+     <y>478</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtInitRatio_max</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>sldInitRatio_max</receiver>
+   <slot>setDValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>929</x>
+     <y>514</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>748</x>
+     <y>514</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sldInitRatio_max</sender>
+   <signal>dsliderMoved(double)</signal>
+   <receiver>edtInitRatio_max</receiver>
+   <slot>setValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>748</x>
+     <y>514</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>933</x>
+     <y>514</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtInitRatio_min</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>updateDualView()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>929</x>
+     <y>478</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtInitRatio_max</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>updateDualView()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>929</x>
+     <y>514</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkApplyToGroup</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>updateDualView()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>801</x>
+     <y>547</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkSwitchToNextFile</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>QFRDRImagingFCSMaskByIntensity</receiver>
+   <slot>updateDualView()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>801</x>
+     <y>576</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
     </hint>
    </hints>
   </connection>

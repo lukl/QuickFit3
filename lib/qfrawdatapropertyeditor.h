@@ -107,6 +107,10 @@ class QFLIB_EXPORT QFRawDataPropertyEditor : public QWidget {
         void sendEditorCommand(const QString& command, const QVariant& param1=QVariant(), const QVariant& param2=QVariant(), const QVariant& param3=QVariant(), const QVariant& param4=QVariant(), const QVariant& param5=QVariant());
         /** \brief returns a list of all QFRawDataEditor already in this view widget */
         QList<QPointer<QFRawDataEditor> > getEditorList() const;
+        /** Changes to the next RDR Record of same role **/
+        void nextOfRolePressed();
+        /** Changes to the next RDR Record **/
+        void nextPressed();
     protected:
 
         /** \brief read the settings */
