@@ -2166,10 +2166,13 @@ void QFRDRImagingFCSImageEditor::excludeByImage(double* imageIn) {
 
         if (accepted) {
             if(useMaskForRDRGroup[0]) btnCopyMaskToGroup->click();
+            QApplication::processEvents();
             if(changeToNextFile[0]) {
                 if(useMaskForRDRGroup[0]) propertyEditor->nextOfRolePressed();
                 else propertyEditor->nextPressed();
+                QApplication::processEvents();
                 btnMaskByIntensity->click();
+                QApplication::processEvents();
             }
         }
 

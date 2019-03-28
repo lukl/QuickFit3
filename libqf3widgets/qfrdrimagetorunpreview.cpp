@@ -143,7 +143,7 @@ QFRDRImageToRunPreview::QFRDRImageToRunPreview(QWidget *parent) :
     QColor ovlSelCol("orange");
     ovlSelCol.setAlphaF(0.5);
 
-    QColor ovlExCol=QColor("darkblue");
+    QColor ovlExCol=QColor("blue");
     ovlExCol.setAlphaF(0.5);
 
     plteOverview=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::UInt16Array, NULL, 0,0, JKQTPMathImageGRAY, pltOverview->get_plotter());

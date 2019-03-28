@@ -1525,13 +1525,15 @@ void QFImFCSFitEvaluationEditor::fitEverythingThreadedWriter() {
             record->disableEmitResultsChanged();
             int runmax=eval->getIndexMax(record);
             int runmin=eval->getIndexMin(record);
-            items=items+runmax-runmin+1;
+            //items+=1+runmax-runmin;
             for (int run=runmin; run<=runmax; run++) {
-                bool doall=!current->getProperty("leaveoutMasked", false).toBool();
-                if (run<=runmax && (doall || (!doall && rsel && !rsel->leaveoutRun(run)))) {
+                bool doall=!current->getProperty("LEAVEOUTMASKED", false).toBool();
+                //qDebug()<<doall;
+                //qDebug()<<rsel->leaveoutRun(run);
+                if ( doall || ( rsel && !rsel->leaveoutRun(run) ) ) {
                     threads[thread]->addJob(eval, record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()));
-                    thread++;
-                    if (thread>=threadcount) thread=0;
+                    thread = (thread+1) % threadcount;
+                    items++;
                 }
             }
         }
@@ -1577,6 +1579,10 @@ void QFImFCSFitEvaluationEditor::fitEverythingThreadedWriter() {
             }
             canceled=true;
         }
+
+        QTime updateTime= QTime::currentTime().addMSecs(50);
+        while (QTime::currentTime() < updateTime) QCoreApplication::processEvents(QEventLoop::AllEvents, 100); // Only update progress every 50 ms
+
     }
 
 
@@ -1661,14 +1667,14 @@ void QFImFCSFitEvaluationEditor::fitAllRunsThreadedWriter() {
             record->disableEmitResultsChanged();
             int runmax=eval->getIndexMax(record);
             int runmin=eval->getIndexMin(record);
-            items=items+runmax-runmin+1;
+            //items+=runmax-runmin+1;
             for (int run=runmin; run<=runmax; run++) {
                 bool doall=!current->getProperty("LEAVEOUTMASKED", false).toBool();
                 //qDebug()<<doall;
-                if (run<=runmax && (doall || (!doall && rsel && !rsel->leaveoutRun(run)))) {
+                if (run<=runmax && (doall || (rsel && !rsel->leaveoutRun(run)))) {
                     threads[thread]->addJob(eval, record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()));
-                    thread++;
-                    if (thread>=threadcount) thread=0;
+                    thread = (thread+1) % threadcount;
+                    items++;
                 }
             }
         }
@@ -1713,6 +1719,11 @@ void QFImFCSFitEvaluationEditor::fitAllRunsThreadedWriter() {
             }
             canceled=true;
         }
+
+
+        QTime updateTime= QTime::currentTime().addMSecs(50);
+        while (QTime::currentTime() < updateTime) QCoreApplication::processEvents(QEventLoop::AllEvents, 100); // Only update progress every 50 ms
+
     }
 
 
@@ -1796,13 +1807,12 @@ void QFImFCSFitEvaluationEditor::fitAllFilesThreadedWriter()
 
         if (record ) {
             record->disableEmitResultsChanged();
-            items=items+1;
             int run=eval->getCurrentIndex();
-            bool doall=!current->getProperty("leaveoutMasked", false).toBool();
-            if (doall || (!doall && rsel && !rsel->leaveoutRun(run))) {
+            bool doall=!current->getProperty("LEAVEOUTMASKED", false).toBool();
+            if (doall || ( rsel && !rsel->leaveoutRun(run))) {
                 threads[thread]->addJob(eval, record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()));
-                thread++;
-                if (thread>=threadcount) thread=0;
+                thread = (thread+1) % threadcount;
+                items++;
             }
         }
     }
@@ -1836,6 +1846,7 @@ void QFImFCSFitEvaluationEditor::fitAllFilesThreadedWriter()
             double remaining=estimatedRuntime-runtime;
             dlgTFitProgress->reportStatus(tr("processing fits in %3 threads ... %1/%2 done\nruntime: %4:%5       remaining: %6:%7 [min:secs]       %8 fits/sec").arg(jobsDone).arg(items).arg(threadcount).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
         }
+
         QApplication::processEvents();
 
         // check for user canceled
@@ -1846,6 +1857,10 @@ void QFImFCSFitEvaluationEditor::fitAllFilesThreadedWriter()
             }
             canceled=true;
         }
+
+        QTime updateTime= QTime::currentTime().addMSecs(50);
+        while (QTime::currentTime() < updateTime) QCoreApplication::processEvents(QEventLoop::AllEvents, 100); // Only update progress every 50 ms
+
     }
 
 

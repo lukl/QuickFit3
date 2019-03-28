@@ -42,6 +42,10 @@ QFRDRImagingFCSMaskByIntensity::QFRDRImagingFCSMaskByIntensity(QWidget *parent, 
     colTrue.setAlphaF(0.4);
     plteMask=new JKQTPOverlayImageEnhanced(0,0,1,1,NULL, 0,0,colTrue, ui->pltMain->get_plotter());
     ui->pltMain->addGraph(plteMask);
+
+    plteOrig=new JKQTPMathImage(0,0,1,1,JKQTPMathImageBase::DoubleArray, NULL, 0,0,JKQTPMathImageGRAY, ui->pltOrig->get_plotter());
+    ui->pltOrig->addGraph(plteOrig);
+
     min=max=0;
 
     iniName="QFRDRImagingFCSMaskByIntensity";
@@ -83,12 +87,15 @@ void QFRDRImagingFCSMaskByIntensity::init(bool *mask, double *image, uint32_t wi
     m_width=width;
     m_height=height;
     ui->labRange->setText("");
+
     plteImage->set_data(m_image, m_width, m_height, JKQTPMathImageBase::DoubleArray);
     plteImage->set_width(m_width);
     plteImage->set_height(m_height);
+
     plteMask->set_data(m_mask, m_width, m_height);
     plteMask->set_width(m_width);
     plteMask->set_height(m_height);
+
     plteImage->get_colorBarRightAxis()->set_minTicks(3);
     plteImage->get_colorBarTopAxis()->set_minTicks(5);
     plteImage->set_colorBarRightVisible(true);
@@ -103,6 +110,24 @@ void QFRDRImagingFCSMaskByIntensity::init(bool *mask, double *image, uint32_t wi
 
     ui->pltMain->setAbsoluteXY(0,m_width,0,m_height);
     ui->pltMain->zoom(0,m_width,0,m_height);
+
+    plteOrig->set_data(m_image, m_width, m_height, JKQTPMathImageBase::DoubleArray);
+    plteOrig->set_width(m_width);
+    plteOrig->set_height(m_height);
+    plteOrig->get_colorBarRightAxis()->set_minTicks(3);
+    plteOrig->get_colorBarTopAxis()->set_minTicks(5);
+    plteOrig->set_colorBarRightVisible(true);
+    plteOrig->set_colorBarTopVisible(false);
+
+    ui->pltOrig->set_displayMousePosition(false);
+    ui->pltOrig->set_displayToolbar(true);
+    ui->pltOrig->get_plotter()->set_maintainAspectRatio(true);
+    ui->pltOrig->get_plotter()->set_aspectRatio((double)m_width/(double)m_height);//1);
+    ui->pltOrig->get_plotter()->set_maintainAxisAspectRatio(true);
+    ui->pltOrig->get_plotter()->set_axisAspectRatio((double)m_width/(double)m_height);
+
+    ui->pltOrig->setAbsoluteXY(0,m_width,0,m_height);
+    ui->pltOrig->zoom(0,m_width,0,m_height);
 
     ui->cmbDualView->setCurrentIndex(dualView);
     ui->chkEqualChannels->setChecked(false);
@@ -281,6 +306,17 @@ void QFRDRImagingFCSMaskByIntensity::updateImage()
     }
     ui->pltMain->set_doDrawing(true);
     ui->pltMain->update_plot();
+
+    ui->pltOrig->set_doDrawing(false);
+    if (ui->chkColorScaling->isChecked()) {
+        plteOrig->set_autoImageRange(false);
+        plteOrig->set_imageMin(statisticsQuantile(m_image, m_width*m_height, ui->edtImgRangeMin->value()/100.0));
+        plteOrig->set_imageMax(statisticsQuantile(m_image, m_width*m_height, 1.0-ui->edtImgRangeMax->value()/100.0));
+    } else {
+        plteOrig->set_autoImageRange(true);
+    }
+    ui->pltOrig->set_doDrawing(true);
+    ui->pltOrig->update_plot();
 }
 
 void QFRDRImagingFCSMaskByIntensity::on_btnHelp_clicked()

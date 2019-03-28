@@ -55,7 +55,6 @@ class QFRDRImagingFCSMaskByIntensity : public QFDialog
         void on_edtImgRangeMax_valueChanged(double val);
         void on_chkColorScaling_toggled(bool checked);
         void updateImage();
-        void updateInitialValues();
         void on_btnHelp_clicked();
         
     private:
@@ -70,6 +69,7 @@ class QFRDRImagingFCSMaskByIntensity : public QFDialog
         double max;
 
         JKQTPMathImage* plteImage;
+        JKQTPMathImage* plteOrig;
         JKQTPOverlayImageEnhanced* plteMask;
 
         bool* m_useMaskForGroup;
