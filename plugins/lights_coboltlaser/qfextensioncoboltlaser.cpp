@@ -267,16 +267,23 @@ void QFExtensionCoboltLaser::setLightSourcePower(unsigned int lightSource, unsig
 
 /** \brief set the laser to external modulation if possible */
 void QFExtensionCoboltLaser::setExternalModulation(unsigned int lightSource, bool OnOff, QWidget* parent) {
+
+    double set_power=getLightSourceCurrentSetPower(lightSource, 0);
+
     if (lightSource>=getLightSourceCount()) return;
-    QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
-    QFCoboltLaserProtocolHandler* serial=sources[lightSource].serial;
-    if (!com || !serial) return ;
-    QMutex* mutex=ports.getMutex(sources[lightSource].port);
-    QMutexLocker locker(mutex);
-    if (sources[lightSource].type==cltMLD6) {
-        if (OnOff) serial->sendCommand(QString("em"));
-        else serial ->sendCommand(QString("cp"));
+    else {
+        QFSerialConnection* com=ports.getCOMPort(sources[lightSource].port);
+        QFCoboltLaserProtocolHandler* serial=sources[lightSource].serial;
+        if (!com || !serial) return ;
+        QMutex* mutex=ports.getMutex(sources[lightSource].port);
+        QMutexLocker locker(mutex);
+        if (sources[lightSource].type==cltMLD6) {
+            if (OnOff) serial->sendCommand(QString("em"));
+            else serial ->sendCommand(QString("cp"));
+        }
     }
+
+    setLightSourcePower(lightSource, 0 , set_power);
 }
 
 double QFExtensionCoboltLaser::getLightSourceCurrentSetPower(unsigned int lightSource, unsigned int /*wavelengthLine*/) {
