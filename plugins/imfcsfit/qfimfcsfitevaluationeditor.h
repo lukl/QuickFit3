@@ -111,6 +111,7 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
 
         QCheckBox* chkDontSaveFitResultMessage;
         QCheckBox* chkLeaveoutMasked;
+        QCheckBox* chkAutoInit;
         QSpinBox* spinRepeats;
 
         QFRDRImageToRunPreview* pltOverview;

@@ -380,6 +380,12 @@ void QFImFCSFitEvaluationEditor::createWidgets() {
 
     layButtons->addWidget(chkLeaveoutMasked, row,1,1,2);
 
+    row++;
+
+    chkAutoInit=new QCheckBox(tr("Automatically initialize fits with current parameters"), this);
+    chkAutoInit->setToolTip(tr("Upon fitting multiple data sets, this automatically initializes all fits in all files with the current set of parameters."));
+    layButtons->addWidget(chkAutoInit, row,0,1,3);
+
     pltOverview=new QFRDRImageToRunPreview(this);
     pltOverview->setMaskEditable(false);
     pltOverview->setSelectionEditable(true);
@@ -444,11 +450,17 @@ void QFImFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEva
 
 void QFImFCSFitEvaluationEditor::readSettings() {
     QFFitResultsByIndexEvaluationEditorWithWidgets::readSettings();
+    if (cmbModel && current) {
+        chkAutoInit->setChecked(settings->getQSettings()->value(QString("fitevaleditor_%1%2/autoinit").arg(current->getType()).arg(current->getID()), 0).toBool());
+    }
 }
 
 void QFImFCSFitEvaluationEditor::writeSettings() {
     QFFitResultsByIndexEvaluationEditorWithWidgets::writeSettings();
-    settings->getQSettings()->setValue(QString("fitevaleditor_%1%2/weights").arg(current->getType()).arg(current->getID()), cmbWeights->currentIndex());
+    if (cmbModel && current) {
+        settings->getQSettings()->setValue(QString("fitevaleditor_%1%2/weights").arg(current->getType()).arg(current->getID()), cmbWeights->currentIndex());
+        settings->getQSettings()->setValue(QString("fitevaleditor_%1%2/autoinit").arg(current->getType()).arg(current->getID()), chkAutoInit->isChecked());
+    }
 }
 
 void QFImFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
@@ -1467,6 +1479,12 @@ void QFImFCSFitEvaluationEditor::errorEstimateModeChanged()
 
 
 void QFImFCSFitEvaluationEditor::fitEverythingThreadedWriter() {
+
+    if (chkAutoInit->isChecked()) {
+        btnCopyToInitial->click();
+        QApplication::processEvents();
+    }
+
     if (!current) return;
     if (!cmbModel) return;
     QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
@@ -1613,6 +1631,12 @@ void QFImFCSFitEvaluationEditor::fitEverythingThreadedWriter() {
 
 
 void QFImFCSFitEvaluationEditor::fitAllRunsThreadedWriter() {
+
+    if (chkAutoInit->isChecked()) {
+        btnCopyToInitial->click();
+        QApplication::processEvents();
+    }
+
     if (!current) return;
     if (!cmbModel) return;
     QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
@@ -1753,8 +1777,14 @@ void QFImFCSFitEvaluationEditor::fitAllRunsThreadedWriter() {
     delete dlgTFitProgress;
 }
 
-void QFImFCSFitEvaluationEditor::fitAllFilesThreadedWriter()
-{
+void QFImFCSFitEvaluationEditor::fitAllFilesThreadedWriter() {
+
+
+    if (chkAutoInit->isChecked()) {
+        btnCopyToInitial->click();
+        QApplication::processEvents();
+    }
+
     if (!current) return;
     if (!cmbModel) return;
     QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
