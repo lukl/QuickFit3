@@ -125,6 +125,9 @@ void QFESPIMB040AcquisitionConfigWidget2::loadSettings(QSettings& settings, QStr
     ui->chkOverview->setChecked(settings.value(prefix+"overview", true).toBool());
     ui->chkCloseMainShutter->setChecked(settings.value(prefix+"chkCloseMainShutter", false).toBool());
     ui->chkAlex->setChecked(settings.value(prefix+"chkAlex", false).toBool());
+    ui->chkAlex->setChecked(settings.value(prefix+"chkSetLaserPower", false).toBool());
+    ui->spinLaser1->setValue(settings.value(prefix+"LaserPower1", 60.0).toFloat());
+    ui->spinLaser2->setValue(settings.value(prefix+"LaserPower2", 25.0).toFloat());
     ui->chkBackground->setChecked(settings.value(prefix+"background", true).toBool());
     ui->spinBackgroundFrames1->setValue(settings.value(prefix+"background_frames1", 1000).toInt());
     ui->spinBackgroundFrames2->setValue(settings.value(prefix+"background_frames2", 1000).toInt());
@@ -173,6 +176,7 @@ void QFESPIMB040AcquisitionConfigWidget2::loadSettings(QSettings& settings, QStr
     on_chkUse1_toggled(ui->chkUse1->isChecked());
     on_chkUse2_toggled(ui->chkUse2->isChecked());
     on_chkBackground_toggled(ui->chkBackground->isChecked());
+    on_chkSetLaserPower_toggled(ui->chkSetLaserPower->isChecked());
 }
 
 
@@ -191,6 +195,9 @@ void QFESPIMB040AcquisitionConfigWidget2::storeSettings(QSettings& settings, QSt
     settings.setValue(prefix+"overview", ui->chkOverview->isChecked());
     settings.setValue(prefix+"chkCloseMainShutter", ui->chkCloseMainShutter->isChecked());
     settings.setValue(prefix+"chkAlex", ui->chkAlex->isChecked());
+    settings.setValue(prefix+"chkSetLaserPower", ui->chkSetLaserPower->isChecked());
+    settings.setValue(prefix+"LaserPower1", ui->spinLaser1->value());
+    settings.setValue(prefix+"LaserPower2", ui->spinLaser2->value());
     settings.setValue(prefix+"background", ui->chkBackground->isChecked());
     settings.setValue(prefix+"background_frames1", ui->spinBackgroundFrames1->value());
     settings.setValue(prefix+"background_frames2", ui->spinBackgroundFrames2->value());
@@ -805,6 +812,11 @@ void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq2TestPreview6_released()
     opticsSetup->resetCameraPreview(1);
 }
 
+void QFESPIMB040AcquisitionConfigWidget2::on_chkSetLaserPower_toggled(bool on) {
+    ui->spinLaser1->setEnabled(on);
+    ui->spinLaser2->setEnabled(on);
+}
+
 
 
 
@@ -1272,9 +1284,52 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                 log->log_text(tr("  - setting acquisition lightpath settings '%1' ... DONE\n").arg(lightpath()));
             }
         }
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // set laser powers if activated
+        //////////////////////////////////////////////////////////////////////////////////////
+
+        double power0=0;
+        double power1=0;
+
+        if(ui->chkSetLaserPower->isChecked()) {
+            if (opticsSetup->getLaserCount()>0) {
+
+                if(opticsSetup->getLaser(0)->isLightSourceConnected(0) && opticsSetup->getLaser(1)->isLightSourceConnected(0)) {
+
+
+                    log->log_text(tr("Setting laser powers for acquisition"));
+
+                    power0=opticsSetup->getLaser(0)->getLightSourceCurrentSetPower(0,0);
+                    power1=opticsSetup->getLaser(1)->getLightSourceCurrentSetPower(0,0);
+
+                    double min0;
+                    double max0;
+                    double min1;
+                    double max1;
+
+                    opticsSetup->getLaser(0)->getLightSourceLinePowerRange(0,0,min0,max0);
+                    opticsSetup->getLaser(1)->getLightSourceLinePowerRange(0,0,min1,max1);
+
+                    if (min0<ui->spinLaser1->value() && ui->spinLaser1->value()<max0) {
+                        opticsSetup->getLaser(0)->setLightSourcePower(0,0,ui->spinLaser1->value());
+                    }
+                    else log->log_warning("Set laser power for acquisition: Laser 1: Laser power out of range, skipping.");
+
+                    if (min1<ui->spinLaser1->value() && ui->spinLaser1->value()<max1) {
+                        opticsSetup->getLaser(1)->setLightSourcePower(0,0,ui->spinLaser2->value());
+                    }
+                    else log->log_warning("Set laser power for acquisition: Laser 2: Laser power out of range, skipping.");
+                }
+                else log->log_warning("Set laser power for acquisition: At least one laser is not connected.");
+            }
+            else log->log_warning("Set laser power for acquisition: No laser found.");
+        }
+
         //////////////////////////////////////////////////////////////////////////////////////
         // switch on alex if activated
         //////////////////////////////////////////////////////////////////////////////////////
+
 
         if(ui->chkAlex->isChecked()) {
             if (opticsSetup->isMainIlluminationShutterAvailable()) {
@@ -1334,6 +1389,27 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                 log->log_text(tr("Switch Alex off after acquisition"));
                 ok=ok&opticsSetup->setAlex(false, true);
             }
+        }
+
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // set laser powers to previous if activated
+        //////////////////////////////////////////////////////////////////////////////////////
+
+        if(ui->chkSetLaserPower->isChecked()) {
+            if (opticsSetup->getLaserCount()>0) {
+
+                if(opticsSetup->getLaser(0)->isLightSourceConnected(0) && opticsSetup->getLaser(1)->isLightSourceConnected(0)) {
+
+
+                    log->log_text(tr("Setting laser powers back after acquisition"));
+
+                    opticsSetup->getLaser(0)->setLightSourcePower(0,0,power0);
+                    opticsSetup->getLaser(1)->setLightSourcePower(0,0,power1);
+                }
+                else log->log_warning("Set laser power for acquisition: At least one laser is not connected.");
+            }
+            else log->log_warning("Set laser power for acquisition: No laser found.");
         }
 
         //////////////////////////////////////////////////////////////////////////////////////

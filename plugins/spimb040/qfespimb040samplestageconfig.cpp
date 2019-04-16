@@ -271,7 +271,6 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     // create input widgets for camera devices
     ////////////////////////////////////////////////////////////////////////////////////////////////
     l=new QLabel (tr("<b>Translational and Rotational Stages:</b>"), this);
-    l->setStyleSheet("background-color: 	aliceblue;");
     stagelayout->addRow(l);
 
     btnConfigSteps=new QToolButton(this);
@@ -338,7 +337,6 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     QFont fb=chkJoystick->font();
     fb.setBold(true);
     chkJoystick->setFont(fb);
-    chkJoystick->setStyleSheet("background-color: 	aliceblue;");
     connect(chkJoystick, SIGNAL(toggled(bool)), this, SLOT(updateJoystick()));
     chkRefMove=new QCheckBox(tr("Reference Movement"), this);
     chkRefMove->setFont(fb);
@@ -423,13 +421,11 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     connect(btnMoveAbsolute, SIGNAL(clicked()), this, SLOT(moveAbsolute()));
     connect(btnMoveRelative, SIGNAL(clicked()), this, SLOT(moveRelative()));
     l=new QLabel (tr("<b>Move:</b>"), this);
-    l->setStyleSheet("background-color: 	aliceblue;");
     stagelayout->addRow(l, gl);
 
 
     // Rotation
     l=new QLabel (tr("<b>Rotate:</b>"), this);
-    l->setStyleSheet("background-color: 	aliceblue;");
     gl=new QGridLayout();
     gl->addWidget(new QLabel("<b>rotate ...</b>", this), 0, 3,1,2);
     gl->addWidget(new QLabel(" ", this), 1, 0);
@@ -568,13 +564,11 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     gl->setHorizontalSpacing(1);
     gl->setVerticalSpacing(1);
     l=new QLabel (tr("<b>Status:</b>"), this);
-    l->setStyleSheet("background-color: 	aliceblue;");
     stagelayout->addRow(l, gl);
     //stagelayout->addRow(tr("<b>status:</b>"), gl);
 
     // Z Limit for Det Obj Protection
     l=new QLabel (tr("<b>Z-Stage Soft Limits:</b>"), this);
-    l->setStyleSheet("background-color: 	aliceblue;");
     gl=new QGridLayout();
     gl->addWidget(new QLabel(" ", this), 1, 0);
     gl->addWidget(new QLabel("<b>Initial:</b>", this), 0, 1);
@@ -607,7 +601,6 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
 
     // Track Coverslip
     l=new QLabel (tr("<b>Track CS:</b>"), this);
-    l->setStyleSheet("background-color: 	aliceblue;");
     gl=new QGridLayout();
     gl->addWidget(new QLabel("<b>Track CS ...</b>", this), 0, 3,1,2);
     gl->addWidget(new QLabel(" ", this), 1, 0);

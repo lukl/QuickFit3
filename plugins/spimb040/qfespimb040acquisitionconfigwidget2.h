@@ -144,6 +144,7 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         void on_btnAcquireNext_clicked();
         void on_chkUse1_toggled(bool enabled);
         void on_chkUse2_toggled(bool enabled);
+        void on_chkSetLaserPower_toggled(bool enabled);
         void on_chkBackground_toggled(bool enabled);
         void updateBackgroundWidgets();
         void updateReplaces();

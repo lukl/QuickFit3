@@ -218,6 +218,10 @@ void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
     ui->filtcDetection->loadSettings(settings, prefix+"filterchanger_detection");
     ui->chkDetectionFilterWheel->setChecked(settings.value(prefix+"filterchanger_detection", false).toBool());
 
+    ui->chkCam1->setChecked(ui->camConfig1->isChecked());
+    ui->chkCam2->setChecked(ui->camConfig2->isChecked());
+
+
     for (int i=0; i<shortcuts.size(); i++) {
         QKeySequence seq(settings.value(prefix+"shortcut_"+shortcuts[i].id, shortcuts[i].shortcut->key().toString()).toString());
         shortcuts[i].shortcut->setKey(seq);
