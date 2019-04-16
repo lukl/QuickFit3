@@ -53,21 +53,21 @@ QFImFCSFitEvaluationEditor::QFImFCSFitEvaluationEditor(QFPluginServices *service
     createWidgets();
     btnFirstRun->setText(tr("avg."));
 
-    actFitAllFilesThreadedWriter=new QFActionWithNoMenuRole(QIcon(":/fcsfit/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files this %1 (newMT)").arg(m_runName), this);
+    actFitAllFilesThreadedWriter=new QFActionWithNoMenuRole(QIcon(":/fcsfit/fit_fitcurrentrunallfiles.png"), tr("Fit all &files, this %1 (MT2)").arg(m_runName), this);
     actFitAllFilesThreadedWriter->setToolTip(tr("fast multi-threaded: perform a fit for all files, but fit in each file only the currently displayed %1").arg(m_runName));
     connect (actFitAllFilesThreadedWriter, SIGNAL(triggered()), this, SLOT(fitAllFilesThreadedWriter()));
 
-    actFitAllThreadedWriter=new QFActionWithNoMenuRole(QIcon(":/imfcsfit/fit_fitall.png"), tr("Fit Everything (newMT)"), this);
+    actFitAllThreadedWriter=new QFActionWithNoMenuRole(QIcon(":/imfcsfit/fit_fitall.png"), tr("Fit everything (MT2)"), this);
     actFitAllThreadedWriter->setToolTip(tr("fast multi-threaded: perform a fit for all files, and all %1s therein (everything)").arg(m_runName));
     connect (actFitAllThreadedWriter, SIGNAL(triggered()), this, SLOT(fitEverythingThreadedWriter()));
 
-    actFitAllRunsThreadedWriter=new QFActionWithNoMenuRole(QIcon(":/imfcsfit/fit_fitallruns.png"), tr("Fit All %1s, this file (newMT)").arg(m_runName), this);
+    actFitAllRunsThreadedWriter=new QFActionWithNoMenuRole(QIcon(":/imfcsfit/fit_fitallruns.png"), tr("Fit all %1s, this file (MT2)").arg(m_runName), this);
     actFitAllRunsThreadedWriter->setToolTip(tr("fast multi-threaded: perform a fit for all %1s, in the current file").arg(m_runName));
     connect (actFitAllRunsThreadedWriter, SIGNAL(triggered()), this, SLOT(fitAllRunsThreadedWriter()));
 
     populateFitButtons();
 
-    setGuessingEnabled(true, true);
+    setGuessingEnabled(false, true); // Guessing not required
 
 }
 
@@ -339,44 +339,38 @@ int QFImFCSFitEvaluationEditor::getUserRangeMin(QFRawDataRecord */*rec*/, int /*
 
 void QFImFCSFitEvaluationEditor::createWidgets() {
 
+
     cmbWeights=new QFFCSWeightingCombobox(this);
-    cmbWeights->setMaximumWidth(150);
-    cmbWeights->setMinimumWidth(150);
     QLabel* l=new QLabel(tr("&Weight Model: "), this);
     l->setBuddy(cmbWeights);
-    layAfterAlgorithm->addSpacing(32);
-    layAfterAlgorithm->addWidget(l);
-    layAfterAlgorithm->addWidget(cmbWeights);
-    //layAfterAlgorithm->addStretch();
+    tgl->addWidget(l,3,1);
+    tgl->addWidget(cmbWeights,3,2);
 
     widFitErrorEstimate=new QFFitAlgorithmErrorEstimateModeWidget(this);
-    widFitErrorEstimate->setMaximumWidth(150);
-    widFitErrorEstimate->setMinimumWidth(150);
     l=new QLabel(tr("&Error Estimation: "), this);
     l->setBuddy(widFitErrorEstimate);
-    layAfterAlgorithm->addSpacing(32);
-    layAfterAlgorithm->addWidget(l);
-    layAfterAlgorithm->addWidget(widFitErrorEstimate);
-    layAfterAlgorithm->addStretch(1);
+    tgl->addWidget(l,3,3);
+    tgl->addWidget(widFitErrorEstimate,3,4);
 
-
+    int row=layButtons->rowCount();
 
     spinRepeats=new QSpinBox(this);
     spinRepeats->setRange(1, 100);
     spinRepeats->setValue(1);
     spinRepeats->setToolTip(tr("repeats the fit the given number of times for every click of fit. The output of the first run is used as initial parameters for the second, ..."));
-    int row=layButtons->rowCount();
+
     layButtons->addWidget(new QLabel(tr("repeats:"), this), row, 0);
     layButtons->addWidget(spinRepeats, row, 1);
     connect(spinRepeats, SIGNAL(valueChanged(int)), this, SLOT(repeatsChanged(int)));
+
+    row++;
 
     chkDontSaveFitResultMessage=new QCheckBox(tr("don't save fit messages"), this);
     chkDontSaveFitResultMessage->setToolTip(tr("this improves the speed of saving the project significantly!"));
     chkDontSaveFitResultMessage->setChecked(true);
     connect(chkDontSaveFitResultMessage, SIGNAL(toggled(bool)), this, SLOT(dontSaveFitResultMessageChanged(bool)));
 
-
-    layButtons->addWidget(chkDontSaveFitResultMessage, layButtons->rowCount(),0,1,2);
+    layButtons->addWidget(chkDontSaveFitResultMessage, row,0);
 
     chkLeaveoutMasked=new QCheckBox(tr("don't fit masked pixels"), this);
     chkLeaveoutMasked->setToolTip(tr("this improves the speed of saving the project significantly!"));
@@ -384,7 +378,7 @@ void QFImFCSFitEvaluationEditor::createWidgets() {
     connect(chkLeaveoutMasked, SIGNAL(toggled(bool)), this, SLOT(leavoutMasked(bool)));
 
 
-    layButtons->addWidget(chkLeaveoutMasked, layButtons->rowCount(),0,1,2);
+    layButtons->addWidget(chkLeaveoutMasked, row,1,1,2);
 
     pltOverview=new QFRDRImageToRunPreview(this);
     pltOverview->setMaskEditable(false);

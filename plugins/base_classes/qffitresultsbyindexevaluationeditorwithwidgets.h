@@ -118,11 +118,8 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         /** \brief combobox to select a model */
         QFFitFunctionComboBox* cmbModel;
 
-        QHBoxLayout* layAlgorithm;
         QHBoxLayout* layAfterAlgorithm;
-        QHBoxLayout* layModel;
-        QHBoxLayout* layAfterModel;
-
+        QGridLayout* tgl;
 
         /** \brief ploter for the data&curves */
         QFPlotter* pltData;

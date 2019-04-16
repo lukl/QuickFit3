@@ -70,10 +70,10 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     cmbWeights->setMinimumWidth(150);
     QLabel* l=new QLabel(tr("&Weight Model: "), this);
     l->setBuddy(cmbWeights);
-    layAlgorithm->addSpacing(32);
-    layAlgorithm->addWidget(l);
-    layAlgorithm->addWidget(cmbWeights);
-    layAlgorithm->addStretch();
+    layAfterAlgorithm->addSpacing(32);
+    layAfterAlgorithm->addWidget(l);
+    layAfterAlgorithm->addWidget(cmbWeights);
+    layAfterAlgorithm->addStretch(1);
 
     widFitErrorEstimate=new QFFitAlgorithmErrorEstimateModeWidget(this);
     l=new QLabel(tr("&Error Estimation: "), this);
@@ -81,7 +81,7 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     layAfterAlgorithm->addSpacing(32);
     layAfterAlgorithm->addWidget(l);
     layAfterAlgorithm->addWidget(widFitErrorEstimate);
-    layAfterAlgorithm->addStretch();
+    layAfterAlgorithm->addStretch(1);
 
     btnCalibrateFocalVolume=createButtonAndActionShowText(actCalibrateFocalVolume, QIcon(":/fcsfit/focalvolume.png"), tr("Focal &Volume"), this);
     actCalibrateFocalVolume->setToolTip(tr("estimate the focal volume from a given concentration or diffusion coefficient"));

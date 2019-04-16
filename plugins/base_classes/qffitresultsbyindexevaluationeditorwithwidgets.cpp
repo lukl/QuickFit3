@@ -76,63 +76,49 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
 
     QWidget* topWidget=new QWidget(this);
     QVBoxLayout* vbl=new QVBoxLayout();
-    vbl->setContentsMargins(0,0,0,0);
     topWidget->setLayout(vbl);
 
-    QFormLayout* fl;//=new QFormLayout();
+
+    tgl=new QGridLayout(); // Top grid layout
+    tgl->setContentsMargins(0,0,0,0);
+
+    int trow=0; //top row
+
+    trow++;
     QLabel* l;
-    QHBoxLayout* hbl=NULL;
-    layAlgorithm=new QHBoxLayout();
-    layAlgorithm->setContentsMargins(0,0,0,0);
     cmbAlgorithm=new QComboBox(this);
+    cmbAlgorithm->setMaximumWidth(850); // Truncate algorithms names that are too long
     l=new QLabel(tr("Fit &Algorithm: "), this);
     l->setBuddy(cmbAlgorithm);
-    layAlgorithm->addWidget(l);
+    tgl->addWidget(l,trow,0);
     cmbAlgorithm->setEditable(false);
-    cmbAlgorithm->setMaximumWidth(900);
-    layAlgorithm->addSpacing(32);
-    layAlgorithm->addWidget(cmbAlgorithm);
+    tgl->addWidget(cmbAlgorithm, trow, 1, 1, 4);
     btnConfigAlgorithm=createButtonAndActionShowText(actConfigAlgorithm, QIcon(":/lib/fit_config.png"), tr("&Configure Alg."), this);
-    btnConfigAlgorithm->setMaximumWidth(250);
-    layAlgorithm->addWidget(btnConfigAlgorithm);
+    tgl->addWidget(btnConfigAlgorithm, trow, 5);
     btnAlgorithmHelp=createButtonAndActionShowText(actAlgorithmHelp, QIcon(":/lib/fit_help.png"), tr("Alg. &Help"), this);
-    btnAlgorithmHelp->setMaximumWidth(250);
-    layAlgorithm->addWidget(btnAlgorithmHelp);
-    layAlgorithm->addStretch();
+    tgl->addWidget(btnAlgorithmHelp, trow, 6);
 
 
+    trow++;
 
-    vbl->addLayout(layAlgorithm);
+    cmbModel=new QFFitFunctionComboBox(this);
+    cmbModel->setMaximumWidth(850); // Truncate model names that are too long
+    l=new QLabel(tr("Fit &Model:"), this);
+    l->setBuddy(cmbModel);
+    tgl->addWidget(l, trow, 0);
+    cmbModel->setEditable(false);
+    tgl->addWidget(cmbModel, trow, 1,1,4);
+    btnModelSelector=createButtonForActionShowText(actModelSelector=cmbModel->getSelectAction(), this);
+    tgl->addWidget(btnModelSelector,trow, 5);
+    btnModelHelp=createButtonForActionShowText(actModelHelp=cmbModel->getHelpAction(), this);
+    //btnModelHelp=createButtonAndActionShowText(actModelHelp, QIcon(":/lib/fit_help.png"), tr("Model H&elp"), this);
+    tgl->addWidget(btnModelHelp, trow, 6);
+
+    vbl->addLayout(tgl);
 
     layAfterAlgorithm=new QHBoxLayout();
     layAfterAlgorithm->setContentsMargins(0,0,0,0);
     vbl->addLayout(layAfterAlgorithm);
-
-
-
-    layModel=new QHBoxLayout();
-    layModel->setContentsMargins(0,0,0,0);
-    cmbModel=new QFFitFunctionComboBox(this);
-    cmbModel->setMaximumWidth(900);
-    l=new QLabel(tr("Fit &Model:"), this);
-    l->setBuddy(cmbModel);
-    layModel->addWidget(l);
-    cmbModel->setEditable(false);
-    layModel->addWidget(cmbModel);
-    btnModelSelector=createButtonForActionShowText(actModelSelector=cmbModel->getSelectAction(), this);
-    btnModelSelector->setMaximumWidth(250);
-    layModel->addWidget(btnModelSelector);
-    btnModelHelp=createButtonForActionShowText(actModelHelp=cmbModel->getHelpAction(), this);
-    //btnModelHelp=createButtonAndActionShowText(actModelHelp, QIcon(":/lib/fit_help.png"), tr("Model H&elp"), this);
-    btnModelHelp->setMaximumWidth(250);
-    layModel->addWidget(btnModelHelp);
-    layModel->addStretch();
-    vbl->addLayout(layModel);
-
-    layAfterModel=new QHBoxLayout();
-    layAfterModel->setContentsMargins(0,0,0,0);
-    vbl->addLayout(layAfterModel);
-
 
     /*QFrame* frame=new QFrame(this);
     frame->setFrameShape(QFrame::HLine);
@@ -260,9 +246,53 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     pltResiduals->setMinimumHeight(75);
     pltData->setMinimumHeight(75);
 
+    QHBoxLayout* hblSubPlot=new QHBoxLayout();
 
     datacut=new DataCutSliders(this);
-    vbl->addWidget(datacut,0);
+    hblSubPlot->addWidget(datacut,0);
+
+    QFormLayout* fl=new QFormLayout();
+    fl->setContentsMargins(9,0,0,0);
+    fl->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
+    cmbRun=NULL;
+    spinRun=NULL;
+    if (useRunCombobox) {
+        cmbRun=new QFEnhancedComboBox(this);
+        cmbRun->setMinimumWidth(100);
+        cmbRun->setMaximumWidth(300);
+    } else {
+        spinRun=new QSpinBox(this);
+        spinRun->setMinimum(-1);
+        spinRun->setMaximum(-1);
+        spinRun->setSpecialValueText(tr("average"));
+        spinRun->setMinimumWidth(100);
+    }
+    labRun=new QLabel(this);
+    QHBoxLayout* hblRun=new QHBoxLayout();
+    hblRun->setContentsMargins(0,0,0,0);
+    btnFirstRun=new QToolButton(this);
+    btnFirstRun->setText(tr("first"));
+    btnFirstRun->setToolTip(tr("switch to first %1").arg(m_runName));
+    connect(btnFirstRun, SIGNAL(clicked()), this, SLOT(gotoFirstRun()));
+
+    if (useRunCombobox) {
+        hblRun->addWidget(cmbRun, 1);
+        //hblRun->addWidget(btnFirstRun, 0);
+        //hblRun->addWidget(labRun, 2);
+        btnFirstRun->setVisible(false);
+        labRun->setVisible(false);
+    } else {
+        hblRun->addWidget(labRun, 2);
+        hblRun->addWidget(spinRun, 1);
+        hblRun->addWidget(btnFirstRun, 0);
+    }
+    fl->addRow(labRunLabel=new QLabel(tr("<b>%1: </b>").arg(m_runName)), hblRun);
+
+    hblSubPlot->addStretch(1);
+    hblSubPlot->addLayout(fl, 0);
+
+    vbl->addLayout(hblSubPlot,0);
+
     splitPlot->addWidget(widgetResiduals);
 
     //splitFitStatistics=new QVisibleHandleSplitter(this);
@@ -354,44 +384,6 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     QVBoxLayout* layModel=new QVBoxLayout();
     modelWidget->setLayout(layModel);
 
-    fl=new QFormLayout();
-    fl->setContentsMargins(9,0,0,0);
-    fl->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
-    cmbRun=NULL;
-    spinRun=NULL;
-    if (useRunCombobox) {
-        cmbRun=new QFEnhancedComboBox(this);
-        cmbRun->setMinimumWidth(100);
-        cmbRun->setMaximumWidth(300);
-    } else {
-        spinRun=new QSpinBox(this);
-        spinRun->setMinimum(-1);
-        spinRun->setMaximum(-1);
-        spinRun->setSpecialValueText(tr("average"));
-        spinRun->setMinimumWidth(100);
-    }
-    labRun=new QLabel(this);
-    QHBoxLayout* hblRun=new QHBoxLayout();
-    hblRun->setContentsMargins(0,0,0,0);
-    btnFirstRun=new QToolButton(this);
-    btnFirstRun->setText(tr("first"));
-    btnFirstRun->setToolTip(tr("switch to first %1").arg(m_runName));
-    connect(btnFirstRun, SIGNAL(clicked()), this, SLOT(gotoFirstRun()));
-
-    if (useRunCombobox) {
-        hblRun->addWidget(cmbRun, 1);
-        //hblRun->addWidget(btnFirstRun, 0);
-        //hblRun->addWidget(labRun, 2);
-        btnFirstRun->setVisible(false);
-        labRun->setVisible(false);
-    } else {
-        hblRun->addWidget(spinRun, 1);
-        hblRun->addWidget(btnFirstRun, 0);
-        hblRun->addWidget(labRun, 2);
-    }
-    fl->addRow(labRunLabel=new QLabel(tr("%1: ").arg(m_runName)), hblRun);
-    layModel->addLayout(fl, 0);
-
     labFitParameters=new QLabel(this);
     layModel->addWidget(labFitParameters);
     /*btnEditRanges=createButtonAndActionShowText(, tr("Edit &Ranges"), this);
@@ -432,74 +424,84 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     int row=0;
 
     row++;
-    btnFitCurrent=createButtonAndActionShowText(actFitCurrent, QIcon(":/lib/fit_fitcurrent.png"), tr("&Fit Current"), this);
+    QLabel* Label1 = new QLabel("Fit:", this);
+    layButtons->addWidget(Label1, row, 0);
+    Label1 = new QLabel("Reset:", this);
+    layButtons->addWidget(Label1, row, 1);
+    Label1 = new QLabel("Copy Param.s To:", this);
+    layButtons->addWidget(Label1, row, 2);
+
+    row++;
+    btnFitCurrent=createButtonAndActionShowText(actFitCurrent, QIcon(":/lib/fit_fitcurrent.png"), tr("&Fit current %1").arg(m_runName), this);
     actFitCurrent->setToolTip(tr("perform a fit for the currently displayed file and %1").arg(m_runName));
     layButtons->addWidget(btnFitCurrent, row, 0);
-    btnFitRunsCurrent=createButtonAndActionShowText(actFitRunsCurrent, QIcon(":/lib/fit_fitallruns.png"), tr("Fit All &%1s").arg(m_runName), this);
-    actFitRunsCurrent->setToolTip(tr("perform a fit for all %1s in the currently selected file ").arg(m_runName));
-    layButtons->addWidget(btnFitRunsCurrent, row, 1);
-
-    row++;
-    btnFitAll=createButtonAndActionShowText(actFitAll, QIcon(":/lib/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files (Current %1)").arg(m_runName), this);    
-    actFitAll->setToolTip(tr("perform a fit for all files, but fit in each file only the currently displayed %1").arg(m_runName));
-    layButtons->addWidget(btnFitAll, row, 0);
-    btnFitRunsAll=createButtonAndActionShowText(actFitRunsAll, QIcon(":/lib/fit_fitall.png"), tr("Fit &Everything"), this);
-    actFitRunsAll->setToolTip(tr("perform a fit for all %1s in all files").arg(m_runName));
-    layButtons->addWidget(btnFitRunsAll, row, 1);
-
-    row++;
-    btnResetCurrent=createButtonAndActionShowText(actResetCurrent, tr("&Reset Current"), this);
+    btnResetCurrent=createButtonAndActionShowText(actResetCurrent, tr("R. current %1").arg(m_runName), this);
     actResetCurrent->setToolTip(tr("reset the currently displayed file (and %1) to the initial parameters\nThis deletes all fit results stored for the current file.").arg(m_runName));
-    layButtons->addWidget(btnResetCurrent, row, 0);
-
-    btnResetAllRuns=createButtonAndActionShowText(actResetAllRuns, tr("&Reset All %1s").arg(m_runName), this);
-    actResetAllRuns->setToolTip(tr("reset all %1s to the initial parameters in the current file.\nThis deletes all fit results stored for all %1s in the current file.").arg(m_runName));
-    layButtons->addWidget(btnResetAllRuns, row, 1);
+    layButtons->addWidget(btnResetCurrent, row, 1);
+    btnCopyToInitial=createButtonAndActionShowText(actCopyToInitial, tr("To initial").arg(m_runName), this);
+    actCopyToInitial->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters,\n so they are used by files/%1s that were not fit yet.").arg(m_runName));
+    layButtons->addWidget(btnCopyToInitial, row, 2);
 
     row++;
-    btnResetAll=createButtonAndActionShowText(actResetAll, tr("&Reset All"), this);
+    btnFitRunsAll=createButtonAndActionShowText(actFitRunsAll, QIcon(":/lib/fit_fitall.png"), tr("Fit &everything"), this);
+    actFitRunsAll->setToolTip(tr("perform a fit for all %1s in all files").arg(m_runName));
+    layButtons->addWidget(btnFitRunsAll, row, 0);
+    btnResetAll=createButtonAndActionShowText(actResetAll, tr("&R. everything"), this);
     actResetAll->setToolTip(tr("reset all loaded files to the initial parameters.\nThis deletes all fit results stored for all files file."));
     layButtons->addWidget(btnResetAll, row, 1);
-
-    row++;
-    btnCopyToInitial=createButtonAndActionShowText(actCopyToInitial, tr("Copy to &Initial"), this);
-    actCopyToInitial->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters,\n so they are used by files/%1s that were not fit yet.").arg(m_runName));
-    layButtons->addWidget(btnCopyToInitial, row, 0);
-    btnCopyToAllRuns=createButtonAndActionShowText(actCopyToAllRuns, tr("&Copy to All %1s").arg(m_runName), this);
-    actCopyToAllRuns->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters\n and also to all %1s in the current file.").arg(m_runName));
-    layButtons->addWidget(btnCopyToAllRuns, row, 1);
-
-    row++;
-    btnCopyToAll=createButtonAndActionShowText(actCopyToAll, tr("&Copy to All"), this);
+    btnCopyToAll=createButtonAndActionShowText(actCopyToAll, tr("To everything"), this);
     actCopyToAll->setToolTip(tr("copy the currently displayed fit parameters to the set\n of initial parameters and also to all files."));
-    layButtons->addWidget(btnCopyToAll, row, 1);
-    btnCopyToAllCurrentRun=createButtonAndActionShowText(actCopyToAllCurrentRun, tr("&Copy to All (Current %1)").arg(m_runName), this);
-    actCopyToAllCurrentRun->setToolTip(tr("copy the currently displayed fit parameters to the set of\n initial parameters and also to all files, but only to the current %1 therein.").arg(m_runName));
-    layButtons->addWidget(btnCopyToAllCurrentRun, row, 0);
+    layButtons->addWidget(btnCopyToAll, row, 2);
 
+
+    row++;
+    btnFitRunsCurrent=createButtonAndActionShowText(actFitRunsCurrent, QIcon(":/lib/fit_fitallruns.png"), tr("Fit all &%1s, this file").arg(m_runName), this);
+    actFitRunsCurrent->setToolTip(tr("perform a fit for all %1s in the currently selected file ").arg(m_runName));
+    layButtons->addWidget(btnFitRunsCurrent, row, 0);
+    btnResetAllRuns=createButtonAndActionShowText(actResetAllRuns, tr("R. this file").arg(m_runName), this);
+    actResetAllRuns->setToolTip(tr("reset all %1s to the initial parameters in the current file.\nThis deletes all fit results stored for all %1s in the current file.").arg(m_runName));
+    layButtons->addWidget(btnResetAllRuns, row, 1);
+    btnCopyToAllRuns=createButtonAndActionShowText(actCopyToAllRuns, tr("To this file").arg(m_runName), this);
+    actCopyToAllRuns->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters\n and also to all %1s in the current file.").arg(m_runName));
+    layButtons->addWidget(btnCopyToAllRuns, row, 2);
+
+    row++;
+    btnFitAll=createButtonAndActionShowText(actFitAll, QIcon(":/lib/fit_fitcurrentrunallfiles.png"), tr("Fit all &files, this %1").arg(m_runName), this);
+    actFitAll->setToolTip(tr("perform a fit for all files, but fit in each file only the currently displayed %1").arg(m_runName));
+    layButtons->addWidget(btnFitAll, row, 0);
+    btnCopyToAllCurrentRun=createButtonAndActionShowText(actCopyToAllCurrentRun, tr("To this %1").arg(m_runName), this);
+    actCopyToAllCurrentRun->setToolTip(tr("copy the currently displayed fit parameters to the set of\n initial parameters and also to all files, but only to the current %1 therein.").arg(m_runName));
+    layButtons->addWidget(btnCopyToAllCurrentRun, row, 2);
+
+    row++;
+    Label1 = new QLabel("Other options:", this);
+    layButtons->addWidget(Label1, row, 0);
+
+    row++;
     guessrow=row;
-    btnGuessCurrent=createButtonAndActionShowText(actGuessCurrent, QIcon(":/lib/fit_guesscurrent.png"), tr("&Guess Current"), this);
+    btnGuessCurrent=createButtonAndActionShowText(actGuessCurrent, QIcon(":/lib/fit_guesscurrent.png"), tr("&Guess current %1").arg(m_runName), this);
     actGuessCurrent->setToolTip(tr("perform a parameter-guessing for the currently displayed file and %1").arg(m_runName));
     btnGuessCurrent->setVisible(false);
     actGuessCurrent->setVisible(false);
     layButtons->addWidget(btnGuessCurrent, row, 0);
-    btnGuessRunsCurrent=createButtonAndActionShowText(actGuessRunsCurrent, QIcon(":/lib/fit_guessallruns.png"), tr("Guess All &%1s").arg(m_runName), this);
-    actGuessRunsCurrent->setToolTip(tr("perform a parameter-guessing for all %1s in the currently selected file ").arg(m_runName));
-    btnGuessRunsCurrent->setVisible(false);
-    actGuessRunsCurrent->setVisible(false);
-    layButtons->addWidget(btnGuessRunsCurrent, row, 1);
-
-    row++;
-    btnGuessAll=createButtonAndActionShowText(actGuessAll, QIcon(":/lib/fit_guessallfiles.png"), tr("Guess All &Files (Current %1)").arg(m_runName), this);
-    actGuessAll->setToolTip(tr("perform a parameter-guessing for all files, but Guess in each file only the currently displayed %1").arg(m_runName));
-    btnGuessAll->setVisible(false);
-    actGuessAll->setVisible(false);
-    layButtons->addWidget(btnGuessAll, row, 0);
-    btnGuessRunsAll=createButtonAndActionShowText(actGuessRunsAll, QIcon(":/lib/fit_guessall.png"), tr("Guess &Everything"), this);
+    btnGuessRunsAll=createButtonAndActionShowText(actGuessRunsAll, QIcon(":/lib/fit_guessall.png"), tr("Guess &everything"), this);
     actGuessRunsAll->setToolTip(tr("perform a parameter-guessing for all %1s in all files").arg(m_runName));
     btnGuessRunsAll->setVisible(false);
     actGuessRunsAll->setVisible(false);
-    layButtons->addWidget(btnGuessRunsAll, row, 1);
+    layButtons->addWidget(btnGuessRunsAll, row, 1,1,2);
+
+    row++;
+    btnGuessRunsCurrent=createButtonAndActionShowText(actGuessRunsCurrent, QIcon(":/lib/fit_guessallruns.png"), tr("Guess all &%1s, this file").arg(m_runName), this);
+    actGuessRunsCurrent->setToolTip(tr("perform a parameter-guessing for all %1s in the currently selected file ").arg(m_runName));
+    btnGuessRunsCurrent->setVisible(false);
+    actGuessRunsCurrent->setVisible(false);
+    layButtons->addWidget(btnGuessRunsCurrent, row, 0);
+    btnGuessAll=createButtonAndActionShowText(actGuessAll, QIcon(":/lib/fit_guessallfiles.png"), tr("Guess all files, this %1").arg(m_runName), this);
+    actGuessAll->setToolTip(tr("perform a parameter-guessing for all files, but Guess in each file only the currently displayed %1").arg(m_runName));
+    btnGuessAll->setVisible(false);
+    actGuessAll->setVisible(false);
+    layButtons->addWidget(btnGuessAll, row, 1,1,2);
+
 
     row++;
     actChi2Landscape=new QFActionWithNoMenuRole(tr("&Plot &Chi2 Landscape"), this);
@@ -632,18 +634,24 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
 
 
     menuParameters=propertyEditor->addMenu("&Parameters", 0);
+    menuParameters->addSeparator();
+    menuParameters->addAction("Reset Fits:");
+    menuParameters->addSeparator();
     menuParameters->addAction(actResetCurrent);
     menuParameters->addAction(actResetAll);
     menuParameters->addAction(actResetAllRuns);
+    menuParameters->addSeparator();
+    menuParameters->addAction("Copy current parameters to fits:");
     menuParameters->addSeparator();
     menuParameters->addAction(actCopyToAll);
     menuParameters->addAction(actCopyToAllRuns);
     menuParameters->addAction(actCopyToInitial);
     menuParameters->addAction(actCopyToAllCurrentRun);
     menuParameters->addSeparator();
+    menuParameters->addAction("(Re-)Store Parameters:");
+    menuParameters->addSeparator();
     menuParameters->addAction(actLoadParameters);
     menuParameters->addAction(actSaveParameters);
-    //menuParameters->addAction();
 
 
     menuFit=propertyEditor->addMenu("&Fit", 0);
@@ -688,15 +696,15 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
 
 
 
-    actFitAllFilesThreaded=new QFActionWithNoMenuRole(QIcon(":/lib/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files, this %1 (MT)").arg(m_runName), this);
+    actFitAllFilesThreaded=new QFActionWithNoMenuRole(QIcon(":/lib/fit_fitcurrentrunallfiles.png"), tr("Fit all &files, this %1 (MT)").arg(m_runName), this);
     actFitAllFilesThreaded->setToolTip(tr("multi-threaded: perform a fit for all files, but fit in each file only the currently displayed %1").arg(m_runName));
     connect (actFitAllFilesThreaded, SIGNAL(triggered()), this, SLOT(fitAllFilesThreaded()));
 
-    actFitAllThreaded=new QFActionWithNoMenuRole(QIcon(":/lib/fit_fitall.png"), tr("Fit Everything (MT)"), this);
+    actFitAllThreaded=new QFActionWithNoMenuRole(QIcon(":/lib/fit_fitall.png"), tr("Fit everything (MT)"), this);
     actFitAllThreaded->setToolTip(tr("multi-threaded: perform a fit for all files, and all %1s therein (everything)").arg(m_runName));
     connect (actFitAllThreaded, SIGNAL(triggered()), this, SLOT(fitEverythingThreaded()));
 
-    actFitAllRunsThreaded=new QFActionWithNoMenuRole(QIcon(":/lib/fit_fitallruns.png"), tr("Fit All %1s, this file (MT)").arg(m_runName), this);
+    actFitAllRunsThreaded=new QFActionWithNoMenuRole(QIcon(":/lib/fit_fitallruns.png"), tr("Fit all %1s, this file (MT)").arg(m_runName), this);
     actFitAllRunsThreaded->setToolTip(tr("multi-threaded: perform a fit for all %1s, in the current file").arg(m_runName));
     connect (actFitAllRunsThreaded, SIGNAL(triggered()), this, SLOT(fitAllRunsThreaded()));
 
@@ -977,13 +985,13 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::setGuessingEnabled(bool ena
     if (currentOnly) {
         layButtons->removeWidget(btnGuessRunsCurrent);
         layButtons->removeWidget(btnGuessAll);
-        layButtons->addWidget(btnGuessAll, guessrow, 1);
+        layButtons->addWidget(btnGuessAll, guessrow+1, 1,1,2);
         layButtons->addWidget(btnGuessRunsCurrent, guessrow+1,0);
     } else {
         layButtons->removeWidget(btnGuessRunsCurrent);
         layButtons->removeWidget(btnGuessAll);
-        layButtons->addWidget(btnGuessAll, guessrow+1,0);
-        layButtons->addWidget(btnGuessRunsCurrent, guessrow,1);
+        layButtons->addWidget(btnGuessAll, guessrow+1,1,1,2);
+        layButtons->addWidget(btnGuessRunsCurrent, guessrow+1,0);
     }
 }
 
