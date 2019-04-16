@@ -35,7 +35,7 @@
 #include <iostream>
 #include "libwid_imexport.h"
 
-/** \brief two sliders in a box, aligned left and right
+/** \brief two sliders in a box, aligned left all left
  *  \ingroup qf3lib_widgets
  *
  * The widget looks like this:
