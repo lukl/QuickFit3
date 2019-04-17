@@ -1108,7 +1108,7 @@ void QFExtensionCameraAndor::readCameraProperties(int /*camera*/, QFExtensionCam
     CHECK_NO_RETURN(GetPixelSize(&(info.pixelWidth), &(info.pixelHeight)), tr("error while reading pixel size"));
     CHECK_NO_RETURN(GetReadOutTime(&(info.readoutTime)), tr("error while reading readout time"));
     CHECK_NO_RETURN(GetPreAmpGain(info.preamp_gain, &(info.preampGainF)), tr("error while reading preamplifier gain"));
-    CHECK_NO_RETURN(GetVerticalSpeed(info.vsSpeed, &(info.verticalSpeed)), tr("error while reading preamplifier gain"));
+    CHECK_NO_RETURN(GetVSSpeed(info.vsSpeed, &(info.verticalSpeed)), tr("error while reading preamplifier gain"));
     CHECK_NO_RETURN(GetHSSpeed(info.ADchannel, info.outputAmplifier, info.hsSpeed, &(info.horizontalSpeed)), tr("error while reading horicontal shift speed"));
     if (GetSensitivity(info.ADchannel, info.outputAmplifier, info.hsSpeed, info.preamp_gain, &(info.sensitivity))!=DRV_SUCCESS) {
         info.sensitivity=0;
