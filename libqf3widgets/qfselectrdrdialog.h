@@ -85,6 +85,7 @@ class QFWIDLIB_EXPORT QFSelectRDRDialog : public QFDialog
         void updateRdrList();
         void selectAll();
         void selectNone();
+        void setFilterText(const QString& text);
 
     protected slots:
         void on_btnAll_clicked();
