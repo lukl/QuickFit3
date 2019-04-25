@@ -125,7 +125,7 @@ void QFESPIMB040AcquisitionConfigWidget2::loadSettings(QSettings& settings, QStr
     ui->chkOverview->setChecked(settings.value(prefix+"overview", true).toBool());
     ui->chkCloseMainShutter->setChecked(settings.value(prefix+"chkCloseMainShutter", false).toBool());
     ui->chkAlex->setChecked(settings.value(prefix+"chkAlex", false).toBool());
-    ui->chkAlex->setChecked(settings.value(prefix+"chkSetLaserPower", false).toBool());
+    ui->chkSetLaserPower->setChecked(settings.value(prefix+"chkSetLaserPower", false).toBool());
     ui->spinLaser1->setValue(settings.value(prefix+"LaserPower1", 60.0).toFloat());
     ui->spinLaser2->setValue(settings.value(prefix+"LaserPower2", 25.0).toFloat());
     ui->chkBackground->setChecked(settings.value(prefix+"background", true).toBool());
@@ -1289,19 +1289,21 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         // set laser powers if activated
         //////////////////////////////////////////////////////////////////////////////////////
 
+        int lst=3500; // Laser settling time in ms
+
         double power0=0;
         double power1=0;
 
         if(ui->chkSetLaserPower->isChecked()) {
+
             if (opticsSetup->getLaserCount()>0) {
 
-                if(opticsSetup->getLaser(0)->isLightSourceConnected(0) && opticsSetup->getLaser(1)->isLightSourceConnected(0)) {
+                if(opticsSetup->getLaser(0)->isLightSourceConnected(0) && opticsSetup->getLaser(1)->isLightSourceConnected(1)) {
 
-
-                    log->log_text(tr("Setting laser powers for acquisition"));
+                    log->log_text(tr("Setting laser powers for acquisition\n"));
 
                     power0=opticsSetup->getLaser(0)->getLightSourceCurrentSetPower(0,0);
-                    power1=opticsSetup->getLaser(1)->getLightSourceCurrentSetPower(0,0);
+                    power1=opticsSetup->getLaser(1)->getLightSourceCurrentSetPower(1,0);
 
                     double min0;
                     double max0;
@@ -1309,21 +1311,25 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                     double max1;
 
                     opticsSetup->getLaser(0)->getLightSourceLinePowerRange(0,0,min0,max0);
-                    opticsSetup->getLaser(1)->getLightSourceLinePowerRange(0,0,min1,max1);
+                    opticsSetup->getLaser(1)->getLightSourceLinePowerRange(1,0,min1,max1);
 
-                    if (min0<ui->spinLaser1->value() && ui->spinLaser1->value()<max0) {
+                    if (min0<=ui->spinLaser1->value() && ui->spinLaser1->value()<=max0) {
                         opticsSetup->getLaser(0)->setLightSourcePower(0,0,ui->spinLaser1->value());
                     }
-                    else log->log_warning("Set laser power for acquisition: Laser 1: Laser power out of range, skipping.");
+                    else log->log_warning("Set laser power for acquisition: Laser 1: Laser power out of range, skipping.\n");
 
-                    if (min1<ui->spinLaser1->value() && ui->spinLaser1->value()<max1) {
-                        opticsSetup->getLaser(1)->setLightSourcePower(0,0,ui->spinLaser2->value());
+                    if (min1<=ui->spinLaser2->value() && ui->spinLaser2->value()<=max1) {
+                        opticsSetup->getLaser(1)->setLightSourcePower(1,0,ui->spinLaser2->value());
                     }
-                    else log->log_warning("Set laser power for acquisition: Laser 2: Laser power out of range, skipping.");
+                    else log->log_warning("Set laser power for acquisition: Laser 2: Laser power out of range, skipping.\n");
                 }
-                else log->log_warning("Set laser power for acquisition: At least one laser is not connected.");
+                else log->log_warning("Set laser power for acquisition: At least one laser is not connected.\n");
             }
-            else log->log_warning("Set laser power for acquisition: No laser found.");
+            else log->log_warning("Set laser power for acquisition: No laser found.\n");
+
+            QTime t;
+            t.start();
+            while (t.elapsed()<lst) QApplication::processEvents();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////
@@ -1399,17 +1405,16 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
         if(ui->chkSetLaserPower->isChecked()) {
             if (opticsSetup->getLaserCount()>0) {
 
-                if(opticsSetup->getLaser(0)->isLightSourceConnected(0) && opticsSetup->getLaser(1)->isLightSourceConnected(0)) {
+                if(opticsSetup->getLaser(0)->isLightSourceConnected(0) && opticsSetup->getLaser(1)->isLightSourceConnected(1)) {
 
 
                     log->log_text(tr("Setting laser powers back after acquisition"));
-
                     opticsSetup->getLaser(0)->setLightSourcePower(0,0,power0);
-                    opticsSetup->getLaser(1)->setLightSourcePower(0,0,power1);
+                    opticsSetup->getLaser(1)->setLightSourcePower(1,0,power1);
                 }
-                else log->log_warning("Set laser power for acquisition: At least one laser is not connected.");
+                else log->log_warning("Set laser power for acquisition: At least one laser is not connected.\n");
             }
-            else log->log_warning("Set laser power for acquisition: No laser found.");
+            else log->log_warning("Set laser power for acquisition: No laser found.\n");
         }
 
         //////////////////////////////////////////////////////////////////////////////////////
