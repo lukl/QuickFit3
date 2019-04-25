@@ -389,7 +389,7 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
             /** \brief vertical shift amplitude (0, +1..+4)*/
             int vsAmplitude;
 
-            /** \brief vertical shift speed */
+            /** \brief vertical shift speed index */
             int vsSpeed;
 
             /** \brief horicontal shift speed */
@@ -425,7 +425,7 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
             /** \brief height of the pixels in microns (read by readCameraProperties() from camera, so not change) */
             float pixelHeight;
             /** \brief speed of vertical shift in microns/pixelshift (read by readCameraProperties() from camera, so not change) */
-            int verticalSpeed;
+            float verticalSpeed;
             /** \brief speed of horizontal shift in MHz (read by readCameraProperties() from camera, so not change) */
             float horizontalSpeed;
             /** \brief speed of horizontal shift in MHz (read by readCameraProperties() from camera, so not change) */

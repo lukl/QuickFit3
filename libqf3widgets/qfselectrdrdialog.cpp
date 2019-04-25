@@ -266,6 +266,13 @@ void QFSelectRDRDialog::on_lineEditFilter_textChanged(const QString &/*text*/)
     ui->listWidget->selectAll();
 }
 
+void QFSelectRDRDialog::setFilterText(const QString& text)
+{
+    updateRdrList();
+    ui->lineEditFilter->setText(text);
+    on_lineEditFilter_textChanged(text);
+}
+
 void QFSelectRDRDialog::on_btnHelp_clicked()
 {
     QFPluginServices::getInstance()->displayHelpWindow(helpfile);
