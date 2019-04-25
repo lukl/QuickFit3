@@ -2263,7 +2263,11 @@ void QFRDRImagingFCSImageEditor::selectByParam2Intensity() {
 
 void QFRDRImagingFCSImageEditor::buildSelection(bool select_notmask)
 {
+    useThisResultAndParamsSetForAllRDRs();
+    QApplication::processEvents();
+
     if (!current) return;
+
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
         QStringList params;
@@ -5690,6 +5694,10 @@ struct copyFitResultStatistics_data {
 };
 
 void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
+
+    btnUseSelectionForAllRDRs->click();
+    QApplication::processEvents();
+
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (!m) return;
     if (m->getCorrelationN()<=0) return;
@@ -5807,6 +5815,23 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                 dlgsel->setAllowMultiSelect(true);
                 dlgsel->setDescription(tr("select records from which to export"));
                 dlgsel->selectAll();
+
+                QRegularExpression re_acf0("acf0", QRegularExpression::CaseInsensitiveOption);
+                QRegularExpression re_acf1("acf1", QRegularExpression::CaseInsensitiveOption);
+                QRegularExpression re_dccf("dccf", QRegularExpression::CaseInsensitiveOption);
+
+                QString RDRrole=m->getRole();
+                QString RDRfullname=m->getName()+" - "+RDRrole;
+
+                if (!RDRfullname.isEmpty()) {
+
+                    if(re_acf0.match(RDRfullname).hasMatch()) dlgsel->setFilterText(QString("acf0"));
+                    if(re_acf1.match(RDRfullname).hasMatch()) dlgsel->setFilterText(QString("acf1"));
+                    if(re_dccf.match(RDRfullname).hasMatch()) dlgsel->setFilterText(QString("dccf"));
+                }
+
+
+
                 if (dlgsel->exec()) {
                     recs=dlgsel->getSelectedRDRs();
                 }
