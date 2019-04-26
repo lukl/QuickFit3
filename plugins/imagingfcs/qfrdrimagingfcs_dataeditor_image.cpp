@@ -251,6 +251,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     actCopyFitResultStatistics=new QFActionWithNoMenuRole(tr("copy fit result statistics for Excel/Origin..."), this);
     actCopyFitResultStatistics->setIconText(tr("copy result stats."));
     btnCopyFitResults=createButtonForActionShowText(actCopyFitResultStatistics, w);
+    btnCopyFitResults->setIcon(QIcon(":/imaging_fcs/copydata.png"));
     connect(actCopyFitResultStatistics, SIGNAL(triggered()), this, SLOT(copyFitResultStatistics()));
 
     grdTopDataEx->addWidget(btnSaveData, 0, 0);
@@ -276,28 +277,27 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     grpTopParameters->setLayout(topgrid);
 
     int row=0;
+
     cmbResultGroup=new QComboBox(this);
-    cmbResultGroup->setMaximumWidth(600);
-    cmbResultGroup->view()->setTextElideMode(Qt::ElideMiddle);
-    cmbResultGroup->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    cmbResultGroup->setMinimumWidth(50);
+
     cmbResultGroup->addAction(actUseResultSetForAll);
     cmbResultGroup->addAction(actUseResultParam1and2SetForAll);
 
     cmbResultGroup->setContextMenuPolicy(Qt::ActionsContextMenu);
-    topgrid->addWidget((l=new QLabel(tr("&result set:"))), row, 0);
+    topgrid->addWidget((l=new QLabel(tr("&result set:"))), row, 0, Qt::AlignLeft);
     l->setBuddy(cmbResultGroup);
     topgrid->addWidget(cmbResultGroup, row, 1);
 
     cmbParameter=new QComboBox(this);
-    cmbParameter->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    cmbParameter->setMinimumWidth(50);
     cmbParameter->addAction(actUseParam1SetForAll);
     cmbParameter->addAction(actUseResultParam1and2SetForAll);
-    cmbParameter->setMaximumWidth(450);
     cmbParameter->setContextMenuPolicy(Qt::ActionsContextMenu);
 
-    topgrid->addWidget((labParameter=new QLabel(tr("&parameter:"))), row, 3);
+    topgrid->addWidget((labParameter=new QLabel(tr("&parameter:"))), row, 2);
     labParameter->setBuddy(cmbParameter);
-    topgrid->addWidget(cmbParameter, row, 4);
+    topgrid->addWidget(cmbParameter, row, 3);
     cmbParameterTransform=new QComboBox(this);
     cmbParameterTransform->addItem(QIcon(":/imaging_fcs/none.png"), tr("none"));
     cmbParameterTransform->addItem(QIcon(":/imaging_fcs/abs.png"), tr("abs"));
@@ -307,21 +307,32 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbParameterTransform->addAction(actUseParam1SetForAll);
     cmbParameterTransform->addAction(actUseResultParam1and2SetForAll);
     cmbParameterTransform->setContextMenuPolicy(Qt::ActionsContextMenu);
-    topgrid->addWidget((labParameterTransform=new QLabel(tr("    &transform:"))), row, 5);
+    topgrid->addWidget((labParameterTransform=new QLabel(tr("&transform:"))), row, 4);
     labParameterTransform->setBuddy(cmbParameterTransform);
-    topgrid->addWidget(cmbParameterTransform, row, 6);
+    topgrid->addWidget(cmbParameterTransform, row, 5);
 
     row++;
 
+    cmbRDRAnnotation=new QFEnhancedComboBox(this);
+    cmbRDRAnnotation->setMinimumWidth(50);
+    cmbRDRAnnotation->addItem(tr("--- none ---"));
+    chkShowRDRAnnotation=new QCheckBox(tr("&annotation:"), this);
+    chkShowRDRAnnotation->setChecked(false);
+    cmbRDRAnnotation->setEnabled(false);
+    cmbRDRAnnotation->setContextMenuPolicy(Qt::ActionsContextMenu);
+    connect(chkShowRDRAnnotation, SIGNAL(toggled(bool)), cmbRDRAnnotation, SLOT(setEnabled(bool)));
+    topgrid->addWidget(chkShowRDRAnnotation, row, 0, Qt::AlignLeft);
+    topgrid->addWidget(cmbRDRAnnotation, row, 1);
+
     cmbParameter2=new QComboBox(this);
-    cmbParameter2->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    cmbParameter2->setMinimumWidth(50);
     cmbParameter2->addAction(actUseParam2SetForAll);
     cmbParameter2->addAction(actUseResultParam1and2SetForAll);
     cmbParameter2->setContextMenuPolicy(Qt::ActionsContextMenu);
-    cmbParameter2->setMaximumWidth(450);
-    topgrid->addWidget((labParameter2=new QLabel(tr("paramater &2:"))), row, 3);
+
+    topgrid->addWidget((labParameter2=new QLabel(tr("parameter &2:"))), row, 2);
     labParameter2->setBuddy(cmbParameter2);
-    topgrid->addWidget(cmbParameter2, row, 4);
+    topgrid->addWidget(cmbParameter2, row, 3);
     cmbParameter2Transform=new QComboBox(this);
     cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/none.png"), tr("none"));
     cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/abs.png"), tr("abs"));
@@ -331,36 +342,29 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbParameter2Transform->addAction(actUseParam2SetForAll);
     cmbParameter2Transform->addAction(actUseResultParam1and2SetForAll);
     cmbParameter2Transform->setContextMenuPolicy(Qt::ActionsContextMenu);
-    topgrid->addWidget((labParameter2Transform=new QLabel(tr("    tr&ansform:"))), row, 5);
+    topgrid->addWidget((labParameter2Transform=new QLabel(tr("tr&ansform:"))), row, 4);
     labParameter2Transform->setBuddy(cmbParameter2Transform);
-    topgrid->addWidget(cmbParameter2Transform, row, 6);
-
-    cmbRDRAnnotation=new QFEnhancedComboBox(this);
-    cmbRDRAnnotation->addItem(tr("--- none ---"));
-    cmbRDRAnnotation->setMaximumWidth(600);
-    chkShowRDRAnnotation=new QCheckBox(tr("&annotation:"), this);
-    chkShowRDRAnnotation->setChecked(false);
-    cmbRDRAnnotation->setEnabled(false);
-    cmbRDRAnnotation->setContextMenuPolicy(Qt::ActionsContextMenu);
-    connect(chkShowRDRAnnotation, SIGNAL(toggled(bool)), cmbRDRAnnotation, SLOT(setEnabled(bool)));
-    topgrid->addWidget(chkShowRDRAnnotation, row, 0);
-    topgrid->addWidget(cmbRDRAnnotation, row, 1);
+    topgrid->addWidget(cmbParameter2Transform, row, 5);
 
 
     row++;
 
-    btnUseSelectionForAllRDRs=new QToolButton();
+    btnUseSelectionForAllRDRs=createButtonForActionShowText(actUseResultParam1and2SetForAll, w);
     btnUseSelectionForAllRDRs->setText(tr("Use current selection for all RDRs"));
     btnUseSelectionForAllRDRs->setToolTip(tr("Use current result set and parameter selections for all RDRs"));
-    connect(btnUseSelectionForAllRDRs,SIGNAL(released()),this, SLOT(useThisResultAndParamsSetForAllRDRs()));
-    topgrid->addWidget(btnUseSelectionForAllRDRs,row,1);
+    btnUseSelectionForAllRDRs->setIcon(QIcon(":/imaging_fcs/copyselection.png"));
+    //connect(btnUseSelectionForAllRDRs,SIGNAL(released()),this, SLOT(useThisResultAndParamsSetForAllRDRs()));
+    QHBoxLayout* hbl = new QHBoxLayout;
+    hbl->addWidget(btnUseSelectionForAllRDRs);
+    hbl->addStretch();
+    topgrid->addLayout(hbl,row,1);
 
-    chkOtherFileP2=new QCheckBox(tr("result parameter 2:"), this);
+    chkOtherFileP2=new QCheckBox(tr("other set param. 2:"), this);
     chkOtherFileP2->addAction(actUseParam2SetForAll);
     chkOtherFileP2->addAction(actUseResultParam1and2SetForAll);
     chkOtherFileP2->setContextMenuPolicy(Qt::ActionsContextMenu);
-    chkOtherFileP2->setToolTip(tr("Use different result set for parameter 2"));
-    topgrid->addWidget(chkOtherFileP2,row,3);
+    chkOtherFileP2->setToolTip(tr("Use and choose different result set for parameter 2"));
+    topgrid->addWidget(chkOtherFileP2,row,2);
 
     cmbOtherFilesResultGroup=new QComboBox(this);
     cmbOtherFilesResultGroup->setMaximumWidth(450);
@@ -370,7 +374,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbOtherFilesResultGroup->addAction(actUseParam2SetForAll);
     cmbOtherFilesResultGroup->addAction(actUseResultParam1and2SetForAll);
     cmbOtherFilesResultGroup->setContextMenuPolicy(Qt::ActionsContextMenu);
-    topgrid->addWidget(cmbOtherFilesResultGroup,row,4);
+    topgrid->addWidget(cmbOtherFilesResultGroup,row,3);
 
     cmbOtherFileRole=new QComboBox(this);
     cmbOtherFileRole->setEnabled(false);
@@ -379,28 +383,15 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbOtherFileRole->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     QLabel* labOtherFileRole;
-    topgrid->addWidget(labOtherFileRole=new QLabel(tr("    role:")),row,5);
+    topgrid->addWidget(labOtherFileRole=new QLabel(tr("role:")),row,4);
     labOtherFileRole->setBuddy(cmbOtherFileRole);
-    topgrid->addWidget(cmbOtherFileRole,row,6);
+    topgrid->addWidget(cmbOtherFileRole,row,5);
 
     connect(chkOtherFileP2, SIGNAL(toggled(bool)), cmbOtherFileRole, SLOT(setEnabled(bool)));
     connect(chkOtherFileP2, SIGNAL(toggled(bool)), cmbOtherFilesResultGroup, SLOT(setEnabled(bool)));
 
-
-
-
-    topgrid->addWidget(new QWidget(), 0, 2);
-    topgrid->addWidget(new QWidget(), 0, 5);
-    topgrid->addWidget(new QWidget(), 0, 7);
-    topgrid->setColumnStretch(0, 0);
-    topgrid->setColumnStretch(1, 0);
-    topgrid->setColumnStretch(2, 1);
-    topgrid->setColumnStretch(3, 0);
-    topgrid->setColumnStretch(4, 0);
-    topgrid->setColumnStretch(5, 0);
-    topgrid->setColumnStretch(6, 0);
-    topgrid->setColumnStretch(7, 1);
-
+    topgrid->setColumnStretch(1, 1);
+    topgrid->setColumnStretch(3, 1);
 
 
     QGridLayout* grdTop=new QGridLayout();

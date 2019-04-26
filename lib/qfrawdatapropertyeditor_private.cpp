@@ -158,12 +158,10 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     ml->addLayout(vl2);
 
     labTopIcon=new QLabel(d);
-    vl2->addWidget(labTopIcon);
+    vl2->addWidget(labTopIcon,0,Qt::AlignLeft);
     labTop=new QLabel(d);
-    /*labTop->setElided(true);
-    labTop->setElidedMode(Qt::ElideMiddle);*/
-    vl2->addWidget(labTop);
-    vl2->addStretch();
+    labTop->setMaximumWidth(100);
+    vl2->addWidget(labTop,1,Qt::AlignLeft);
 
     actDelete=new QFActionWithNoMenuRole(QIcon(":/lib/item_delete.png"), tr("&Delete RDR"), d);
     actDelete->setToolTip(tr("removes the currently displayed record from the project"));
@@ -243,9 +241,8 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     labID->setSizePolicy(labID->sizePolicy().verticalPolicy(),QSizePolicy::Fixed);
     //fl->addRow(tr("ID:"), labID);
     fl->addWidget((l=new QLabel(tr("ID:"), w)), 0, 0);
-    l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+    l->setAlignment(Qt::AlignLeft|Qt::AlignCenter);
     fl->addWidget(labID, 0, 1);
-    fl->setRowStretch(0,1);
     labType=new QLabel(w);
     labTypeIcon=new QLabel(w);
     labType->setSizePolicy(labType->sizePolicy().verticalPolicy(),QSizePolicy::Fixed);
@@ -255,58 +252,61 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     ptl->addWidget(labTypeIcon);
     ptl->addWidget(labType);
     ptl->addStretch();
-    //fl->addRow(tr("Type:"), ptl);
+
     fl->addWidget((l=new QLabel(tr("Type:"), w)), 1, 0);
-    fl->setRowStretch(1,1);
-    l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+    l->setAlignment(Qt::AlignLeft|Qt::AlignCenter);
     fl->addLayout(ptl, 1, 1);
+
     edtName=new QLineEdit(w);
-    //fl->addRow(tr("&Name:"), edtName);
     fl->addWidget((l=new QLabel(tr("&Name:"), w)), 2, 0);
-    l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+    l->setAlignment(Qt::AlignLeft|Qt::AlignCenter);
     l->setBuddy(edtName);
     QHBoxLayout* ntl=new QHBoxLayout();
     ntl->setContentsMargins(0,0,0,0);
     ntl->addWidget(edtName, 1);
     ntl->addStretch();
+    fl->addLayout(ntl, 2, 1);
+
+    fl->addWidget(l=new QLabel(tr("&Group:"), w),3,0);
+    QHBoxLayout* gtl=new QHBoxLayout();
+    gtl->setContentsMargins(0,0,0,0);
 
     cmbGroup=new QComboBox(d);
     cmbGroup->setEditable(false);
     cmbGroup->setEnabled(true);
-    cmbGroup->setMaximumWidth(400);
-    ntl->addWidget(l=new QLabel(tr("&group:"), d));
-    l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+    cmbGroup->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    gtl->addWidget(cmbGroup,1,Qt::AlignLeft);
+
+    l->setAlignment(Qt::AlignLeft|Qt::AlignCenter);
     l->setBuddy(cmbGroup);
-    ntl->addWidget(cmbGroup);
 
     cmbRole=new QComboBox(d);
     cmbRole->setEditable(true);
     cmbRole->setEnabled(false);
-    ntl->addWidget(l=new QLabel(tr("&role:"), d));
-    l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+    gtl->addWidget(l=new QLabel(tr("&role:"), d));
+    l->setAlignment(Qt::AlignLeft|Qt::AlignCenter);
     l->setBuddy(cmbRole);
-    ntl->addWidget(cmbRole);
+    gtl->addWidget(cmbRole);
+    gtl->addStretch();
 
-    fl->addLayout(ntl, 2, 1);
-    fl->setRowStretch(2,1);
+    fl->addLayout(gtl,3,1);
+
 
     edtFolder=new QLineEdit(w);
-    fl->addWidget((l=new QLabel(tr("&Folder:"), w)), 3, 0);
-    l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+    fl->addWidget((l=new QLabel(tr("&Folder:"), w)), 4, 0);
+    l->setAlignment(Qt::AlignLeft|Qt::AlignCenter);
     l->setBuddy(edtFolder);
-    fl->addWidget(edtFolder, 3, 1);
-    fl->setRowStretch(3,1);
+    fl->addWidget(edtFolder, 4, 1);
 
     pteDescription=new QPlainTextEdit(w);
     pteDescription->setSizePolicy( pteDescription->sizePolicy().horizontalPolicy(),QSizePolicy::Preferred);
 
     //fl->addRow(tr("&Description:"), pteDescription);
-    fl->addWidget((l=new QLabel(tr("&Description:"), w)), 4, 0);
-    l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+    fl->addWidget((l=new QLabel(tr("&Description:"), w)), 5, 0);
+    l->setAlignment(Qt::AlignLeft|Qt::AlignCenter);
     l->setBuddy(pteDescription);
-    fl->addWidget(pteDescription, 4, 1);
-    fl->setRowStretch(4,1);
-    //fl->setRowStretch(flcounter-1, 2);
+    fl->addWidget(pteDescription, 5, 1);
+    fl->setRowStretch(5,2);
     lstFiles=new QListWidget(w);
     lstFiles->setSizePolicy(lstFiles->sizePolicy().verticalPolicy(), QSizePolicy::Preferred);
     lstFiles->setContextMenuPolicy(Qt::ActionsContextMenu);
@@ -362,13 +362,11 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     lstFiles->addAction(actMoveFilesDown);
 
 
-    //fl->addRow(tr("&Files:"), lstFiles);
-    fl->addWidget((l=new QLabel(tr("&Files:"), w)), 5, 0);
-    l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+    fl->addWidget((l=new QLabel(tr("&Files:"), w)), 6, 0);
+    l->setAlignment(Qt::AlignLeft|Qt::AlignCenter);
     l->setBuddy(lstFiles);
-    fl->addWidget(lstFiles, 5, 1);
-    fl->setRowStretch(5,1);
-    //fl->setRowStretch(flcounter-1, 1);
+    fl->addWidget(lstFiles, 6, 1);
+    fl->setRowStretch(6, 2);
     tvProperties=new QEnhancedTableView(w);
     QFontMetrics fm(d->font());
     tvProperties->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.1));
@@ -413,11 +411,10 @@ void QFRawDataPropertyEditor_private::createWidgets() {
 
     pl2->addStretch();
     //fl->addRow(tr("Properties:"), widProperties);
-    fl->addWidget((l=new QLabel(tr("Properties:"), w)), 6, 0);
-    l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
-    fl->addWidget(widProperties, 6, 1);
-    fl->setRowStretch(6,3);
-    //fl->setRowStretch(flcounter-1, 5);
+    fl->addWidget((l=new QLabel(tr("Properties:"), w)), 7, 0);
+    l->setAlignment(Qt::AlignLeft|Qt::AlignCenter);
+    fl->addWidget(widProperties, 7, 1);
+    fl->setRowStretch(7,2);
 
     actMakePropertyEditable=new QFActionWithNoMenuRole(tr("Make property editable"), d);
     connect(actMakePropertyEditable, SIGNAL(triggered()), this, SLOT(makePropEditable()));
@@ -1422,7 +1419,7 @@ void QFRawDataPropertyEditor_private::setCurrent(QFRawDataRecord* c) {
             if (prefix.isEmpty()) prefix=QFileInfo(current->getProject()->getFile()).fileName();
         }
         if (!prefix.isEmpty()) prefix += QString(": ");
-        d->setWindowTitle(tr("%3Raw Data (%1): %2").arg(current->getTypeDescription()).arg(current->getName()).arg(prefix));
+        d->setWindowTitle(tr("%3RDR (%1): %2").arg(current->getTypeName()).arg(current->getName()).arg(prefix));
         d->setWindowIcon(current->getLargeIcon());
         if (current->getType()!=oldType) {
             editorList.clear();
@@ -1465,7 +1462,7 @@ void QFRawDataPropertyEditor_private::setCurrent(QFRawDataRecord* c) {
         labID->setText(QString::number(current->getID()));
         labTopIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
         labTop->setText(tr("current record:<br /><b>%1</b>").arg(current->getName()));
-        labType->setText(current->getTypeDescription());
+        labType->setText(current->getTypeName()+" - "+current->getTypeDescription());
         labTypeIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
         lstFiles->clear();
         QStringList f=current->getFiles();
@@ -1928,7 +1925,7 @@ void QFRawDataPropertyEditor_private::basicPropsChanged() {
     labTopIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
     labTop->setText(tr("current record:<br /><b>%1</b>").arg(current->getName()));
     labID->setText(QString::number(current->getID()));
-    labType->setText(current->getTypeDescription());
+    labType->setText(current->getTypeName()+" - "+current->getTypeDescription());
     labTypeIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
     lstFiles->clear();
     QStringList f=current->getFiles();

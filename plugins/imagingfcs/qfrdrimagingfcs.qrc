@@ -11,7 +11,6 @@
         <file alias="imaging_fcs/fcsplot_enone.png">icons/fcsplot_enone.png</file>
         <file alias="imaging_fcs/fcsplot_epoly.png">icons/fcsplot_epoly.png</file>
         <file alias="imaging_fcs/fcsplot_epolybars.png">icons/fcsplot_epolybars.png</file>
-
         <file alias="imaging_fcs/imfcs_flow.png">icons/imfcs_flow.png</file>
         <file alias="imaging_fcs/dualview_fccs.png">icons/dualview_fccs.png</file>
         <file alias="imaging_fcs/microscope.png">icons/microscope.png</file>
@@ -21,11 +20,9 @@
         <file alias="imaging_fcs/wizmicroscopy3.png">icons/wizmicroscopy3.png</file>
     </qresource>
     <qresource prefix="/imaging_fcs">
-    <file alias="projectwizard.png">icons/projectwizard.png</file>
-    <file alias="rdrwizard.png">icons/rdr_wizard.png</file>
-    <file alias="evalwizard.png">icons/evalwizard.png</file>
-
-
+        <file alias="projectwizard.png">icons/projectwizard.png</file>
+        <file alias="rdrwizard.png">icons/rdr_wizard.png</file>
+        <file alias="evalwizard.png">icons/evalwizard.png</file>
         <file alias="abs.png">icons/abs.png</file>
         <file alias="log.png">icons/log.png</file>
         <file alias="reci.png">icons/reci.png</file>
@@ -80,5 +77,6 @@
         <file alias="dvnone.png">icons/dvnone.png</file>
         <file alias="dvver.png">icons/dvver.png</file>
         <file alias="qfrdrimagingfcs_simulate.png">icons/qfrdrimagingfcs_simulate.png</file>
+        <file>icons/copydata.png</file>
     </qresource>
 </RCC>
