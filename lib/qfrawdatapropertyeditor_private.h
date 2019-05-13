@@ -351,6 +351,7 @@ class QFRawDataPropertyEditor_private : public QObject
         void showData();
         void deleteAllVisibleResults();
         //void copyResultAccessParserFunctionTable();
+        void updateLabTop();
 };
 
 #endif // QFRAWDATAPROPERTYEDITOR_PRIVATE_H

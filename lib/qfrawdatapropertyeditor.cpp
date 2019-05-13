@@ -75,6 +75,8 @@ void QFRawDataPropertyEditor::closeEvent ( QCloseEvent * event ) {
 
 
 void QFRawDataPropertyEditor::resizeEvent ( QResizeEvent * event ) {
+
+    p->updateLabTop();
     QWidget::resizeEvent(event);
 }
 

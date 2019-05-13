@@ -166,7 +166,8 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     labTopIcon=new QLabel(d);
     vl2->addWidget(labTopIcon,0);
     labTop=new QLabel(d);
-    vl2->addWidget(labTop,1);
+    labTop->setMinimumWidth(30);
+    vl2->addWidget(labTop, 1);
     vl2->addStretch();
 
     actDelete=new QFActionWithNoMenuRole(QIcon(":/lib/item_delete.png"), tr("&Delete RDR"), d);
@@ -1468,7 +1469,7 @@ void QFRawDataPropertyEditor_private::setCurrent(QFRawDataRecord* c) {
         pteDescription->setEnabled(true);
         labID->setText(QString::number(current->getID()));
         labTopIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
-        labTop->setText(tr("<b>%1</b>").arg(current->getName()));
+        updateLabTop();
         labType->setText(current->getTypeName()+" - "+current->getTypeDescription());
         labTypeIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
         lstFiles->clear();
@@ -1930,7 +1931,7 @@ void QFRawDataPropertyEditor_private::basicPropsChanged() {
         if (cmbGroup->count()>0) cmbGroup->setCurrentIndex(current->getGroup()+1);
     }
     labTopIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
-    labTop->setText(tr("<b>%1</b>").arg(current->getName()));
+    updateLabTop();
     labID->setText(QString::number(current->getID()));
     labType->setText(current->getTypeName()+" - "+current->getTypeDescription());
     labTypeIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
@@ -2033,3 +2034,14 @@ void QFRawDataPropertyEditor_private::showData()
 }
 
 
+void QFRawDataPropertyEditor_private::updateLabTop() {
+
+    if(current) {
+        QFontMetrics metrics(labTop->font());
+        QString elidedText = metrics.elidedText(tr("<b>%1</b>").arg(current->getName()), Qt::ElideMiddle, menuBar->width()-225);
+        labTop->setText(elidedText);
+    }
+    else {
+        labTop->setText("");
+    }
+}
