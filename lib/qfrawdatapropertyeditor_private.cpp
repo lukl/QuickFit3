@@ -113,6 +113,8 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     actPreviousSameRole->setToolTip(tr("move to previous record of same role"));
     actExportPluginData=new QFActionWithNoMenuRole(QIcon(":/lib/export_data.png"), tr("&Export Data"), d);
     actExportPluginData->setToolTip(tr("export the data from the current RDR into a file (enabled, if the plugin supports this feature)"));
+    actSelectFromTree=new QFActionWithNoMenuRole(QIcon(":/lib/projecttree_folderopen.png"), tr("select RDR"), d);
+    actSelectFromTree->setToolTip(tr("click this to select the next record to display from a tree of all records in the current project which are of the same type"));
 
     btnPrevious=new QToolButton(d);
     btnPrevious->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -128,9 +130,11 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     connect(actPreviousSameRole, SIGNAL(triggered()), this, SLOT(previousOfRolePressed()));
     connect(actExportPluginData, SIGNAL(triggered()), this, SLOT(exportData()));
 
-    btnSelectFromTree=new QPushButton(tr("select RDR"), d);
-    btnSelectFromTree->setToolTip(tr("click this to select the next record to display from a tree of all records in the current project which are of the semae type"));
-    connect(btnSelectFromTree, SIGNAL(clicked()), this, SLOT(selectRecordFromTreeClicked()));
+    btnSelectFromTree=new QToolButton(d);
+    btnSelectFromTree->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    btnSelectFromTree->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    btnSelectFromTree->setDefaultAction(actSelectFromTree);
+    connect(actSelectFromTree, SIGNAL(triggered()), this, SLOT(selectRecordFromTreeClicked()));
     vl->addWidget(btnSelectFromTree);
 
     actNext=new QFActionWithNoMenuRole(QIcon(":/lib/prop_next.png"), tr("&next"), d);

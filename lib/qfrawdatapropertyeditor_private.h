@@ -145,6 +145,7 @@ class QFRawDataPropertyEditor_private : public QObject
         QAction* actHelpRDR;
         QAction* actPrevious;
         QAction* actNext;
+        QAction* actSelectFromTree;
         QAction* actDelete;
         QAction* actDeleteGroup;
         QAction* actClose;
@@ -221,7 +222,7 @@ class QFRawDataPropertyEditor_private : public QObject
 
         QPointer<QTreeView> treeNextRecord;
         QPointer<QFProjectTreeModel> projectTree;
-        QPushButton* btnSelectFromTree;
+        QToolButton* btnSelectFromTree;
 
 
         //QSortFilterProxyModel* paramFilterProxy;
