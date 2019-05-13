@@ -157,11 +157,13 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     QHBoxLayout* vl2=new QHBoxLayout();
     ml->addLayout(vl2);
 
+    vl2->addWidget(l=new QLabel(tr("current record:")),0,Qt::AlignLeft);
+    vl2->addStretch();
     labTopIcon=new QLabel(d);
-    vl2->addWidget(labTopIcon,0,Qt::AlignLeft);
+    vl2->addWidget(labTopIcon,0);
     labTop=new QLabel(d);
-    labTop->setMaximumWidth(100);
-    vl2->addWidget(labTop,1,Qt::AlignLeft);
+    vl2->addWidget(labTop,1);
+    vl2->addStretch();
 
     actDelete=new QFActionWithNoMenuRole(QIcon(":/lib/item_delete.png"), tr("&Delete RDR"), d);
     actDelete->setToolTip(tr("removes the currently displayed record from the project"));
@@ -268,6 +270,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     fl->addLayout(ntl, 2, 1);
 
     fl->addWidget(l=new QLabel(tr("&Group:"), w),3,0);
+    l->setAlignment(Qt::AlignLeft|Qt::AlignCenter);
     QHBoxLayout* gtl=new QHBoxLayout();
     gtl->setContentsMargins(0,0,0,0);
 
@@ -275,19 +278,19 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     cmbGroup->setEditable(false);
     cmbGroup->setEnabled(true);
     cmbGroup->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    cmbGroup->setMinimumWidth(30);
     gtl->addWidget(cmbGroup,1,Qt::AlignLeft);
-
-    l->setAlignment(Qt::AlignLeft|Qt::AlignCenter);
     l->setBuddy(cmbGroup);
+    gtl->addStretch();
 
     cmbRole=new QComboBox(d);
     cmbRole->setEditable(true);
     cmbRole->setEnabled(false);
+    cmbRole->setMinimumWidth(10);
     gtl->addWidget(l=new QLabel(tr("&role:"), d));
     l->setAlignment(Qt::AlignLeft|Qt::AlignCenter);
     l->setBuddy(cmbRole);
     gtl->addWidget(cmbRole);
-    gtl->addStretch();
 
     fl->addLayout(gtl,3,1);
 
@@ -1461,7 +1464,7 @@ void QFRawDataPropertyEditor_private::setCurrent(QFRawDataRecord* c) {
         pteDescription->setEnabled(true);
         labID->setText(QString::number(current->getID()));
         labTopIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
-        labTop->setText(tr("current record:<br /><b>%1</b>").arg(current->getName()));
+        labTop->setText(tr("<b>%1</b>").arg(current->getName()));
         labType->setText(current->getTypeName()+" - "+current->getTypeDescription());
         labTypeIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
         lstFiles->clear();
@@ -1923,7 +1926,7 @@ void QFRawDataPropertyEditor_private::basicPropsChanged() {
         if (cmbGroup->count()>0) cmbGroup->setCurrentIndex(current->getGroup()+1);
     }
     labTopIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
-    labTop->setText(tr("current record:<br /><b>%1</b>").arg(current->getName()));
+    labTop->setText(tr("<b>%1</b>").arg(current->getName()));
     labID->setText(QString::number(current->getID()));
     labType->setText(current->getTypeName()+" - "+current->getTypeDescription());
     labTypeIcon->setPixmap(current->getSmallIcon().pixmap(16,16));
