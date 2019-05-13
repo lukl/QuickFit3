@@ -2285,6 +2285,21 @@ void QFRDRImagingFCSImageEditor::buildSelection(bool select_notmask)
                 dlgsel->setAllowMultiSelect(true);
                 dlgsel->setDescription(tr("select records to which to apply the mask/selection builder"));
                 dlgsel->selectAll();
+
+                QRegularExpression re_acf0("acf0", QRegularExpression::CaseInsensitiveOption);
+                QRegularExpression re_acf1("acf1", QRegularExpression::CaseInsensitiveOption);
+                QRegularExpression re_dccf("dccf", QRegularExpression::CaseInsensitiveOption);
+
+                QString RDRrole=m->getRole();
+                QString RDRfullname=m->getName()+" - "+RDRrole;
+
+                if (!RDRfullname.isEmpty()) {
+
+                    if(re_acf0.match(RDRfullname).hasMatch()) dlgsel->setFilterText(QString("acf0"));
+                    if(re_acf1.match(RDRfullname).hasMatch()) dlgsel->setFilterText(QString("acf1"));
+                    if(re_dccf.match(RDRfullname).hasMatch()) dlgsel->setFilterText(QString("dccf"));
+                }
+
                 if (dlgsel->exec()) {
                     rdrs=dlgsel->getSelectedRDRs();
                 } else {

@@ -72,6 +72,7 @@ QFRDRImagingFCSMaskBuilder::QFRDRImagingFCSMaskBuilder(const QStringList& parame
     ui->chkUse5->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskBuilder/use5", false).toBool());
 
     ui->chkSaveDel->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskBuilder/chkSaveDel", false).toBool());
+    ui->radSeveral->setChecked(!ProgramOptions::getConfigValue("QFRDRImagingFCSMaskBuilder/radCurrent", false).toBool());
     ui->radCurrent->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskBuilder/radCurrent", true).toBool());
     ui->edtSelName->setText(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskBuilder/edtSelName", "").toString());
     setWindowFlags(windowFlags()|Qt::WindowMinMaxButtonsHint);
