@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1280</width>
+    <width>1400</width>
     <height>900</height>
    </rect>
   </property>
@@ -224,8 +224,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>1494</width>
-           <height>662</height>
+           <width>1628</width>
+           <height>702</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -2198,7 +2198,7 @@ p, li { white-space: pre-wrap; }
           <widget class="QToolButton" name="btnAddCellsAndJobs">
            <property name="minimumSize">
             <size>
-             <width>0</width>
+             <width>120</width>
              <height>35</height>
             </size>
            </property>
@@ -2210,6 +2210,29 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="text">
             <string>add all cells and jobs</string>
+           </property>
+           <property name="icon">
+            <iconset resource="qfrdrimagingfcs.qrc">
+             <normaloff>:/imaging_fcs/add_job.png</normaloff>:/imaging_fcs/add_job.png</iconset>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextBesideIcon</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnAddJobsThisCell">
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>35</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>read all files with this cell number with settings above and add jobs</string>
+           </property>
+           <property name="text">
+            <string>add all jobs this cell</string>
            </property>
            <property name="icon">
             <iconset resource="qfrdrimagingfcs.qrc">
@@ -2460,8 +2483,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>1234</width>
-           <height>188</height>
+           <width>1350</width>
+           <height>185</height>
           </rect>
          </property>
          <property name="sizePolicy">

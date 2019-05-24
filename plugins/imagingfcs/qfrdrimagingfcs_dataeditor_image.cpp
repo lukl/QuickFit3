@@ -1029,10 +1029,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     wpltImage->setLayout(lpltImage);
     pltImage=new QFImagePlotter(wpltImage);
     pltImage->setObjectName("pltImage");
-    pltImage->get_plotter()->set_plotLabel(tr("\\textbf{Parameter Image}"));
+    pltImage->get_plotter()->set_plotLabel(tr("\\textbf{Parameter 1}"));
     pltImage->connectTo(grpImage, cmbSelectionStyle);
 
-    //lpltImage->addWidget((labParamImage=new QLabel(tr("Parameter Image:"))));
     lpltImage->addWidget(pltImage, 1);
 
 
@@ -1062,7 +1061,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     pltParamImage2=new QFImagePlotter(wpltImage2);
     pltParamImage2->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltParamImage2->setObjectName("pltImage2");
-    pltParamImage2->get_plotter()->set_plotLabel(tr("\\textbf{\"Parameter Image 2\" Image}"));
+    pltParamImage2->get_plotter()->set_plotLabel(tr("\\textbf{Parameter 2}"));
     pltParamImage2->connectTo(grpImage2, cmbSelectionStyle);
     lpltImage2->addWidget(pltParamImage2, 1);
 
@@ -1115,7 +1114,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     plotterResid->getYAxis()->set_labelFontSize(11);
     plotterResid->getYAxis()->set_tickLabelFontSize(10);
     plotterResid->getYAxis()->set_minTicks(5);
-    plotter->getXAxis()->set_axisLabel("");
+    plotter->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));
     plotter->getYAxis()->set_axisLabel(tr("correlation function $g(\\tau)$"));
     plotter->getYAxis()->set_labelFontSize(11);
     plotter->getYAxis()->set_tickLabelFontSize(10);
@@ -4205,7 +4204,16 @@ void QFRDRImagingFCSImageEditor::replotData() {
     JKQTPdatastore* ds=plotter->getDatastore();
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
 
-    plotterResid->setVisible(chkDisplayResiduals->isChecked());
+    if (chkDisplayResiduals->isChecked()) {
+
+        plotterResid->setVisible(true);
+        plotter->getXAxis()->set_drawMode1(JKQTPCADMticks);
+    }
+    else {
+        plotterResid->setVisible(false);
+        plotter->getXAxis()->set_drawMode1(JKQTPCADMcomplete);
+    }
+
 
     if (!m) {
         plotter->clearGraphs();
@@ -8212,5 +8220,3 @@ void QFRDRImagingFCSImageEditor::copyCFFromFilesToTable(QList<QFRawDataRecord *>
         }
     }
 }
-
-
