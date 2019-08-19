@@ -1,0 +1,73 @@
+
+To compile it I'd recommend git (Version Manager), MSYS2 (linux console plus minimal tools) and Qt Creator plus Qt 5.x .
+
+
+- Install Git, MSYS2, QT (with some version of Qt 5.x) properly.
+
+    Make sure not to have any spaces in the used installation paths (so c:/program files/.. won't not work)
+
+
+- Clone Repo via Git (Recursive!!):
+
+    Open git bash in the directory where QuickFit3 should end up. Then command:
+
+    git clone --recursive -b rot-devel https://github.com/lukl/QuickFit3_rot/ <relative destination directory>
+
+
+- MSYS2: Upgrade tools and install basic develompent tools
+
+    Open MSYS2 console. Commands:
+
+    pacman -Syuu
+
+    pacman -S needed base_devel
+
+
+- Compile dependency libraries for QF3.
+
+    In MSYS2, go to QuickFit3lukl/extlibs
+
+    Then type command:
+
+    (sudo chmod +x build_dependencies.sh)
+
+    ./build_dependencies.sh
+
+    Some libs might not build, this is not always a problem.
+
+
+- Rename or copy corresponding configuration template in QF Folder quickfit.inc.windows->quickfit.inc
+
+
+- Open quickfit3.pro in qtcreator, configure and build.
+
+    Open qt creator, open quickfit3.pro
+
+    Click configure
+
+    Then choose projects (left) ->choose build configuration: Release, untick Shadow build, QT5.x
+
+    Build->Build all
+
+
+
+Linux
+
+
+- Install Git, QT, basic development tools
+
+(In ubuntu 16.04, compilation required the following packages: qtscript5dev, libpng, pkg-config, libblas-dev, liblapack-dev, boost)
+
+- Clone Repo via Git (Recursive!!) in terminal
+
+    git clone --recursive -b rot-devel https://github.com/lukl/QuickFit3_rot/ QuickFit3lukl
+
+- (sudo chmod +x build_dependencies.sh in extlibs)
+
+- run extlibs/build_dependencies.sh (some might not build, this is not always a problem)
+
+- Alter corresponding configuration template in QF Folder quickfit.inc.ubuntu->quickfit.inc, alter according to system configuration
+
+- Configure quickfit3.pro in qtcreator (Choose Release, No Shadow build, QT5.x)
+
+- Build all

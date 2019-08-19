@@ -1,30 +1,21 @@
 ================================================================================
 == Install a GCC and Qt                                                       ==
 ================================================================================
-1. install a current version of the GNU compiler (>4.4) and install Qt (5.x or
-   4.8.x ... although 4.7.x should also work.) You can check the
-   compiler and Qt versions, that have been used to build the current binary
-   release of QF3 in the Help|About menu entry (scroll down in the Info tab). It
-   is advised to use a modern MinGW gcc compiler and a recent Qt version!
+1. install a current version of the GNU compiler and install Qt ( tested on
+   5.x) You can check the compiler and Qt versions, that have been used to build
+   the current binary release of QF3 in the Help|About menu entry. It is advised
+   to use a modern MinGW gcc compiler and a recent Qt version!
 
 
    -- LINUX --------------------------------------------------------------------
-   On Linux: this can be done using your prefered distribution management (e.g.
-   Yast on SUSE). Make sure to also install the developer libraries for Qt, as
+   On Linux: this can be done using your prefered distribution management.
+   Make sure to also install the developer libraries for Qt, as
    you will need the link- and header-files!
-
-   -- MACOS X ------------------------------------------------------------------
-   On MacOS X you will have to install XCode first and then the Qt SDK. You can
-   then compile QuickFit using QtCreator, as described below. QF3 then compiles
-   with the clang installed by Apple along with XCode!
-   Note: You'll have to run XCode at least once, so the command line tools
-   (clang/gcc/...) are actually installed and activated after installing XCode
-   and before compiling QuickFit.
 
    -- WINDOWS ------------------------------------------------------------------
    On windows: You will need a current version of Qt and the MinGW gcc compiler.
    There are several options to achieve this:
-      1.1. You can download Qt 4.8.x and a QtCreator (including MinGW) from
+      1.1. You can download Qt and a QtCreator (including MinGW) from
                http://www.qt-project.org/
            This should work in most cases, but the compiler is a 32-bit version,
            so you can only create a 32-bit version of Qt.
@@ -43,20 +34,25 @@
                  with the Qt archives, before using the binaries!
 
 
-      Now you need to install MSys, which provides a bash and several standard
-      Linux/Unix tools:
-        You can get MSys 1.0.x from here:
-               http://downloads.sourceforge.net/mingw/MSYS-1.0.11.exe
-        This tool will give you a full unix bash on Windows and should work with
-        all MinGW/MinGW64 GCC compilers. SImply run the installer (usually I
-        install it into a subdirectory \MSys\ of the MinGW installation. Also
-        run the post-install steps. In these you need to answer "yes" you have a
-        GCC/MinGW installed and yes, you want to configure MSys now. Finally you
-        will have to give the full path to the MSys installation directory (the
-        one, in which bin, lib, includes, ... recide). Note, that here you have
-        to provide the path with slashed '/' instead of    backslashes '\'. So, if
-        MinGW is installed in C:\development\MinGW64\, you have to enter
-        C:/development/MinGW64/.
+	Now you need to install MSys/MSys2, which provides a bash and several
+	standard Linux/Unix tools.
+	This tool will give you a full unix bash on Windows and should work with
+	all MinGW/MinGW64 GCC compilers. SImply run the installer (usually I
+	install it into a subdirectory \MSys\ of the MinGW installation. Also
+	run the post-install steps. In these you need to answer "yes" you have a
+	GCC/MinGW installed and yes, you want to configure MSys now. Finally you
+	will have to give the full path to the MSys installation directory (the
+	one, in which bin, lib, includes, ... recide). Note, that here you have
+	to provide the path with slashed '/' instead of    backslashes '\'. So, if
+	MinGW is installed in C:\development\MinGW64\, you have to enter
+	C:/development/MinGW64/.
+	For building the dependencies, you will also need some basic development
+	tools in MSys. They can be installed in the MSys console:
+		pacman -Syuu
+		pacman -S--needed base-devel
+
+	We recommend also installing git as a version management software for
+	easier updates.
 
      Finally, you need to tell your windows system, where the Qt libs and tools
      can be found. To do this, you have to add its location to the system-wide
@@ -66,19 +62,28 @@
         set PATH=C:\development\Qt32-4.8.6\bin;%PATH%
      where you only have to change the Qt-path accordingly.
 
+   -- MACOS X ------------------------------------------------------------------
+   On MacOS X you will have to install XCode first and then the Qt SDK. You can
+   then compile QuickFit using QtCreator, as described below. QF3 then compiles
+   with the clang installed by Apple along with XCode!
+   Note: You'll have to run XCode at least once, so the command line tools
+   (clang/gcc/...) are actually installed and activated after installing XCode
+   and before compiling QuickFit.
+
 ================================================================================
 == Download/Unpack QuickFit Sources                                           ==
 ================================================================================
 2. The full sourcecode is available on GitHub:
-         https://github.com/jkriege2/QuickFit3.git
+         https://github.com/lukl/QuickFit3_rot/tree/rot-devel
    To set up the source code on your machine, you have two possibilities:
       (i) Download and unpack the source ZIP file
      (ii) [PREFERED]: Checkout the repository from GitHub (ensure to make a 
           "recursive" checkout, as the repository contains some other repositories 
           as submodules, which will  be cloned when giving the option --recursive):
-             git clone --recursive "https://github.com/jkriege2/QuickFit3.git" "./QuickFit3.git"
-          Now ensure that all submodules (all in the subfolder './extlibsb040' are
-          up to date. To do so, execute in the base directory of the repository:
+             git clone --recursive -b rot-devel https://github.com/lukl/QuickFit3_rot/ <destination directory>
+          Optional:
+	Update submodules (all in the subfolder './extlibsb040').
+          To do so, execute in the base directory of the repository:
               ./checkout_update_submodules.sh
           this script also switches all modules to their respective master-branch,
           which simplifies later submitting/pushing.
@@ -114,12 +119,10 @@ system!!!
        of your QuickFit source tree.
    3.2 run the shell script ./build_dependencies.sh, which will build
        the external libraries, needed to build QuickFit 3 (e.g. libtiff,GSL,...)
-
-       3.2.1 select "n" when asked if you want to keep the build directories,
+       3.2.1 depending on the number of processors in your computer, select the
+             appropriate number of threads to use for compile (typ. no of cores.)
+       3.2.2 select "n" when asked if you want to keep the build directories,
              as this is a DEBUG function.
-       3.2.2 depending on the number of processors in your computer, select the
-             appropriate number of threads to use for compile (2 on a DualCore,
-             4 on a QuadCore, ...)
        3.2.3 choose whether to use agressive optimizations (e.g. -O3 -msse ...)
              Typically you can answer this question with (y)es!
        3.2.4 Choose whether to optimized for the local machine (e.g. --march=native).
@@ -132,22 +135,23 @@ system!!!
                          necessary, as the clang-compiler of MacOS does not
                          understand the same command-line switches as GCC on
                          Linux/Windows.
-       3.2.5 On some system the script will ask you, whether position-independent
-             code should be produced. Find out, whether you need the -fPIC option
-             for your system (Linux: typically yes, Windows: no, MacOS: yes) and
-             answer accordingly with y or n.
-       3.2.6 If you want, you can use OpenMP to speed up some of the libraries.
+       3.2.5 If you want, you can use OpenMP to speed up some of the libraries.
              If you want that, answer this question with yes.     [default: "n"]
              We usually don't use OpenMP, as QF3 typically executes fits etc.
              already in parallel, so an addition parallelization by OpenMP will
              not lead to a significant speedup. Although: Some plugins might
              really profit from this! Note that OpenMP often add additional de-
-             pendencies on external libraries to the binaryies!!!
-       3.2.7 copy Qt DLLs:
+             pendencies on external libraries to the binaries!!!
+       3.2.6 On some system the script will ask you, whether position-independent
+             code should be produced. Find out, whether you need the -fPIC option
+             for your system (Linux: typically yes, Windows: no, MacOS: yes) and
+             answer accordingly with y or n.
+       3.2.7 Windows: copy Qt DLLs:
                  WINDOWS: NO (best do it by hand, see below!)
                  MacOS:   NO
                  Linux:   NO
-       3.2.8 build these libraries:
+       3.2.8 Should all other libraries be built without asking:
+             Try yes by default.
 
 library       | Linux               | Windows                            | MacOS X
 ---------------+---------------------+----------------------------------------------------------------

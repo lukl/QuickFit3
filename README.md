@@ -29,7 +29,9 @@ Older versions and windows binaries:
 	 * a bash environment (use MSys2 for MinGW on Windows!)
 	 * a current Qt version for your compiler (we tried some Qt 5.x versions)
 	 * QTCreator may be used
- 3. Follow the instructions in https://github.com/lukl/QuickFit3_rot/blob/rot-devel/basic_documentation/compile_quickfit3.txt
+ 3. Instructions can be found here:
+	 * https://github.com/lukl/QuickFit3_rot/blob/rot-devel/basic_documentation/compile_quickfit3short.txt
+	 * https://github.com/lukl/QuickFit3_rot/blob/rot-devel/basic_documentation/compile_quickfit3.txt
 
 
 
