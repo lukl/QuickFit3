@@ -278,7 +278,10 @@ void QFExtensionCoboltLaser::setExternalModulation(unsigned int lightSource, boo
         QMutex* mutex=ports.getMutex(sources[lightSource].port);
         QMutexLocker locker(mutex);
         if (sources[lightSource].type==cltMLD6) {
-            if (OnOff) serial->sendCommand(QString("em"));
+            if (OnOff) {
+                serial->sendCommand(QString("slmp ")+QString::number(set_power));
+                serial->sendCommand(QString("em"));
+            }
             else serial ->sendCommand(QString("cp"));
         }
     }
